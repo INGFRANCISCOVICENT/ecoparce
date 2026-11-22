@@ -31,14 +31,14 @@ def auditar_fallo(sender, credentials, request=None, **kwargs):
 def mfa_activada(sender, request, user, authenticator, **kwargs):
     # Quien acaba de activar TOTP demostró poseer el segundo factor en esta sesión.
     record_authentication(request, user, 'mfa', id=authenticator.pk, type=authenticator.type)
-    evento('mfa_activada', request, user, tipo=authenticator.type)
+    evento('mfa_activada', request, user, metodo=authenticator.type)
     if user.es_personal:
         RegistroAuditoria.registrar(user, Accion.ACTIVAR, user, f'Activó la verificación en dos pasos ({authenticator.type})')
 
 
 @receiver(authenticator_removed)
 def mfa_desactivada(sender, request, user, authenticator, **kwargs):
-    evento('mfa_desactivada', request, user, tipo=authenticator.type)
+    evento('mfa_desactivada', request, user, metodo=authenticator.type)
     if user.es_personal:
         RegistroAuditoria.registrar(user, Accion.DESACTIVAR, user, f'Desactivó la verificación en dos pasos ({authenticator.type})')
 
