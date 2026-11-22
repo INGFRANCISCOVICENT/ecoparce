@@ -1,0 +1,66 @@
+{% extends 'base.html' %}{% load static eco %}
+{% block titulo %}Trivia por niveles{% endblock %}
+{% block contenido %}
+<section class="center" style="padding-top:6px">
+  <img src="{% static 'img/logo-256.png' %}" alt="Escarlata, guacamaya roja mascota de EcoParce (ilustración asistida con IA)" style="width:124px;height:124px;border-radius:50%;box-shadow:var(--sh-sm)">
+  <h1 style="margin-top:8px">Trivia de Escarlata</h1>
+  <p class="mut">Cada nivel sube la dificultad y el puntaje exigido. Las insignias se otorgan solo según tus puntos.</p>
+  <div class="row" style="justify-content:center;gap:8px;margin-top:6px;flex-wrap:wrap">
+    <span class="tag">Puntos acumulados: <strong>{{ puntos_totales }}</strong></span>
+    <span class="tag">Insignias: <strong>{{ total_obtenidas }}/{{ insignias|length }}</strong></span>
+  </div>
+</section>
+
+{% if partida and not partida.terminada and partida.respondidas %}
+<a class="btn p full" style="margin-top:14px;margin-bottom:14px" href="{% url 'trivia:jugar' %}">{% icono 'game' 20 '#fff' %}Seguir mi partida · Nivel {{ partida.nivel }} ({{ partida.respondidas }}/{{ partida.total_preguntas }})</a>
+{% endif %}
+
+{% if hay_preguntas %}
+<h2>Elige tu nivel</h2>
+<div class="lista">
+  {% for n in niveles %}
+  <div class="card nivel-card {% if n.desbloqueado %}desbloqueado{% else %}bloqueado{% endif %}">
+    <div class="row top-al">
+      <span class="ic" style="background:{% if n.superado %}var(--gl){% elif n.desbloqueado %}var(--yl){% else %}#ECEFF1{% endif %}">
+        {% if n.desbloqueado %}{% icono n.icono 24 '#14532D' %}{% else %}{% icono 'lock' 22 '#4B5A51' %}{% endif %}
+      </span>
+      <div style="flex:1">
+        <div class="row" style="gap:8px;flex-wrap:wrap">
+          <strong>Nivel {{ n.numero }} · {{ n.nombre }}</strong>
+          <span class="tag">Dificultad: {{ n.dificultad_etiqueta }}</span>
+          {% if n.superado %}<span class="st s-pub">Superado{% if n.mejor is not None %} ({{ n.mejor }}/5){% endif %}</span>
+          {% elif n.mejor is not None %}<span class="st s-rev">Mejor: {{ n.mejor }}/5 (meta {{ n.meta }}/5)</span>
+          {% elif not n.desbloqueado %}<span class="st s-bor">Bloqueado</span>{% endif %}
+        </div>
+        <div class="small mut" style="margin-top:2px">{{ n.subtitulo }}</div>
+        {% if not n.desbloqueado %}<div class="xs mut" style="margin-top:4px">{{ n.requisito }}</div>{% endif %}
+      </div>
+    </div>
+    {% if n.desbloqueado %}
+    <form method="post" action="{% url 'trivia:nueva' %}" style="margin-top:12px">{% csrf_token %}
+      <input type="hidden" name="nivel" value="{{ n.numero }}">
+      <button class="btn {% if n.superado %}o{% else %}p{% endif %} sm full" type="submit">{% icono 'game' 18 %}Jugar Nivel {{ n.numero }}</button>
+    </form>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="aviso info" style="margin-top:16px">{% icono 'info' 20 %}<span>Estamos preparando las preguntas. ¡Vuelve pronto!</span></div>
+{% endif %}
+
+<h2>Insignias ecológicas ({{ total_obtenidas }}/{{ insignias|length }})</h2>
+<p class="small mut" style="margin-top:-4px">{% if user.is_authenticated %}Tus insignias se guardan en tu cuenta.{% else %}Juega sin cuenta o <a href="{% url 'account_login' %}?next={% url 'trivia:inicio' %}">inicia sesión</a> para guardar tus insignias permanentemente.{% endif %}</p>
+<div class="grid insignias-grid">
+  {% for ins in insignias %}
+  <div class="insignia {% if ins.obtenida %}obtenida{% else %}bloqueada{% endif %}">
+    <span class="insignia-ic" style="background:{{ ins.fondo }};color:{{ ins.color }}">{% icono ins.icono 22 ins.color %}</span>
+    <div>
+      <strong>{{ ins.nombre }}</strong>
+      <div class="xs mut">{{ ins.descripcion }}</div>
+      {% if ins.obtenida %}<span class="xs" style="color:var(--gd);font-weight:800">Desbloqueada</span>{% else %}<span class="xs mut">Bloqueada</span>{% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

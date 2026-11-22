@@ -1,0 +1,17 @@
+{% extends 'panel/base.html' %}{% load eco %}
+{% block titulo %}Administradores{% endblock %}{% block encabezado %}Administradores{% endblock %}
+{% block contenido %}
+<div class="filtros"><span class="mut small">Solo el administrador del sistema autoriza administradores, asigna roles y desactiva cuentas (RF-15). Hay {{ visitantes }} visitante{{ visitantes|pluralize }} con cuenta.</span>
+<a class="btn p sm ml" href="{% url 'cuentas:usuario_crear' %}">{% icono 'plus' 18 '#fff' %}Nuevo administrador</a></div>
+<section class="card tabla"><table>
+<tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Google</th><th>2FA</th><th>Estado</th><th>Último acceso</th><th></th></tr>
+{% for u in usuarios %}
+<tr><td><strong>{{ u.nombre }}</strong>{% if u == user %} <span class="tag">tú</span>{% endif %}</td><td>{{ u.correo }}</td><td>{{ u.get_rol_display }}</td>
+<td>{% if u.socialaccount_set.all %}<span class="st s-pub">Sí</span>{% else %}<span class="st s-bor">No</span>{% endif %}</td>
+<td>{% if u.pk in con_mfa %}<span class="st s-pub">Activa</span>{% else %}<span class="st s-rev">Pendiente</span>{% endif %}</td>
+<td>{% if u.is_active %}<span class="st s-pub">Activa</span>{% else %}<span class="st s-bor">Desactivada</span>{% endif %}</td>
+<td class="small mut">{{ u.last_login|date:"j M Y, H:i"|default:"Nunca" }}</td>
+<td class="right"><a href="{% url 'cuentas:usuario_editar' u.pk %}" aria-label="Editar">{% icono 'edit' 18 '#1E7A46' %}</a></td></tr>
+{% endfor %}
+</table></section>
+{% endblock %}

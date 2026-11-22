@@ -1,0 +1,11 @@
+from django.urls import path
+
+from . import views
+
+app_name = 'buscador'
+urlpatterns = [
+    path('buscar/', views.buscar, name='buscar'),
+    path('sugerencias/', views.sugerir, name='sugerir'),
+    path('escanear/', views.escanear, name='escanear'),
+    path('escanear/producto/<str:codigo>/', views.producto, name='producto'),
+]

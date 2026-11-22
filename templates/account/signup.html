@@ -1,0 +1,25 @@
+{% extends "account/base_entrance.html" %}{% load socialaccount eco %}
+{% block head_title %}Crear cuenta{% endblock head_title %}
+{% block content %}
+<h1 class="center" style="font-size:22px;margin-top:12px">Crea tu cuenta</h1>
+{% if GOOGLE_ACTIVO %}<form method="post" action="{% provider_login_url 'google' %}" class="acciones">{% csrf_token %}
+  <button class="btn btn-google full" type="submit">{% icono 'shield' 20 '#1F4FA3' %}Registrarme con Google</button>
+</form>{% else %}<div class="acciones"><button class="btn btn-google full" type="button" disabled>{% icono 'shield' 20 '#1F4FA3' %}Continuar con Google</button></div>
+<p class="xs mut center" style="margin-top:6px">El ingreso con Google se activa cuando el administrador configure las credenciales de Google (ver docs/GOOGLE_Y_CORREO.md).</p>{% endif %}
+<div class="separador"><span>o con tu correo</span></div>
+<form method="post" action="{% url 'account_signup' %}" novalidate>{% csrf_token %}
+  {{ redirect_field }}
+  {% if form.non_field_errors %}<div class="aviso error">{{ form.non_field_errors.0 }}</div>{% endif %}
+  {% include 'includes/campo.html' with campo=form.nombre %}
+  {% include 'includes/campo.html' with campo=form.email %}
+  {% include 'includes/campo.html' with campo=form.password1 %}
+  {% include 'includes/campo.html' with campo=form.password2 %}
+  {% include 'includes/campo.html' with campo=form.acepta_datos %}
+  <div class="xs" style="margin:-6px 0 6px 28px"><a href="{% url 'core:terminos' %}" target="_blank" rel="noopener noreferrer">Términos y condiciones</a> · <a href="{% url 'core:privacidad' %}" target="_blank" rel="noopener noreferrer">Política de privacidad</a></div>
+  {% include 'includes/campo.html' with campo=form.mayor_edad %}
+  {% include 'includes/campo.html' with campo=form.acepta_marketing %}
+  <button class="btn p full" style="margin-top:14px" type="submit">Crear cuenta</button>
+  <p class="xs mut center" style="margin-top:10px">Te enviaremos un código a tu correo para verificar que es tuyo.</p>
+</form>
+<p class="center small" style="margin-top:12px">¿Ya tienes cuenta? <a href="{% url 'account_login' %}">Ingresa</a></p>
+{% endblock content %}

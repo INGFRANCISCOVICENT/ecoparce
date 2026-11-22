@@ -1,0 +1,19 @@
+{% extends 'panel/base.html' %}{% load eco %}
+{% block titulo %}Resumen{% endblock %}{% block encabezado %}Resumen{% endblock %}
+{% block contenido %}
+<div class="row" style="margin:-8px 0 14px;gap:8px"><span class="tag">Últimos 7 días · {{ inicio|date:"j M" }} a {{ fin|date:"j M" }}</span></div>
+<div class="kpis">
+  <div class="kpi"><small>Lecturas de QR</small><div>{{ escaneos }}</div><em>en {{ codigos_activos }} código{{ codigos_activos|pluralize }} activo{{ codigos_activos|pluralize }}</em></div>
+  <div class="kpi"><small>Búsquedas</small><div>{{ busquedas }}</div><em>{{ pct_encontrado }} % con resultado</em></div>
+  <div class="kpi"><small>Partidas de trivia</small><div>{{ partidas }}</div><em>{% if puntaje_medio is not None %}puntaje medio {{ puntaje_medio|floatformat:1 }} de 5{% else %}sin partidas terminadas{% endif %}</em></div>
+  <a class="kpi {% if pend_guias or pend_residuos %}alerta{% endif %}" href="{% url 'panel_contenidos:revision' %}"><small>Pendientes de revisión</small><div>{{ pend_guias|add:pend_residuos }}</div><em>{{ pend_guias }} guía{{ pend_guias|pluralize }} · {{ pend_residuos }} residuo{{ pend_residuos|pluralize }}</em></a>
+</div>
+<div class="dos" style="margin-top:14px">
+  <section class="card"><strong>Lecturas de QR por día</strong>{% include 'estadisticas/_barras.html' with serie=serie_escaneos titulo='Lecturas de QR por día' %}</section>
+  <section class="card"><strong>Búsquedas sin resultado</strong>
+    <table style="margin-top:6px"><tr><th>Término</th><th class="right">Veces</th></tr>
+    {% for r in sin_resultado %}<tr><td>{{ r.termino }}</td><td class="right">{{ r.veces }}</td></tr>{% empty %}<tr><td colspan="2" class="mut">Ninguna esta semana.</td></tr>{% endfor %}</table>
+    <p class="xs mut" style="margin:10px 0 0">Úsalas para decidir qué residuos agregar.</p></section>
+</div>
+<p class="xs mut" style="margin-top:14px">Contenido publicado: {{ publicadas }} guía{{ publicadas|pluralize }} y {{ residuos_publicados }} residuo{{ residuos_publicados|pluralize }}. Los datos de uso son anónimos (RN-08).</p>
+{% endblock %}

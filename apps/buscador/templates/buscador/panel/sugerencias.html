@@ -1,0 +1,17 @@
+{% extends 'panel/base.html' %}{% load eco %}
+{% block titulo %}Sugerencias{% endblock %}{% block encabezado %}Sugerencias de residuos{% endblock %}
+{% block contenido %}
+<div class="filtros">{% for v, t in estados %}<a class="tag {% if v == estado %}on{% endif %}" href="?estado={{ v }}">{{ t }}</a>{% endfor %}
+<span class="small mut ml">Residuos que los visitantes buscaron y no encontraron (RF-13).</span></div>
+<section class="card tabla"><table>
+<tr><th>Residuo sugerido</th><th>Comentario</th><th>Fecha</th>{% if estado == 'PENDIENTE' %}<th></th>{% else %}<th>Atendida por</th>{% endif %}</tr>
+{% for s in sugerencias %}
+<tr><td><strong>{{ s.termino }}</strong></td><td class="small">{{ s.comentario|default:"—" }}</td><td class="small mut" style="white-space:nowrap">{{ s.fecha_hora|date:"j M Y, H:i" }}</td>
+{% if estado == 'PENDIENTE' %}<td class="right"><form method="post" action="{% url 'panel_buscador:atender' s.pk %}" class="row" style="justify-content:flex-end;gap:6px">{% csrf_token %}
+<button class="btn p sm" name="accion" value="crear" type="submit">{% icono 'plus' 16 '#fff' %}Crear residuo</button>
+<button class="btn o sm" name="accion" value="atender" type="submit">Atendida</button>
+<button class="btn r sm" name="accion" value="descartar" type="submit">Descartar</button></form></td>
+{% else %}<td class="small">{{ s.atendida_por.nombre_corto|default:"—" }} · {{ s.atendida_en|date:"j M" }}</td>{% endif %}</tr>
+{% empty %}<tr><td colspan="4" class="mut">No hay sugerencias en este estado.</td></tr>{% endfor %}
+</table></section>
+{% endblock %}

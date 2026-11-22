@@ -1,0 +1,18 @@
+{% extends 'panel/base.html' %}
+{% block titulo %}Auditoría{% endblock %}{% block encabezado %}Auditoría{% endblock %}
+{% block contenido %}
+<form class="filtros" method="get"><select name="accion" aria-label="Acción"><option value="">Todas las acciones</option>
+{% for v, t in acciones %}<option value="{{ v }}" {% if v == accion %}selected{% endif %}>{{ t }}</option>{% endfor %}</select>
+<button class="btn o sm" type="submit">Filtrar</button><span class="small mut ml">Registro inmutable de las acciones de los administradores.</span></form>
+<section class="card tabla"><table>
+<tr><th>Fecha y hora</th><th>Administrador</th><th>Acción</th><th>Elemento</th><th>Detalle</th></tr>
+{% for r in pagina %}
+<tr><td class="small" style="white-space:nowrap">{{ r.fecha_hora|date:"j M Y, H:i" }}</td><td>{{ r.usuario.nombre_corto|default:"—" }}</td><td><span class="tag">{{ r.get_accion_display }}</span></td>
+<td class="small mut">{{ r.entidad }}{% if r.entidad_id %} #{{ r.entidad_id }}{% endif %}</td><td class="small">{{ r.detalle }}</td></tr>
+{% empty %}<tr><td colspan="5" class="mut">Sin registros.</td></tr>{% endfor %}
+</table></section>
+{% if pagina.has_other_pages %}<div class="row" style="margin-top:12px">
+{% if pagina.has_previous %}<a class="btn o sm" href="?accion={{ accion }}&p={{ pagina.previous_page_number }}">Anterior</a>{% endif %}
+<span class="small mut">Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}</span>
+{% if pagina.has_next %}<a class="btn o sm" href="?accion={{ accion }}&p={{ pagina.next_page_number }}">Siguiente</a>{% endif %}</div>{% endif %}
+{% endblock %}

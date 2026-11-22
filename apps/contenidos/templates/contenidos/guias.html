@@ -1,0 +1,24 @@
+{% extends 'base.html' %}{% load eco %}
+{% block titulo %}Guías{% endblock %}
+{% block contenido %}
+<h1>Guías</h1>
+<p class="mut">Todo lo que necesitas para separar en la fuente y manejar bien la basura en casa.</p>
+{% for titulo, lista in secciones %}{% if lista %}
+<h2>{{ titulo }}</h2>
+<div class="lista">
+{% for g in lista %}
+  <a class="card row" href="{{ g.get_absolute_url }}">
+    {% if g.contenedor %}<span class="swatch chip-{{ g.contenedor.codigo }}" style="width:44px;height:44px;border-radius:12px">{% if g.contenedor.codigo == 'POSCONSUMO' %}{% icono 'battery' 22 '#fff' %}{% endif %}</span>
+    {% else %}<span class="ic" style="background:var(--gl)">{% icono 'leaf' 24 '#14532D' %}</span>{% endif %}
+    <span><strong>{{ g.titulo }}</strong><br><span class="small mut">{{ g.resumen }}</span></span>
+    <span class="ml">{% icono 'arrow' 22 '#1E7A46' %}</span>
+  </a>
+{% endfor %}
+</div>
+{% endif %}{% empty %}{% endfor %}
+<a class="card row" href="{% url 'contenidos:manejo' %}" style="margin-top:14px;background:var(--rl);border-color:#F2C4BE">
+  <span class="ic" style="background:var(--r)">{% icono 'battery' 24 '#fff' %}</span>
+  <span><strong>Residuos especiales y puntos de entrega</strong><br><span class="small mut">Pilas, aceite, medicamentos, electrónicos y bombillos</span></span>
+  <span class="ml">{% icono 'arrow' 22 '#1E7A46' %}</span>
+</a>
+{% endblock %}

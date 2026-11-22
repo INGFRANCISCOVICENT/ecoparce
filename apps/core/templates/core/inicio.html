@@ -1,0 +1,45 @@
+{% extends 'base.html' %}{% load static eco %}
+{% block titulo %}Inicio{% endblock %}
+{% block contenido %}
+<section class="hero">
+  <img src="{% static 'img/logo-256.png' %}" alt="Escarlata, la guacamaya roja de EcoParce (ilustración asistida con IA)">
+  <div><h1>¡Hola, parce!<br>Soy Escarlata.</h1><p>Te ayudo a separar bien. Vuela limpio.</p><span class="ai-etiqueta" title="Ilustración creada con asistencia de herramientas de IA">Ilustración asistida con IA</span></div>
+</section>
+<form class="search" action="{% url 'buscador:buscar' %}" method="get" role="search">
+  {% icono 'search' 24 '#1E7A46' %}
+  <label class="sr" for="q">¿Qué vas a botar?</label>
+  <input id="q" name="q" type="search" placeholder="¿Qué vas a botar?" maxlength="100" autocomplete="off" required>
+  <button type="submit">Buscar</button>
+</form>
+<div class="grid" style="margin-top:12px">
+  <a class="btn p" href="{% url 'buscador:escanear' %}">{% icono 'qr' 20 '#fff' %}Escanear producto</a>
+  <a class="btn o" href="{% url 'contenidos:puntos' %}">{% icono 'pin' 20 '#1E7A46' %}Puntos cercanos</a>
+</div>
+<h2>¿En qué bolsa va?</h2>
+<div class="grid g4">
+  {% for c, guia in bolsas %}
+  <a class="bag bag-{{ c.codigo }}" href="{% if guia %}{{ guia.get_absolute_url }}{% else %}{% url 'contenidos:guias' %}{% endif %}">
+    <span class="chip chip-{{ c.codigo }}"></span><strong>{{ c.nombre }}</strong><span>{{ c.descripcion }}</span>
+  </a>
+  {% endfor %}
+  <a class="bag especial" href="{% url 'contenidos:manejo' %}">
+    <span class="chip chip-POSCONSUMO">{% icono 'battery' 20 '#fff' %}</span><strong>Residuos especiales</strong>
+    <span>Pilas, aceite, medicamentos: a un punto de entrega</span>
+  </a>
+</div>
+<h2>Aprende jugando</h2>
+<a class="card row" href="{% url 'trivia:inicio' %}">
+  <span class="ic" style="background:var(--yl)">{% icono 'game' 26 '#7A5A00' %}</span>
+  <span><strong>Trivia de Escarlata</strong><br><span class="small mut">5 preguntas · 2 minutos</span></span>
+  <span class="ml">{% icono 'arrow' 22 '#1E7A46' %}</span>
+</a>
+{% if manejo %}
+<h2>Manejo de basuras</h2>
+<div class="lista">
+  {% for g in manejo %}
+  <a class="card row" href="{{ g.get_absolute_url }}"><span class="ic" style="background:var(--gl)">{% icono 'leaf' 24 '#14532D' %}</span>
+    <span><strong>{{ g.titulo }}</strong><br><span class="small mut">{{ g.resumen }}</span></span><span class="ml">{% icono 'arrow' 22 '#1E7A46' %}</span></a>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

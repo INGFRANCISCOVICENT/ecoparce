@@ -1,0 +1,26 @@
+{% extends 'panel/base.html' %}{% load eco %}
+{% block titulo %}{{ titulo }}{% endblock %}{% block encabezado %}{{ titulo }}{% endblock %}
+{% block contenido %}
+<div class="dos">
+<section class="card"><form method="post" novalidate>{% csrf_token %}
+{% for campo in form %}{% include 'includes/campo.html' %}{% endfor %}
+{% if form.non_field_errors %}<div class="aviso error" style="margin-top:12px">{{ form.non_field_errors.0 }}</div>{% endif %}
+<div class="row" style="margin-top:16px"><button class="btn p" type="submit">Guardar</button><a class="btn o" href="{% url 'cuentas:usuarios' %}">Cancelar</a></div>
+</form></section>
+{% if objeto %}
+<section class="card small"><strong>Acceso</strong>
+<p style="margin-top:8px">Correo: {{ objeto.correo }}<br>Google: {% if google %}conectado{% else %}no conectado{% endif %}<br>
+Verificación en dos pasos: {% if tiene_mfa %}activa{% else %}pendiente{% endif %}<br>Último acceso: {{ objeto.last_login|date:"j M Y, H:i"|default:"nunca" }}</p>
+{% if tiene_mfa and objeto != user %}
+<p class="mut">Si perdió el teléfono y sus códigos de recuperación, restablece la verificación: deberá configurarla de nuevo al entrar. Queda registrado en la auditoría.</p>
+<form method="post" data-confirmar="¿Restablecer la verificación en dos pasos de {{ objeto.nombre }}?">{% csrf_token %}<button class="btn r" type="submit" name="restablecer_mfa" value="1">{% icono 'refresh' 18 '#C81E1E' %}Restablecer verificación en dos pasos</button></form>
+{% endif %}
+<p class="xs mut" style="margin-top:12px">Al desactivar la cuenta o cambiar el rol se cierran de inmediato todas sus sesiones.</p>
+</section>
+{% else %}
+<section class="card small"><strong>Cómo entra el nuevo administrador</strong>
+<p style="margin-top:8px">1. Ingresa con su cuenta de Google del mismo correo (o crea una contraseña con «¿Olvidaste tu contraseña?»).<br>2. Al abrir el panel, activa la verificación en dos pasos con una app como Google Authenticator.<br>3. Guarda sus códigos de recuperación.</p>
+<p><strong>Administrador de contenido:</strong> guías, residuos, puntos, preguntas y sugerencias.<br><strong>Administrador del sistema:</strong> además QR, estadísticas, administradores y eliminación de contenido retirado.</p></section>
+{% endif %}
+</div>
+{% endblock %}

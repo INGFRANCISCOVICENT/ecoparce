@@ -1,0 +1,72 @@
+{% extends 'base.html' %}{% load eco %}
+{% block titulo %}Política de privacidad{% endblock %}
+{% block contenido %}
+<div class="crumb"><a href="{% url 'core:inicio' %}">Inicio</a> › Privacidad</div>
+<h1>Política de privacidad y tratamiento de datos</h1>
+<p class="xs mut">Versión 2026-11 · Ley 1581 de 2012 y Decreto 1074 de 2015 (Colombia)</p>
+<div class="card prose">
+<p><strong>Responsable y contacto.</strong> Equipo del proyecto EcoParce (Politécnico Internacional, curso Calidad de Software). Sitio web: <strong>{{ SITE_URL }}</strong>.<br>
+• Soporte general: <strong>soporte@ecoparce.com.co</strong><br>
+• Privacidad y datos personales: <strong>privacidad@ecoparce.com.co</strong><br>
+• Derechos de autor: <strong>derechos@ecoparce.com.co</strong></p>
+
+<h2>1. Principio de minimización (solo pedimos lo necesario)</h2>
+<p><strong>Uso sin cuenta:</strong> puedes leer todas las guías, buscar residuos, escanear empaques, ver puntos posconsumo y jugar la trivia sin registrarte. En ese modo no pedimos nombre, teléfono, dirección ni guardamos tu IP. Solo registramos de forma anónima la fecha y tipo de dispositivo en lecturas QR, las palabras buscadas y los puntajes de trivia.</p>
+<p><strong>Cuenta opcional:</strong> si decides crear una cuenta (con correo o con Google), pedimos únicamente:</p>
+<ul>
+  <li><strong>Nombre y correo electrónico</strong>, para identificarte y enviarte códigos de verificación y alertas de seguridad.</li>
+  <li><strong>Contraseña cifrada con Argon2id</strong> (solo si te registras con correo; nunca la vemos en texto claro).</li>
+  <li><strong>Identificador único de Google</strong> (si entras con Google; no accedemos a tu contraseña, contactos ni correos).</li>
+  <li><strong>Progreso de trivia, niveles, insignias y sugerencias</strong> hechas con tu sesión activa.</li>
+  <li><strong>Registro de consentimiento</strong>: quién aceptó, qué versión de los términos y la política aceptó, si confirmó permiso parental y si autorizó novedades por correo, junto con la fecha y hora exacta.</li>
+</ul>
+
+<h2>2. Permiso de padres o acudientes (menores de edad)</h2>
+<p>El uso sin cuenta es libre y seguro para todas las edades. Para crear una cuenta personal debes ser mayor de 14 años o contar con la <strong>autorización expresa de tu madre, padre o acudiente</strong>, confirmada mediante una casilla sin marcar previamente. Si eres padre, madre o acudiente y deseas consultar o eliminar la cuenta de un menor, escríbenos a <strong>privacidad@ecoparce.com.co</strong> y atenderemos tu solicitud de forma prioritaria.</p>
+
+<h2>3. Comunicaciones y marketing (permiso aparte y baja sencilla)</h2>
+<p>Nunca enviamos publicidad sin tu autorización. La casilla para recibir novedades educativas es <strong>opcional, independiente y aparece sin marcar</strong>. Puedes darte de baja en cualquier momento desde <a href="{% url 'cuentas:comunicaciones' %}">Preferencias de comunicaciones</a> o desde el enlace de baja incluido en nuestros correos. Los correos transaccionales (código de verificación o alertas de seguridad) solo se envían cuando realizas una acción en tu cuenta.</p>
+
+<h2>4. Cuánto tiempo guardamos los datos</h2>
+<div class="tabla" style="padding:0;margin:8px 0 12px">
+<table>
+  <thead><tr><th>Tipo de dato</th><th>Tiempo de conservación</th><th>Al vencer o cancelar</th></tr></thead>
+  <tbody>
+    <tr><td>Cuenta personal (nombre, correo, credenciales, insignias)</td><td>Mientras la cuenta permanezca activa</td><td>Eliminación inmediata al borrar la cuenta</td></tr>
+    <tr><td>Registro de aceptación de términos y privacidad</td><td>Mientras la cuenta esté activa (o plazo legal aplicable)</td><td>Se suprime al eliminar la cuenta</td></tr>
+    <tr><td>Registros anónimos de uso (búsquedas y lecturas QR)</td><td>Máximo 24 meses</td><td>Depuración automática mensual</td></tr>
+    <tr><td>Auditoría de acciones administrativas</td><td>24 meses</td><td>Conservación de trazabilidad sin datos de visitantes</td></tr>
+    <tr><td>Cámara del escáner y ubicación para puntos cercanos</td><td>0 segundos en el servidor</td><td>Se procesan solo en tu navegador; nunca se envían</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>5. Proveedores que procesan datos y acuerdos (DPA)</h2>
+<p>Publicamos con total transparencia los proveedores que intervienen en la operación de EcoParce. Con cada encargado del tratamiento aplicable se rigen acuerdos o cláusulas contractuales de protección de datos (DPA) limitando el uso exclusivamente a prestar el servicio:</p>
+<div class="tabla" style="padding:0;margin:8px 0 12px">
+<table>
+  <thead><tr><th>Proveedor</th><th>Finalidad</th><th>Datos que recibe</th></tr></thead>
+  <tbody>
+    <tr><td>PythonAnywhere (Anaconda, Inc.)</td><td>Alojamiento web y base de datos en producción</td><td>Datos almacenados en la base de datos bajo HTTPS</td></tr>
+    <tr><td>Google LLC (OpenID Connect)</td><td>Inicio de sesión opcional con Google</td><td>Solo si eliges «Continuar con Google» (correo y nombre verificados)</td></tr>
+    <tr><td>Proveedor SMTP transaccional (p. ej. Resend)</td><td>Envío de códigos de verificación y alertas</td><td>Dirección de correo y mensaje transaccional</td></tr>
+    <tr><td>OpenStreetMap (OSMF)</td><td>Imágenes del mapa en /puntos/</td><td>Solo si aceptas cookies/recursos externos o pulsas cargar mapa</td></tr>
+    <tr><td>Open Food Facts (ODbL)</td><td>Consulta de empaque por código de barras</td><td>Solo el número del código de barras desde el servidor (sin datos del usuario)</td></tr>
+    <tr><td>Secretaría Distrital de Ambiente (Bogotá)</td><td>Sincronización periódica de puntos oficiales</td><td>Ningún dato del usuario (descarga de datos abiertos desde el servidor)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>6. Cookies, SDKs y bloqueo de rastreadores</h2>
+<p>EcoParce <strong>no incluye SDKs de publicidad, ni píxeles de redes sociales, ni analítica invasiva de terceros</strong> (consulta nuestra <a href="{% url 'core:licencias' %}#auditoria-sdks">auditoría de SDKs y rastreo</a>). Usamos cookies técnicas estrictamente necesarias (sesión y protección CSRF). Cualquier recurso externo opcional (como la carga automática de mapas de OpenStreetMap) permanece <strong>bloqueado hasta que aceptes las cookies</strong> desde el aviso de cookies o desde «Preferencias de cookies» en el pie de página.</p>
+
+<h2>7. Transparencia sobre contenido asistido con IA</h2>
+<p>Las ilustraciones de nuestra mascota Escarlata y ciertos apoyos gráficos fueron creados o perfeccionados con asistencia de herramientas de inteligencia artificial y revisados por el equipo humano. Los textos normativos se basan exclusivamente en fuentes oficiales (Resolución 2184 de 2019 y datos abiertos de la SDA) y pasan por revisión humana obligatoria (RN-03).</p>
+
+<h2>8. Tus derechos (descargar y borrar tus datos)</h2>
+<p>Puedes conocer, actualizar, rectificar, descargar y suprimir tus datos en cualquier momento. Desde <a href="{% url 'cuentas:mi_cuenta' %}">Mi cuenta</a> puedes descargar una copia completa en formato JSON y <strong>eliminar tu cuenta con la misma facilidad con la que la creaste</strong>. Atendemos consultas en máximo 10 días hábiles y reclamos en máximo 15 días hábiles. Si no quedas conforme, puedes acudir a la Superintendencia de Industria y Comercio (SIC).</p>
+
+<h2>9. Seguridad realista y honesta</h2>
+<p>Aplicamos buenas prácticas verificables: HTTPS, Argon2id, verificación de correo por código, 2FA obligatoria para administradores, cabeceras CSP estrictas y auditoría interna. <strong>No afirmamos contar con certificaciones externas como SOC 2 o ISO 27001</strong> que este proyecto académico no posee. Para reportar vulnerabilidades, consulta <a href="/.well-known/security.txt">security.txt</a>.</p>
+</div>
+{% endblock %}

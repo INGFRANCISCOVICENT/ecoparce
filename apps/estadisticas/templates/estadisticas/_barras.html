@@ -1,0 +1,2 @@
+<div class="barras" role="img" aria-label="{{ titulo }}">{% for s in serie %}<div class="c" title="{{ s.fecha|date:'j M' }}: {{ s.valor }}">{% if serie|length <= 31 %}<span>{{ s.valor }}</span>{% endif %}<i style="height:{{ s.alto }}px"></i></div>{% endfor %}</div>
+<div class="ejes">{% for s in serie %}<span>{% if serie|length <= 14 or forloop.counter0|divisibleby:7 %}{{ s.etiqueta }}{% endif %}</span>{% endfor %}</div>

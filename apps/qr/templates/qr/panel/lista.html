@@ -1,0 +1,37 @@
+{% extends 'panel/base.html' %}{% load eco %}
+{% block titulo %}Códigos QR{% endblock %}{% block encabezado %}Códigos QR{% endblock %}
+{% block contenido %}
+<div class="dos qrg">
+<section class="card"><strong style="font-size:17px">Nuevo código</strong>
+<form method="post" novalidate>{% csrf_token %}
+  {% include 'includes/campo.html' with campo=form.destino_tipo %}
+  <div id="campo-guia">{% include 'includes/campo.html' with campo=form.guia %}</div>
+  {% include 'includes/campo.html' with campo=form.institucion %}
+  <div class="ayuda"><a href="{% url 'panel_qr:instituciones' %}">Registrar una institución</a></div>
+  {% include 'includes/campo.html' with campo=form.ubicacion %}
+  <button class="btn p full" style="margin-top:16px" type="submit">{% icono 'qr' 20 '#fff' %}Generar código</button>
+</form>
+{% if nuevo %}
+<div style="margin-top:18px;border-top:1px solid var(--line);padding-top:16px;display:grid;grid-template-columns:170px 1fr;gap:16px">
+  <img class="qrimg" src="{% url 'panel_qr:imagen' nuevo.pk 'png' %}" alt="Código QR {{ nuevo.codigo_corto }}">
+  <div><div class="xs mut">URL corta</div><strong style="font-size:15px;word-break:break-all">{{ nuevo.url_corta }}</strong>
+  <div class="small mut" style="margin-top:4px">{{ nuevo.destino_texto }} · {{ nuevo.ubicacion }}</div>
+  <div class="acciones" style="margin-top:10px">
+    <a class="btn p sm" href="{% url 'panel_qr:imagen' nuevo.pk 'png' %}?descargar=1">{% icono 'down' 18 '#fff' %}Descargar PNG</a>
+    <a class="btn o sm" href="{% url 'panel_qr:imagen' nuevo.pk 'svg' %}?descargar=1">{% icono 'down' 18 '#1E7A46' %}Descargar SVG</a></div></div>
+</div>
+{% endif %}
+</section>
+<section class="card tabla"><table>
+<tr><th>Código</th><th>Destino</th><th>Ubicación</th><th class="right">Lecturas</th><th>Estado</th><th></th></tr>
+{% for c in codigos %}
+<tr><td><a href="?nuevo={{ c.pk }}">{{ c.codigo_corto }}</a></td>
+<td>{{ c.destino_texto }}{% if c.destino_tipo == 'GUIA' and not c.guia.publicado %} <span class="st s-ret" title="La guía no está publicada: el código lleva al inicio">guía no publicada</span>{% endif %}</td>
+<td class="small">{{ c.ubicacion }}{% if c.institucion %}<div class="xs mut">{{ c.institucion }}</div>{% endif %}</td><td class="right">{{ c.lecturas }}</td>
+<td>{% if c.activo %}<span class="st s-pub">Activo</span>{% else %}<span class="st s-bor">Inactivo</span>{% endif %}</td>
+<td class="right"><form method="post" action="{% url 'panel_qr:activar' c.pk %}" {% if c.activo %}data-confirmar="¿Desactivar {{ c.codigo_corto }}? Quien lo lea verá «código no disponible»."{% endif %}>{% csrf_token %}<button class="btn o sm" type="submit">{% if c.activo %}Desactivar{% else %}Activar{% endif %}</button></form></td></tr>
+{% empty %}<tr><td colspan="6" class="mut">Aún no hay códigos.</td></tr>{% endfor %}
+</table>
+<p class="xs mut" style="margin:8px 4px">Un código inactivo muestra «código no disponible» con un enlace al inicio. Los códigos no se borran para conservar sus estadísticas (RN-06).</p></section>
+</div>
+{% endblock %}

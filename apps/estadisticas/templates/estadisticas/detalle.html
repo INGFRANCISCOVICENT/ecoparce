@@ -1,0 +1,33 @@
+{% extends 'panel/base.html' %}{% load eco %}
+{% block titulo %}Estadísticas{% endblock %}{% block encabezado %}Estadísticas{% endblock %}
+{% block contenido %}
+<div class="filtros">{% for d in periodos %}<a class="tag {% if d == dias %}on{% endif %}" href="?dias={{ d }}">Últimos {{ d }} días</a>{% endfor %}
+<span class="small mut">{{ inicio|date:"j M Y" }} a {{ fin|date:"j M Y" }}</span>
+<a class="btn o sm ml" href="{% url 'estadisticas:exportar' %}?dias={{ dias }}">{% icono 'down' 16 %}Exportar CSV</a></div>
+<div class="kpis">
+  <div class="kpi"><small>Lecturas de QR</small><div>{{ escaneos }}</div><em>{{ codigos_activos }} códigos activos</em></div>
+  <div class="kpi"><small>Búsquedas</small><div>{{ busquedas }}</div><em>{{ pct_encontrado }} % con resultado</em></div>
+  <div class="kpi"><small>Partidas terminadas</small><div>{{ partidas }}</div><em>de {{ partidas_iniciadas }} iniciadas</em></div>
+  <div class="kpi"><small>Puntaje medio</small><div>{% if puntaje_medio is not None %}{{ puntaje_medio|floatformat:1 }}{% else %}—{% endif %}</div><em>de 5 posibles</em></div>
+</div>
+<div class="dos" style="margin-top:14px">
+  <section class="card"><strong>Lecturas de QR por día</strong>{% include 'estadisticas/_barras.html' with serie=serie_escaneos titulo='Lecturas de QR por día' %}</section>
+  <section class="card"><strong>Dispositivos</strong>
+  <table style="margin-top:6px">{% for d in por_dispositivo %}<tr><td>{{ d.nombre }}</td><td style="width:45%"><div class="hbar"><i style="width:{{ d.pct }}%"></i></div></td><td class="right">{{ d.pct }} %</td></tr>{% empty %}<tr><td class="mut">Sin lecturas en el periodo.</td></tr>{% endfor %}</table></section>
+</div>
+<div class="dos" style="margin-top:14px">
+  <section class="card"><strong>Lecturas por código</strong>
+  <table style="margin-top:6px"><tr><th>Código</th><th>Destino</th><th>Ubicación</th><th class="right">Lecturas</th></tr>
+  {% for c in por_codigo %}<tr><td><strong>{{ c.codigo_corto }}</strong></td><td>{{ c.destino_texto }}</td><td class="small">{{ c.ubicacion }}</td><td class="right">{{ c.n }}</td></tr>{% empty %}<tr><td colspan="4" class="mut">Sin lecturas en el periodo.</td></tr>{% endfor %}</table></section>
+  <section class="card"><strong>Búsquedas por día</strong>{% include 'estadisticas/_barras.html' with serie=serie_busquedas titulo='Búsquedas por día' %}</section>
+</div>
+<div class="dos" style="margin-top:14px">
+  <section class="card"><strong>Lo más buscado</strong>
+  <table style="margin-top:6px"><tr><th>Término</th><th class="right">Veces</th></tr>{% for r in top_busquedas %}<tr><td>{{ r.termino }}</td><td class="right">{{ r.veces }}</td></tr>{% empty %}<tr><td colspan="2" class="mut">Sin datos.</td></tr>{% endfor %}</table>
+  <strong style="display:block;margin-top:16px">Sin resultado</strong>
+  <table style="margin-top:6px">{% for r in sin_resultado %}<tr><td>{{ r.termino }}</td><td class="right">{{ r.veces }}</td></tr>{% empty %}<tr><td class="mut">Ninguna.</td></tr>{% endfor %}</table></section>
+  <section class="card"><strong>Preguntas más falladas</strong>
+  <table style="margin-top:6px"><tr><th>Pregunta</th><th class="right">Errores</th></tr>{% for p in preguntas_falladas %}<tr><td class="small">{{ p.enunciado }}</td><td class="right">{{ p.pct }} % <span class="xs mut">({{ p.errores }}/{{ p.total }})</span></td></tr>{% empty %}<tr><td colspan="2" class="mut">Sin errores registrados.</td></tr>{% endfor %}</table>
+  <p class="xs mut" style="margin-top:10px">Una pregunta muy fallada indica un tema que conviene reforzar en las guías.</p></section>
+</div>
+{% endblock %}

@@ -1,0 +1,8 @@
+from django.apps import AppConfig
+
+
+class BuscadorConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'apps.buscador'
+    label = 'buscador'
+    verbose_name = 'Buscador de residuos'

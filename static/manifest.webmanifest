@@ -1,0 +1,31 @@
+{
+  "name": "EcoParce · Sistema de reciclaje y manejo de residuos",
+  "short_name": "EcoParce",
+  "description": "Aprende a separar en la fuente con el código de colores de Colombia (Resolución 2184 de 2019), escanea empaques y ubica puntos posconsumo oficiales.",
+  "lang": "es-CO",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#1E7A46",
+  "background_color": "#F6FAF7",
+  "categories": ["education", "lifestyle", "utilities"],
+  "icons": [
+    {
+      "src": "/static/img/logo-96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/img/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/img/logo-256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

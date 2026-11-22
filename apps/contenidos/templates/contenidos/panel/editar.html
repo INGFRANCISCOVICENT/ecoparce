@@ -1,0 +1,67 @@
+{% extends 'panel/base.html' %}{% load eco %}
+{% block titulo %}{% if obj %}{{ obj }}{% else %}Nueva {{ nombre }}{% endif %}{% endblock %}
+{% block encabezado %}{% if obj %}{% if editable %}Editar {{ nombre }}{% else %}{{ obj }}{% endif %}{% else %}{% if tipo == 'guias' %}Nueva guía{% else %}Nuevo residuo{% endif %}{% endif %}{% endblock %}
+{% block contenido %}
+<div class="crumb"><a href="{% url 'panel_contenidos:lista' %}?tipo={{ tipo }}">Guías y residuos</a> › {% if obj %}{{ obj }}{% else %}nuevo{% endif %}</div>
+<div class="dos ed">
+<section class="card">
+{% if editable %}
+  {% if devolucion %}<div class="aviso info">{% icono 'msg' 20 %}<div><strong>Observaciones de {{ devolucion.usuario.nombre_corto }}:</strong><br>{{ devolucion.detalle }}</div></div>{% endif %}
+  <form method="post" novalidate>{% csrf_token %}
+    {% for campo in form %}{% include 'includes/campo.html' %}{% endfor %}
+    {% if form.non_field_errors %}<div class="aviso error" style="margin-top:12px">{{ form.non_field_errors.0 }}</div>{% endif %}
+    <div class="row" style="margin-top:18px;flex-wrap:wrap">
+      <button class="btn o" type="submit">Guardar borrador</button>
+      <button class="btn p" type="submit" name="enviar" value="1">{% icono 'send' 20 '#fff' %}Guardar y enviar a revisión</button>
+    </div>
+  </form>
+{% else %}
+  {% if tipo == 'guias' %}
+  <div class="small mut">{{ obj.get_tipo_display }}{% if obj.contenedor %} · {{ obj.contenedor }}{% endif %}</div>
+  <p style="margin-top:8px"><strong>{{ obj.resumen }}</strong></p>
+  {% for p in obj.parrafos %}<p>{{ p }}</p>{% endfor %}
+  {% if obj.que_va %}<h2 style="font-size:16px">Qué va</h2><ul class="ok">{% for x in obj.que_va %}<li>{% icono 'check' 18 '#1E7A46' 3 %}{{ x }}</li>{% endfor %}</ul>{% endif %}
+  {% if obj.que_no_va %}<h2 style="font-size:16px">Qué no va</h2><ul class="no">{% for x in obj.que_no_va %}<li>{% icono 'x' 18 '#C81E1E' 3 %}{{ x }}</li>{% endfor %}</ul>{% endif %}
+  <p class="src">Fuente oficial: {{ obj.fuente_oficial|default:"—" }}</p>
+  {% if obj.publicado %}<a class="btn o sm" href="{{ obj.get_absolute_url }}" target="_blank" rel="noopener">{% icono 'eye' 16 %}Ver en el sitio</a>{% endif %}
+  {% else %}
+  <div class="row"><span class="swatch chip-{{ obj.contenedor.codigo }}" style="width:40px;height:40px"></span><div><strong>{{ obj.contenedor }}</strong><div class="small mut">Sinónimos: {{ obj.sinonimos|default:"—" }}</div></div></div>
+  {% if obj.pasos %}<h2 style="font-size:16px">Preparación</h2><ul class="ok">{% for p in obj.pasos %}<li>{% icono 'check' 18 '#1E7A46' 3 %}{{ p|capfirst }}</li>{% endfor %}</ul>{% endif %}
+  <p class="small" style="margin-top:10px">Guía: {{ obj.guia|default:"—" }}{% if obj.es_especial %} · Puntos: {% for p in obj.puntos.all %}{{ p }}{% if not forloop.last %}, {% endif %}{% empty %}ninguno{% endfor %}{% endif %}</p>
+  {% endif %}
+  <p class="xs mut" style="margin-top:12px">Para corregir contenido publicado, retíralo y luego reábrelo como borrador.</p>
+{% endif %}
+</section>
+<aside>
+{% if obj %}
+<section class="card"><strong>Estado</strong>
+  <div style="margin:8px 0 10px"><span class="st {{ obj.estado|clase_estado }}">{{ obj.get_estado_display }}</span></div>
+  <div class="small mut">Autor: {{ obj.autor.nombre_corto }}{% if obj.revisor %}<br>Revisor: {{ obj.revisor.nombre_corto }}{% endif %}<br>Actualizado: {{ obj.actualizado_en|date:"j M Y, H:i" }}</div>
+  <div class="acciones">
+  {% if obj.estado == 'EN_REVISION' %}
+    {% if puede_revisar %}
+    <form method="post" action="{% url 'panel_contenidos:accion' tipo obj.pk 'publicar' %}">{% csrf_token %}<button class="btn p full" type="submit">{% icono 'check' 20 '#fff' 3 %}Aprobar y publicar</button></form>
+    <form method="post" action="{% url 'panel_contenidos:accion' tipo obj.pk 'devolver' %}">{% csrf_token %}
+      <label for="obs" style="margin-top:4px">Observaciones para el autor</label><textarea id="obs" name="observaciones" rows="3" required maxlength="400"></textarea>
+      <button class="btn o full" style="margin-top:8px" type="submit">Devolver con observaciones</button></form>
+    {% else %}<div class="aviso info small">{% icono 'info' 18 %}Tú eres el autor: otro administrador debe revisarlo (RN-03).</div>{% endif %}
+  {% elif obj.estado == 'PUBLICADO' %}
+    <form method="post" action="{% url 'panel_contenidos:accion' tipo obj.pk 'retirar' %}" data-confirmar="¿Retirar? Dejará de verse en el sitio público.">{% csrf_token %}<button class="btn r full" type="submit">{% icono 'power' 20 '#C81E1E' %}Retirar del sitio</button></form>
+  {% elif obj.estado == 'RETIRADO' %}
+    <form method="post" action="{% url 'panel_contenidos:accion' tipo obj.pk 'reabrir' %}">{% csrf_token %}<button class="btn o full" type="submit">{% icono 'edit' 20 '#1E7A46' %}Reabrir para corregir</button></form>
+    {% if user.es_admin_sistema %}<form method="post" action="{% url 'panel_contenidos:accion' tipo obj.pk 'eliminar' %}" data-confirmar="¿Eliminar definitivamente? Esta acción no se puede deshacer.">{% csrf_token %}<button class="btn r full" type="submit">{% icono 'trash' 20 '#C81E1E' %}Eliminar</button></form>{% endif %}
+  {% endif %}
+  </div>
+</section>
+<section class="card" style="margin-top:14px"><strong>Historial</strong>
+<ul class="historial">{% for h in historial %}<li>{% icono 'history' 16 '#4B5A51' %}<span>{{ h.fecha_hora|date:"j M, H:i" }} · {{ h.usuario.nombre_corto|default:"—" }} · {{ h.get_accion_display|lower }}{% if h.accion == 'DEVOLVER' %}<div class="obs">{{ h.detalle }}</div>{% endif %}</span></li>{% empty %}<li class="mut">Sin movimientos.</li>{% endfor %}</ul>
+</section>
+{% else %}
+<section class="card small"><strong>Flujo de publicación</strong>
+<p style="margin-top:8px">1. Guarda el borrador.<br>2. Envíalo a revisión (con fuente oficial).<br>3. Otro administrador lo aprueba y queda publicado, o lo devuelve con observaciones.</p>
+{% if tipo == 'guias' %}<p class="mut">En el contenido, una línea que empieza con «+» aparece en «Qué va» y una con «-» en «Qué no va».</p>{% else %}<p class="mut">Separa los pasos de preparación con punto y coma. Los sinónimos ayudan al buscador: «tetrapak», «icopor», etc.</p>{% endif %}
+</section>
+{% endif %}
+</aside>
+</div>
+{% endblock %}

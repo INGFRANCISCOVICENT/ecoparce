@@ -1,0 +1,3 @@
+{% for campo in attrs.form.hidden_fields %}{{ campo }}{% endfor %}
+{% if attrs.form.non_field_errors %}<div class="aviso error">{{ attrs.form.non_field_errors.0 }}</div>{% endif %}
+{% for campo in attrs.form.visible_fields %}{% include 'includes/campo.html' %}{% endfor %}

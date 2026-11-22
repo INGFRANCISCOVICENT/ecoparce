@@ -1,0 +1,8 @@
+{% extends "account/email/base_message.txt" %}{% block content %}{% autoescape off %}Alerta de seguridad: se hizo este cambio en tu cuenta de EcoParce:
+
+{% block notification_message %}{% endblock notification_message %}
+
+Fecha: {{ timestamp }}
+Navegador: {{ user_agent }}
+
+Si no fuiste tú, cambia tu contraseña de inmediato y escríbenos.{% endautoescape %}{% endblock %}

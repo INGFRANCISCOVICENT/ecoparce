@@ -1,0 +1,10 @@
+{% extends 'base.html' %}{% load static %}
+{% block titulo %}Página no encontrada{% endblock %}
+{% block contenido %}
+<section class="card center" style="padding:24px 16px">
+  <img src="{% static 'img/logo-256.png' %}" alt="Escarlata, guacamaya roja de EcoParce" style="width:96px;height:96px;border-radius:50%">
+  <h1 style="margin-top:10px">{% block mensaje %}No encontramos esa página{% endblock %}</h1>
+  <p class="mut">{% block detalle %}Puede que el enlace esté mal escrito o que el contenido ya no esté publicado.{% endblock %}</p>
+  <a class="btn p" href="{% url 'core:inicio' %}">Ir al inicio</a>
+</section>
+{% endblock %}

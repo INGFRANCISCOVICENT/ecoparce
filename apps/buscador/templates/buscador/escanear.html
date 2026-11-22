@@ -1,0 +1,26 @@
+{% extends 'base.html' %}{% load static eco %}
+{% block titulo %}Escanear{% endblock %}
+{% block contenido %}
+<h1>Escanea y separa</h1>
+<p class="mut">Apunta la cámara al <strong>código de barras</strong> del empaque y te digo en qué bolsa va cada parte. También lee los códigos QR de EcoParce.</p>
+<div class="escaner" id="escaner">
+  <video id="video" playsinline muted aria-label="Vista de la cámara"></video>
+  <div class="marco" aria-hidden="true"></div>
+  <div class="escaner-vacio" id="escaner-vacio">{% icono 'qr' 48 '#1E7A46' 1.6 %}<span>La cámara se activa solo cuando tú lo pides</span></div>
+</div>
+<button class="btn p full" type="button" id="btn-camara" style="margin-top:12px">{% icono 'qr' 20 '#fff' %}Abrir cámara</button>
+<button class="btn o full" type="button" id="btn-detener" style="margin-top:10px" hidden>Detener cámara</button>
+<p class="xs mut center" style="margin-top:6px">Las imágenes de la cámara no salen de tu teléfono: solo se envía el número del código.</p>
+
+<form id="form-codigo" class="search" style="margin-top:16px" autocomplete="off">
+  {% icono 'search' 22 '#1E7A46' %}<label class="sr" for="codigo">Número del código de barras</label>
+  <input id="codigo" name="codigo" inputmode="numeric" pattern="[0-9]{8,14}" maxlength="14" placeholder="O escribe el número del código" required>
+  <button type="submit">Ver</button>
+</form>
+
+<div id="resultado" aria-live="polite"></div>
+
+<div class="speech" style="margin-top:16px"><img src="{% static 'img/logo-96.png' %}" alt="Escarlata, mascota de EcoParce"><div>¿El producto no tiene código? <a href="{% url 'buscador:buscar' %}">Búscalo por su nombre</a>: «botella», «icopor», «pilas»…</div></div>
+<script src="{% static 'vendor/zxing/zxing.min.js' %}" defer></script>
+<script src="{% static 'js/escaner.js' %}" defer data-api="{% url 'buscador:producto' '00000000' %}" data-buscar="{% url 'buscador:buscar' %}" id="escaner-js"></script>
+{% endblock %}

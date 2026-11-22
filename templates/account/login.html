@@ -1,0 +1,25 @@
+{% extends "account/base_entrance.html" %}{% load socialaccount eco %}
+{% block head_title %}Ingresar{% endblock head_title %}
+{% block content %}
+<h1 class="center" style="font-size:22px;margin-top:12px">Ingresa a EcoParce</h1>
+<p class="center small mut">Guarda tu progreso de la trivia y sigue tus sugerencias. Navegar y aprender no requiere cuenta.</p>
+
+{% if GOOGLE_ACTIVO %}<form method="post" action="{% provider_login_url 'google' %}" class="acciones">{% csrf_token %}
+  {% if redirect_field_value %}<input type="hidden" name="next" value="{{ redirect_field_value }}">{% endif %}
+  <button class="btn btn-google full" type="submit">{% icono 'shield' 20 '#1F4FA3' %}Continuar con Google</button>
+</form>{% else %}<div class="acciones"><button class="btn btn-google full" type="button" disabled>{% icono 'shield' 20 '#1F4FA3' %}Continuar con Google</button></div>
+<p class="xs mut center" style="margin-top:6px">El ingreso con Google se activa cuando el administrador configure las credenciales de Google (ver docs/GOOGLE_Y_CORREO.md).</p>{% endif %}
+
+<div class="separador"><span>o con tu correo</span></div>
+
+<form method="post" action="{% url 'account_login' %}" novalidate>{% csrf_token %}
+  {{ redirect_field }}
+  {% if form.non_field_errors %}<div class="aviso error" role="alert">{% icono 'lock' 20 '#8E1414' %}<span>{{ form.non_field_errors.0 }}</span></div>{% endif %}
+  {% include 'includes/campo.html' with campo=form.login %}
+  {% include 'includes/campo.html' with campo=form.password %}
+  <div class="right xs" style="margin-top:6px"><a href="{% url 'account_reset_password' %}">¿Olvidaste tu contraseña?</a></div>
+  <button class="btn p full" style="margin-top:14px" type="submit">Ingresar</button>
+</form>
+<p class="center small" style="margin-top:14px">¿No tienes cuenta? <a href="{% url 'account_signup' %}{% if redirect_field_value %}?next={{ redirect_field_value|urlencode }}{% endif %}">Crea una gratis</a></p>
+<p class="center xs mut" style="margin-top:10px">{% icono 'shield' 14 '#4B5A51' %} Los administradores confirman su identidad con un código de su app de autenticación.</p>
+{% endblock content %}

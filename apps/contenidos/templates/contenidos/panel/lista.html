@@ -1,0 +1,24 @@
+{% extends 'panel/base.html' %}{% load eco %}
+{% block titulo %}Guías y residuos{% endblock %}{% block encabezado %}Guías y residuos{% endblock %}
+{% block contenido %}
+<div class="filtros">
+  <a class="tag {% if tipo == 'guias' %}on{% endif %}" href="?tipo=guias">Guías</a>
+  <a class="tag {% if tipo == 'residuos' %}on{% endif %}" href="?tipo=residuos">Residuos</a>
+  <form method="get" class="filtros" style="margin:0"><input type="hidden" name="tipo" value="{{ tipo }}">
+    <input type="search" name="q" value="{{ q }}" placeholder="{% if tipo == 'guias' %}Buscar por título{% else %}Buscar por nombre o sinónimo{% endif %}" aria-label="Buscar">
+    <select name="estado" aria-label="Estado"><option value="">Estado: todos</option>{% for v, t in estados %}<option value="{{ v }}" {% if v == estado %}selected{% endif %}>{{ t }}{% for k, n in conteo.items %}{% if k == v %} ({{ n }}){% endif %}{% endfor %}</option>{% endfor %}</select>
+    <button class="btn o sm" type="submit">{% icono 'filter' 16 %}Filtrar</button></form>
+  <a class="btn p sm ml" href="{% url 'panel_contenidos:nuevo' tipo %}">{% icono 'plus' 18 '#fff' %}{% if tipo == 'guias' %}Nueva guía{% else %}Nuevo residuo{% endif %}</a>
+</div>
+<section class="card tabla"><table>
+<tr><th>{% if tipo == 'guias' %}Título{% else %}Residuo{% endif %}</th><th>{% if tipo == 'guias' %}Tipo{% else %}Contenedor{% endif %}</th><th>Estado</th><th>Autor</th><th>Revisor</th><th>Actualizado</th><th></th></tr>
+{% for o in objetos %}
+<tr><td><a href="{% url 'panel_contenidos:editar' tipo o.pk %}">{{ o }}</a></td>
+<td>{% if tipo == 'guias' %}{{ o.get_tipo_display }}{% else %}{{ o.contenedor.nombre }}{% endif %}</td>
+<td><span class="st {{ o.estado|clase_estado }}">{{ o.get_estado_display }}</span></td>
+<td>{{ o.autor.nombre_corto }}</td><td>{{ o.revisor.nombre_corto|default:"—" }}</td><td class="small mut">{{ o.actualizado_en|date:"j M Y" }}</td>
+<td class="right"><a href="{% url 'panel_contenidos:editar' tipo o.pk %}" aria-label="Abrir">{% icono 'edit' 18 '#1E7A46' %}</a></td></tr>
+{% empty %}<tr><td colspan="7" class="mut">No hay elementos con esos filtros.</td></tr>{% endfor %}
+</table></section>
+<p class="xs mut">Solo lo que está en estado Publicado es visible para el público (RN-01). El revisor debe ser un administrador distinto del autor (RN-03).</p>
+{% endblock %}

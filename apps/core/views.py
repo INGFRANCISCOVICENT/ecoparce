@@ -1,0 +1,102 @@
+from django.shortcuts import render
+
+from apps.contenidos.models import Contenedor, Guia, TipoGuia
+
+
+def inicio(request):
+    contenedores = {c.codigo: c for c in Contenedor.objects.all()}
+    guias = {g.contenedor_id: g for g in Guia.publicadas.filter(tipo=TipoGuia.SEPARACION, contenedor__isnull=False)}
+    bolsas = [(c, guias.get(c.pk)) for c in contenedores.values() if c.es_bolsa]
+    return render(request, 'core/inicio.html', {
+        'bolsas': bolsas,
+        'posconsumo': contenedores.get(Contenedor.POSCONSUMO),
+        'manejo': Guia.publicadas.filter(tipo=TipoGuia.MANEJO)[:3],
+    })
+
+
+def privacidad(request):
+    return render(request, 'core/privacidad.html')
+
+
+def terminos(request):
+    return render(request, 'core/terminos.html')
+
+
+def licencias(request):
+    return render(request, 'core/licencias.html')
+
+
+def error_404(request, exception=None):
+    return render(request, 'core/404.html', status=404)
+
+
+def error_500(request):
+    return render(request, 'core/500.html', status=500)
+
+
+def error_403(request, exception=None):
+    return render(request, 'core/403.html', status=403)
+
+
+def security_txt(request):
+    """RFC 9116: canal para reportar vulnerabilidades de forma responsable."""
+    from datetime import timedelta
+
+    from django.conf import settings
+    from django.http import HttpResponse
+    from django.utils import timezone
+    expira = (timezone.now() + timedelta(days=180)).strftime('%Y-%m-%dT00:00:00Z')
+    texto = (f'Contact: mailto:{settings.CONTACTO_SEGURIDAD}\n'
+             f'Expires: {expira}\n'
+             'Preferred-Languages: es, en\n'
+             f'Canonical: {settings.SITE_URL}/.well-known/security.txt\n'
+             f'Policy: {settings.SITE_URL}/privacidad/\n')
+    return HttpResponse(texto, content_type='text/plain; charset=utf-8')
+
+
+def robots_txt(request):
+    """Directivas para buscadores: indexar el sitio público y excluir panel y cuentas."""
+    from django.conf import settings
+    from django.http import HttpResponse
+    base = settings.SITE_URL.rstrip('/')
+    texto = (
+        'User-agent: *\n'
+        'Allow: /\n'
+        'Disallow: /panel/\n'
+        'Disallow: /cuenta/\n'
+        'Disallow: /accounts/\n'
+        'Disallow: /q/\n'
+        f'Sitemap: {base}/sitemap.xml\n'
+    )
+    return HttpResponse(texto, content_type='text/plain; charset=utf-8')
+
+
+def sitemap_xml(request):
+    """Mapa del sitio con rutas públicas y guías publicadas (RN-01)."""
+    from xml.sax.saxutils import escape
+
+    from django.conf import settings
+    from django.http import HttpResponse
+    base = settings.SITE_URL.rstrip('/')
+    rutas_fijas = [
+        ('/', 'weekly', '1.0'),
+        ('/guias/', 'weekly', '0.9'),
+        ('/manejo/', 'weekly', '0.9'),
+        ('/buscar/', 'weekly', '0.8'),
+        ('/escanear/', 'monthly', '0.8'),
+        ('/puntos/', 'weekly', '0.9'),
+        ('/trivia/', 'weekly', '0.8'),
+        ('/privacidad/', 'yearly', '0.3'),
+        ('/terminos/', 'yearly', '0.3'),
+        ('/licencias/', 'yearly', '0.3'),
+    ]
+    lineas = ['<?xml version="1.0" encoding="UTF-8"?>',
+              '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    for ruta, freq, prio in rutas_fijas:
+        lineas.append(f'  <url><loc>{escape(base + ruta)}</loc><changefreq>{freq}</changefreq><priority>{prio}</priority></url>')
+    for g in Guia.publicadas.only('slug', 'actualizado_en'):
+        loc = escape(base + g.get_absolute_url())
+        lastmod = f'<lastmod>{g.actualizado_en.date().isoformat()}</lastmod>' if g.actualizado_en else ''
+        lineas.append(f'  <url><loc>{loc}</loc>{lastmod}<changefreq>monthly</changefreq><priority>0.8</priority></url>')
+    lineas.append('</urlset>\n')
+    return HttpResponse('\n'.join(lineas), content_type='application/xml; charset=utf-8')

@@ -1,0 +1,11 @@
+{% if campo.field.widget.allow_multiple_selected %}
+<label>{{ campo.label }}</label>
+<div class="multi">{{ campo }}</div>
+{% elif campo.field.widget.input_type == 'checkbox' %}
+<label class="check">{{ campo }} {{ campo.label }}</label>
+{% else %}
+<label for="{{ campo.id_for_label }}">{{ campo.label }}{% if campo.field.required %} <span style="color:var(--r)">*</span>{% endif %}</label>
+{{ campo }}
+{% endif %}
+{% if campo.help_text %}<div class="ayuda">{{ campo.help_text }}</div>{% endif %}
+{{ campo.errors }}

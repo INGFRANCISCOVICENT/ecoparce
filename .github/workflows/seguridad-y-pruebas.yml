@@ -1,0 +1,58 @@
+# Integración continua: cada push o pull request corre las pruebas en MySQL 8 y los análisis de seguridad.
+name: Pruebas y seguridad
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '17 11 * * 1'   # lunes: revisión semanal de vulnerabilidades nuevas en las dependencias
+
+permissions:
+  contents: read
+
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ci-solo-pruebas
+          MYSQL_DATABASE: ecoparce
+        ports: ['3306:3306']
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+    env:
+      DB_ENGINE: mysql
+      DB_NAME: ecoparce
+      DB_USER: root
+      DB_PASSWORD: ci-solo-pruebas
+      DB_HOST: 127.0.0.1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: sudo apt-get update && sudo apt-get install -y default-libmysqlclient-dev pkg-config
+      - run: pip install -r requirements.lock -r requirements-dev.txt
+      - name: Pruebas automatizadas
+        run: python manage.py test --verbosity 2
+      - name: Migraciones al día
+        run: python manage.py makemigrations --check --dry-run
+      - name: Análisis estático de seguridad (Bandit)
+        run: bandit -q -r apps config -x "*/tests.py,*/migrations/*,apps/core/pruebas.py"
+      - name: Vulnerabilidades conocidas en dependencias (pip-audit)
+        run: pip-audit -r requirements.lock
+      - name: Configuración de producción (check --deploy)
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.produccion
+          DJANGO_SECRET_KEY: ${{ github.run_id }}-clave-temporal-de-ci-que-no-se-usa-en-produccion-xyz
+          MFA_CLAVE_CIFRADO: 3q2-7wEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+          GOOGLE_CLIENT_ID: ci.apps.googleusercontent.com
+          GOOGLE_CLIENT_SECRET: ci
+          SMTP_HOST: localhost
+          SMTP_PASSWORD: ci
+        run: python manage.py check --deploy --fail-level WARNING
+      - name: Ningún secreto en el repositorio
+        run: |
+          ! git ls-files | grep -E '(^|/)\.env$'
+          ! git grep -nE '(GOCSPX-[A-Za-z0-9_-]{20,}|re_[A-Za-z0-9]{20,}|AIza[0-9A-Za-z_-]{35})' -- ':!*.md'

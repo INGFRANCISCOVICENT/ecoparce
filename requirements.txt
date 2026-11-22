@@ -1,0 +1,11 @@
+# EcoParce · dependencias directas de producción (Python 3.12 o superior)
+# Versiones exactas: se actualizan solo después de correr pip-audit y las pruebas.
+Django==5.2.19
+django-allauth[socialaccount,mfa]==65.22.1
+argon2-cffi==25.1.0
+cryptography==50.0.2
+dnspython==2.9.2
+qrcode==8.2
+pillow==13.0.0
+python-dotenv==1.2.4
+mysqlclient==2.3.2

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}{% load eco %}
+{% block titulo %}Licencias y transparencia{% endblock %}
+{% block contenido %}
+<div class="crumb"><a href="{% url 'core:inicio' %}">Inicio</a> › Licencias y transparencia</div>
+<h1>Licencias open source, atribuciones y auditoría</h1>
+<p class="mut">Cumplimos todas las licencias del código, tipografías, datos abiertos e imágenes que usa EcoParce, y publicamos con transparencia cómo funciona el sitio.</p>
+
+<section class="card" style="margin-top:14px">
+  <h2 style="margin-top:0">1. Software libre y código de terceros</h2>
+  <div class="tabla" style="padding:0">
+    <table>
+      <thead><tr><th>Componente</th><th>Uso</th><th>Licencia</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Django 5.2 LTS</strong></td><td>Framework web backend</td><td>BSD-3-Clause</td></tr>
+        <tr><td><strong>django-allauth</strong></td><td>Autenticación, verificación por código, Google OIDC y 2FA</td><td>MIT</td></tr>
+        <tr><td><strong>Argon2-cffi / cryptography</strong></td><td>Cifrado de contraseñas y secretos TOTP</td><td>MIT / Apache-2.0 / BSD</td></tr>
+        <tr><td><strong>qrcode &amp; Pillow</strong></td><td>Generación de códigos QR en PNG y SVG</td><td>BSD / HPND</td></tr>
+        <tr><td><strong>Leaflet</strong> (alojado localmente)</td><td>Mapa interactivo de puntos posconsumo</td><td>BSD-2-Clause</td></tr>
+        <tr><td><strong>ZXing JS</strong> (alojado localmente)</td><td>Lectura local de códigos de barras en cámara</td><td>MIT</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="card" style="margin-top:14px">
+  <h2 style="margin-top:0">2. Tipografías, imágenes y contenido asistido con IA</h2>
+  <ul class="ok">
+    <li>{% icono 'check' 18 '#1E7A46' 3 %}<span><strong>Fuentes tipográficas:</strong> Nunito y Baloo 2 servidas localmente bajo licencia <strong>SIL Open Font License 1.1</strong> (sin llamadas a Google Fonts).</span></li>
+    <li>{% icono 'check' 18 '#1E7A46' 3 %}<span><strong>Iconografía:</strong> iconos vectoriales SVG de trazo propio incluidos en el proyecto, sin marcas de clientes ni logotipos de terceros sin autorización.</span></li>
+    <li>{% icono 'info' 18 '#1F4FA3' 3 %}<span><strong>Etiqueta de contenido con IA:</strong> las ilustraciones de nuestra mascota <em>Escarlata</em> fueron generadas/asistidas con herramientas de inteligencia artificial y revisadas por el equipo de EcoParce. Todas las guías de separación y puntos oficiales se basan en normativa y datos públicos revisados por humanos.</span></li>
+  </ul>
+</section>
+
+<section class="card" style="margin-top:14px">
+  <h2 style="margin-top:0">3. Datos abiertos y atribuciones</h2>
+  <ul class="ok">
+    <li>{% icono 'check' 18 '#1E7A46' 3 %}<span><strong>Resolución 2184 de 2019:</strong> Ministerio de Ambiente y Desarrollo Sostenible de Colombia (código de colores nacional).</span></li>
+    <li>{% icono 'check' 18 '#1E7A46' 3 %}<span><strong>Puntos posconsumo de Bogotá:</strong> Secretaría Distrital de Ambiente (Visor Geográfico Ambiental), datos abiertos bajo licencia <strong>CC BY 4.0</strong>.</span></li>
+    <li>{% icono 'check' 18 '#1E7A46' 3 %}<span><strong>Open Food Facts / Beauty / Products Facts:</strong> base colaborativa de empaques bajo licencia <strong>ODbL</strong>.</span></li>
+    <li>{% icono 'check' 18 '#1E7A46' 3 %}<span><strong>OpenStreetMap:</strong> mapas base © colaboradores de OpenStreetMap bajo licencia <strong>ODbL</strong>.</span></li>
+  </ul>
+</section>
+
+<section class="card" id="auditoria-sdks" style="margin-top:14px">
+  <h2 style="margin-top:0">4. Auditoría de SDKs, analítica y rastreo</h2>
+  <p class="small mut">Resultado de la auditoría técnica de scripts y rastreadores en el navegador:</p>
+  <div class="tabla" style="padding:0">
+    <table>
+      <thead><tr><th>Categoría</th><th>Estado en EcoParce</th><th>Detalle</th></tr></thead>
+      <tbody>
+        <tr><td>Analítica de terceros (Google Analytics, Hotjar, etc.)</td><td><span class="st s-pub">0 instalados</span></td><td>No se cargan scripts externos de analítica</td></tr>
+        <tr><td>Píxeles publicitarios / retargeting</td><td><span class="st s-pub">0 instalados</span></td><td>Bloqueados además por CSP (<code>script-src 'self'</code>)</td></tr>
+        <tr><td>SDKs externos por CDN</td><td><span class="st s-pub">0 instalados</span></td><td>Leaflet, ZXing y fuentes se sirven desde el propio dominio</td></tr>
+        <tr><td>Mapas de OpenStreetMap</td><td><span class="st s-rev">Bajo consentimiento</span></td><td>Bloqueados hasta aceptar cookies o solicitar su carga en /puntos/</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="xs mut" style="margin-top:10px">¿Encontraste un error de atribución o deseas presentar un reclamo de derechos de autor? Escribe a <strong>derechos@ecoparce.com.co</strong>.</p>
+</section>
+{% endblock %}

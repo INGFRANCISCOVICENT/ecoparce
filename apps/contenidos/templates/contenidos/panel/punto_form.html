@@ -1,0 +1,8 @@
+{% extends 'panel/base.html' %}
+{% block titulo %}Punto de entrega{% endblock %}{% block encabezado %}{% if obj %}Editar punto{% else %}Nuevo punto de entrega{% endif %}{% endblock %}
+{% block contenido %}
+<section class="card" style="max-width:640px"><form method="post" novalidate>{% csrf_token %}
+{% for campo in form %}{% include 'includes/campo.html' %}{% endfor %}
+<div class="row" style="margin-top:16px"><button class="btn p" type="submit">Guardar</button><a class="btn o" href="{% url 'panel_contenidos:puntos' %}">Cancelar</a></div>
+</form></section>
+{% endblock %}

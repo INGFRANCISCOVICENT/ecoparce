@@ -1,0 +1,57 @@
+{% extends 'base.html' %}{% load static eco %}
+{% block titulo %}{% if q %}{{ q }} · Buscar{% else %}Buscar{% endif %}{% endblock %}
+{% block contenido %}
+<form class="search" style="margin-top:0" action="{% url 'buscador:buscar' %}" method="get" role="search">
+  {% icono 'search' 24 '#1E7A46' %}<label class="sr" for="q">¿Qué vas a botar?</label>
+  <input id="q" name="q" type="search" value="{{ q }}" placeholder="¿Qué vas a botar?" maxlength="100" autocomplete="off" {% if not q %}autofocus{% endif %} required>
+  <button type="submit">Buscar</button>
+</form>
+{% if principal %}
+<div class="crumb" style="margin-top:14px">{{ total }} resultado{{ total|pluralize }}</div>
+<section class="card" style="padding:18px">
+  <div class="small mut" style="font-weight:700">{{ principal.nombre }}</div>
+  <div style="font-size:15px;margin-top:2px">{% if principal.contenedor.es_bolsa %}va en la{% else %}no va en ninguna bolsa: llévalo a un{% endif %}</div>
+  <div class="row" style="margin:8px 0 6px"><span class="swatch xl chip-{{ principal.contenedor.codigo }}">{% if not principal.contenedor.es_bolsa %}{% icono principal.nombre|icono_residuo 30 '#fff' %}{% endif %}</span>
+    <div style="font-size:28px;font-weight:800;line-height:1.1">{{ principal.contenedor.nombre }}</div></div>
+  {% if principal.pasos %}
+  <h2 style="font-size:17px;margin-top:14px">Cómo prepararlo</h2>
+  <ul class="ok">{% for p in principal.pasos %}<li>{% icono 'check' 20 '#1E7A46' 3 %}{{ p|capfirst }}</li>{% endfor %}</ul>
+  {% endif %}
+</section>
+<div class="speech" style="margin-top:14px"><img src="{% static 'img/logo-96.png' %}" alt="Escarlata, mascota de EcoParce"><div>
+  {% if principal.contenedor.codigo == 'BLANCA' %}¡Bien, parce! Limpio y seco vale más para quien lo recicla.
+  {% elif principal.contenedor.codigo == 'VERDE' %}¡Eso! Los orgánicos bien separados se pueden volver abono.
+  {% elif principal.contenedor.codigo == 'NEGRA' %}Este no se puede aprovechar: a la bolsa negra, bien cerrada.
+  {% else %}Guárdalo aparte, sin romperlo ni mezclarlo, y llévalo a un punto de entrega.{% endif %}</div></div>
+{% if principal.es_especial %}
+<a class="card row" style="margin-top:14px" href="{% url 'contenidos:puntos' %}?residuo={{ principal.pk }}">{% icono 'pin' 24 '#C81E1E' %}<strong>Ver puntos de entrega</strong><span class="ml">{% icono 'arrow' 22 '#1E7A46' %}</span></a>
+{% endif %}
+{% if guia %}
+<a class="card row" style="margin-top:10px" href="{{ guia.get_absolute_url }}">{% icono 'book' 24 '#1E7A46' %}<strong>Ver la guía: {{ guia.titulo }}</strong><span class="ml">{% icono 'arrow' 22 '#1E7A46' %}</span></a>
+{% endif %}
+{% if otros %}
+<h2>También coincide</h2>
+<div class="lista">{% for r in otros %}<a class="card row" href="?q={{ r.nombre|urlencode }}"><span class="swatch chip-{{ r.contenedor.codigo }}" style="width:32px;height:32px;border-radius:9px"></span><span><strong>{{ r.nombre }}</strong> <span class="small mut">· {{ r.contenedor.nombre }}</span></span></a>{% endfor %}</div>
+{% endif %}
+{% elif q %}
+<section class="card center" style="margin-top:14px;padding:22px 16px">
+  <img src="{% static 'img/logo-256.png' %}" alt="Escarlata, guacamaya roja de EcoParce" style="width:88px;height:88px;border-radius:50%">
+  <h1 style="font-size:21px;margin:10px 0 4px">Aún no tengo ese residuo</h1>
+  <p class="mut" style="margin:0">Mientras lo revisamos, no lo mezcles con los reciclables. Cuéntanos y lo agregamos.</p>
+</section>
+{% if otros %}<p class="small mut" style="margin-top:10px">¿Quisiste decir {% for r in otros %}<a href="?q={{ r.nombre|urlencode }}">{{ r.nombre }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}?</p>{% endif %}
+<h2>Sugerir el residuo</h2>
+<form method="post" action="{% url 'buscador:sugerir' %}">{% csrf_token %}
+  {% include 'includes/campo.html' with campo=form.termino %}
+  {% include 'includes/campo.html' with campo=form.comentario %}
+  <div class="oculto" aria-hidden="true">{{ form.sitio_web }}</div>
+  <p class="xs mut" style="margin:8px 0 12px">No pedimos tu nombre ni tu correo.</p>
+  <button class="btn p full" type="submit">{% icono 'send' 20 '#fff' %}Enviar sugerencia</button>
+</form>
+{% else %}
+<h2>Prueba con</h2>
+<div class="row" style="flex-wrap:wrap;gap:8px">
+<a class="tag" href="?q=botella">botella</a><a class="tag" href="?q=pilas">pilas</a><a class="tag" href="?q=cascara">cáscara</a><a class="tag" href="?q=servilleta">servilleta</a><a class="tag" href="?q=tetrapak">caja de leche</a><a class="tag" href="?q=aceite">aceite de cocina</a></div>
+<div class="speech" style="margin-top:16px"><img src="{% static 'img/logo-96.png' %}" alt="Escarlata, mascota de EcoParce"><div>Escribe el nombre como lo dices en tu casa: «tetrapak», «icopor», «cuncho de café»... yo lo entiendo.</div></div>
+{% endif %}
+{% endblock %}

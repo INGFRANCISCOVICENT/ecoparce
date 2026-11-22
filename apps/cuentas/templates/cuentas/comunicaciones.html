@@ -1,0 +1,28 @@
+{% extends 'base.html' %}{% load eco %}
+{% block titulo %}Preferencias de comunicaciones{% endblock %}
+{% block contenido %}
+<div class="crumb"><a href="{% url 'cuentas:mi_cuenta' %}">Mi cuenta</a> › Comunicaciones</div>
+<h1>Preferencias de comunicaciones</h1>
+<p class="mut">Tú decides si quieres recibir novedades educativas y tips de reciclaje en <strong>{{ user.correo }}</strong>. Puedes darte de baja en un solo clic.</p>
+
+<section class="card" style="margin-top:12px">
+  <div class="row">
+    <span class="ic" style="background:{% if consentimiento and consentimiento.acepta_marketing %}var(--gl){% else %}#ECEFF1{% endif %}">
+      {% icono 'msg' 22 '#14532D' %}
+    </span>
+    <div>
+      <strong>Novedades educativas y tips ambientales</strong>
+      <div class="small mut">Estado actual: {% if consentimiento and consentimiento.acepta_marketing %}<span class="st s-pub">Activadas</span>{% else %}<span class="st s-bor">Desactivadas (sin correos)</span>{% endif %}</div>
+    </div>
+  </div>
+  <form method="post" style="margin-top:14px">{% csrf_token %}
+    {% if consentimiento and consentimiento.acepta_marketing %}
+    <button class="btn r full" type="submit" name="accion" value="baja">{% icono 'x' 18 '#C81E1E' %}Darme de baja de novedades por correo</button>
+    {% else %}
+    <button class="btn p full" type="submit" name="accion" value="alta">{% icono 'check' 18 '#fff' %}Activar novedades educativas por correo</button>
+    {% endif %}
+  </form>
+  <p class="xs mut" style="margin-top:10px">Nota: los correos transaccionales de seguridad (códigos de verificación, recuperación de contraseña y alertas de cambio de clave) se envían únicamente cuando interactúas con tu cuenta.</p>
+</section>
+<a class="btn o full" style="margin-top:12px" href="{% url 'cuentas:mi_cuenta' %}">{% icono 'back' 18 '#1E7A46' %}Volver a Mi cuenta</a>
+{% endblock %}

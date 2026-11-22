@@ -1,0 +1,27 @@
+{% extends 'panel/base.html' %}
+{% block titulo %}Pregunta{% endblock %}{% block encabezado %}{% if pregunta %}Editar pregunta{% else %}Nueva pregunta{% endif %}{% endblock %}
+{% block contenido %}
+<form method="post" novalidate>{% csrf_token %}
+<div class="dos ed">
+<section class="card">
+{% for campo in form %}{% include 'includes/campo.html' %}{% endfor %}
+</section>
+<section class="card"><strong>Opciones</strong>
+<p class="xs mut">Escribe de 2 a 4 opciones y marca la correcta.</p>
+{% if opciones.non_field_errors %}<div class="aviso error">{{ opciones.non_field_errors.0 }}</div>{% endif %}
+<div class="opciones-grid">
+{% for radio, campo in opciones.filas %}
+  <span class="letra">{{ radio.choice_label }}</span>
+  <div>{{ campo }}{{ campo.errors }}</div>
+  <label class="check" style="margin:0;font-weight:600">{{ radio.tag }} Correcta</label>
+{% endfor %}
+</div>
+{{ opciones.correcta.errors }}
+</section>
+</div>
+<div class="row" style="margin-top:16px;flex-wrap:wrap">
+<button class="btn o" type="submit">Guardar</button>
+<button class="btn p" type="submit" name="activar" value="1">Guardar y activar</button>
+<a class="btn o" href="{% url 'panel_trivia:lista' %}">Cancelar</a></div>
+</form>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% autoescape off %}Hola, parce:
+
+{% block content %}{% endblock content %}
+
+—
+EcoParce · Sistema de reciclaje y manejo de residuos
+Este es un mensaje transaccional de seguridad/verificación enviado por tu cuenta.
+Si no fuiste tú, ignora el mensaje; tu cuenta sigue protegida.
+
+Gestionar preferencias o darte de baja de novedades: https://www.ecoparce.com.co/cuenta/comunicaciones/
+Soporte y privacidad: soporte@ecoparce.com.co · privacidad@ecoparce.com.co
+{% endautoescape %}

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}{% load static %}
+{% block titulo %}{% block head_title %}{% endblock head_title %}{% endblock %}
+{% block contenido %}
+<div class="entrada">
+  <div class="card entrada-card">
+    <a class="marca entrada-marca" href="{% url 'core:inicio' %}"><img src="{% static 'img/logo-96.png' %}" alt="" width="48" height="48"><span class="brand"><span class="e">Eco</span><span class="p">Parce</span></span></a>
+    {% block content %}{% endblock content %}
+  </div>
+</div>
+{% block extra_body %}{% endblock extra_body %}
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "account/base_reauthenticate.html" %}{% load allauth eco %}
+{% block reauthenticate_content %}
+{% if user.has_usable_password %}
+  {% element p %}Por seguridad, confirma tu contraseña para continuar.{% endelement %}
+  <form method="post" action="{% url 'account_reauthenticate' %}" novalidate>{% csrf_token %}
+    {% element fields form=form %}{% endelement %}
+    {{ redirect_field }}
+    <button class="btn p full" style="margin-top:14px" type="submit">Confirmar</button>
+  </form>
+{% else %}
+  <div class="aviso info">{% icono 'lock' 20 %}<span>Por seguridad, esta acción exige que hayas ingresado hace pocos minutos. Vuelve a entrar con Google y repítela.</span></div>
+  <form method="post" action="{% url 'account_logout' %}">{% csrf_token %}
+    <input type="hidden" name="next" value="{% url 'account_login' %}?next={{ request.GET.next|default:'/cuenta/'|urlencode }}">
+    <button class="btn p full" type="submit">Volver a ingresar</button>
+  </form>
+{% endif %}
+{% endblock %}

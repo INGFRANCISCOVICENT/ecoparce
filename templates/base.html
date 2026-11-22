@@ -1,0 +1,76 @@
+{% load static eco %}<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{% block titulo %}EcoParce{% endblock %} · Sistema de reciclaje y manejo de residuos</title>
+<meta name="description" content="{% block descripcion %}Aprende a separar en la fuente con el código de colores de Colombia: bolsa blanca, negra y verde, y dónde llevar los residuos especiales.{% endblock %}">
+<meta name="theme-color" content="#1E7A46">
+<meta name="color-scheme" content="light">
+<link rel="canonical" href="{{ SITE_URL }}{{ request.path }}">
+<link rel="manifest" href="{% static 'manifest.webmanifest' %}">
+<link rel="icon" href="{% static 'img/favicon-32.png' %}" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
+<meta property="og:site_name" content="EcoParce">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_CO">
+<meta name="twitter:card" content="summary">
+{% block og %}
+<meta property="og:title" content="EcoParce · Sistema de reciclaje y manejo de residuos">
+<meta property="og:description" content="Aprende a separar en la fuente con el código de colores de Colombia: bolsa blanca, negra y verde, y dónde llevar los residuos especiales.">
+<meta property="og:image" content="{{ SITE_URL }}{% static 'img/logo-256.png' %}">
+{% endblock %}
+<link rel="stylesheet" href="{% static 'css/ecoparce.css' %}">
+</head>
+<body>
+<a class="saltar" href="#contenido">Ir al contenido</a>
+<header class="top" id="encabezado">
+  <a class="marca" href="{% url 'core:inicio' %}" aria-label="EcoParce, ir al inicio">
+    <img src="{% static 'img/logo-96.png' %}" alt="" width="40" height="40">
+    <span class="brand"><span class="e">Eco</span><span class="p">Parce</span></span>
+  </a>
+  <nav class="escritorio" aria-label="Secciones">
+    <a class="{% activo '/' %}" {% aria_actual '/' %} href="{% url 'core:inicio' %}">Inicio</a>
+    <a class="{% activo '/guias/' '/manejo/' %}" {% aria_actual '/guias/' '/manejo/' %} href="{% url 'contenidos:guias' %}">Guías</a>
+    <a class="{% activo '/buscar/' %}" {% aria_actual '/buscar/' %} href="{% url 'buscador:buscar' %}">Buscar</a>
+    <a class="{% activo '/escanear/' %}" {% aria_actual '/escanear/' %} href="{% url 'buscador:escanear' %}">Escanear</a>
+    <a class="{% activo '/puntos/' %}" {% aria_actual '/puntos/' %} href="{% url 'contenidos:puntos' %}">Puntos</a>
+    <a class="{% activo '/trivia/' %}" {% aria_actual '/trivia/' %} href="{% url 'trivia:inicio' %}">Trivia</a>
+  </nav>
+  {% if user.is_authenticated %}
+  <a class="cuenta" href="{% if user.es_personal %}{% url 'estadisticas:resumen' %}{% else %}{% url 'cuentas:mi_cuenta' %}{% endif %}" aria-label="Mi cuenta">{% icono 'users' 18 %}<span>{{ user.nombre.split.0|truncatechars:12 }}</span></a>
+  {% else %}
+  <a class="cuenta" href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}">{% icono 'users' 18 %}<span>Ingresar</span></a>
+  {% endif %}
+</header>
+<main id="contenido" class="wrap" tabindex="-1">
+{% for m in messages %}<div class="aviso {% if m.tags == 'error' %}error{% elif m.tags == 'warning' or m.tags == 'info' %}info{% else %}ok{% endif %}" role="{% if m.tags == 'error' %}alert{% else %}status{% endif %}">{% icono 'info' 20 %}<span>{{ m }}</span><button class="aviso-cerrar" type="button" aria-label="Cerrar aviso" data-cerrar-aviso>{% icono 'x' 16 %}</button></div>{% endfor %}
+{% block contenido %}{% endblock %}
+</main>
+<footer class="pie">
+  <p>EcoParce v{{ APP_VERSION }} · Sistema de reciclaje y manejo de residuos · {{ ANIO }}<br>
+  Basado en la Resolución 2184 de 2019 (MinAmbiente). · <a href="{% url 'core:privacidad' %}">Privacidad</a> · <a href="{% url 'core:terminos' %}">Términos</a> · <a href="{% url 'core:licencias' %}">Licencias</a><br>
+  Soporte: <a href="mailto:soporte@ecoparce.com.co">soporte@ecoparce.com.co</a> · <button type="button" class="link-btn" id="btn-preferencias-cookies">Preferencias de cookies</button> · <button type="button" class="link-btn" id="btn-contraste" aria-pressed="false">Alto contraste</button></p>
+</footer>
+<aside id="banner-cookies" class="cookies-banner" role="dialog" aria-label="Aviso de cookies" aria-live="polite" hidden>
+  <div class="cookies-inner">
+    <div>
+      <strong>Cookies y privacidad en EcoParce</strong>
+      <p class="small mut" style="margin:4px 0 0">Usamos cookies técnicas necesarias para tu sesión y seguridad (CSRF), y bloqueamos recursos externos como el mapa de OpenStreetMap hasta que aceptes. No usamos rastreadores publicitarios. <a href="{% url 'core:privacidad' %}">Política de privacidad</a>.</p>
+    </div>
+    <div class="cookies-acciones">
+      <button type="button" class="btn o sm" id="cookies-esenciales">Solo esenciales</button>
+      <button type="button" class="btn p sm" id="cookies-aceptar">Aceptar cookies</button>
+    </div>
+  </div>
+</aside>
+<nav class="tabbar" aria-label="Navegación principal">
+  <a class="{% activo '/' %}" {% aria_actual '/' %} href="{% url 'core:inicio' %}">{% icono 'home' 24 %}<span>Inicio</span></a>
+  <a class="{% activo '/guias/' '/manejo/' %}" {% aria_actual '/guias/' '/manejo/' %} href="{% url 'contenidos:guias' %}">{% icono 'book' 24 %}<span>Guías</span></a>
+  <a class="{% activo '/escanear/' %} tab-escanear" {% aria_actual '/escanear/' %} href="{% url 'buscador:escanear' %}">{% icono 'qr' 24 %}<span>Escanear</span></a>
+  <a class="{% activo '/buscar/' '/puntos/' %}" {% aria_actual '/buscar/' '/puntos/' %} href="{% url 'buscador:buscar' %}">{% icono 'search' 24 %}<span>Buscar</span></a>
+  <a class="{% activo '/trivia/' %}" {% aria_actual '/trivia/' %} href="{% url 'trivia:inicio' %}">{% icono 'game' 24 %}<span>Trivia</span></a>
+</nav>
+<script src="{% static 'js/ecoparce.js' %}" defer></script>
+</body>
+</html>

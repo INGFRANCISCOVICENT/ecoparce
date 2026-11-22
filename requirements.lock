@@ -1,0 +1,24 @@
+# Árbol completo de dependencias verificado con pip-audit (sin vulnerabilidades conocidas al 2026-11-21).
+# Instalar en producción con: pip install -r requirements.lock
+argon2-cffi==25.1.0
+argon2-cffi-bindings==26.2.0
+asgiref==3.13.0
+certifi==2026.11.20
+cffi==2.1.1
+charset-normalizer==3.5.2
+cryptography==50.0.2
+Django==5.2.19
+django-allauth==65.22.1
+dnspython==2.9.2
+fido2==2.2.1
+idna==3.20
+mysqlclient==2.3.2
+oauthlib==4.0.1
+pillow==13.0.0
+pycparser==3.12
+PyJWT==2.15.1
+python-dotenv==1.2.4
+qrcode==8.2
+requests==2.34.2
+sqlparse==0.6.1
+urllib3==2.8.0

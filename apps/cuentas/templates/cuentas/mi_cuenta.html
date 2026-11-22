@@ -1,0 +1,66 @@
+{% extends 'base.html' %}{% load eco %}
+{% block titulo %}Mi cuenta{% endblock %}
+{% block contenido %}
+<h1>Mi cuenta</h1>
+<div class="card row" style="margin-top:10px">
+  <span class="av" style="width:48px;height:48px;font-size:18px">{{ user.iniciales }}</span>
+  <div><strong>{{ user.nombre }}</strong><div class="small mut">{{ user.correo }}</div>
+  <div class="xs mut">{% if google %}Conectada con Google{% else %}Ingreso con correo y contraseña{% endif %}{% if tiene_mfa %} · Verificación en dos pasos activa{% endif %}</div></div>
+</div>
+{% if user.es_personal %}
+<a class="card row" style="margin-top:10px" href="{% url 'estadisticas:resumen' %}">{% icono 'chart' 24 '#1E7A46' %}<strong>Ir al panel de administración</strong><span class="ml">{% icono 'arrow' 22 '#1E7A46' %}</span></a>
+{% endif %}
+
+<h2>Mis insignias ecológicas ({{ insignias_obtenidas }}/{{ insignias|length }})</h2>
+<div class="grid insignias-grid">
+  {% for ins in insignias %}
+  <div class="insignia {% if ins.obtenida %}obtenida{% else %}bloqueada{% endif %}">
+    <span class="insignia-ic" style="background:{{ ins.fondo }};color:{{ ins.color }}">{% icono ins.icono 22 ins.color %}</span>
+    <div>
+      <strong>{{ ins.nombre }}</strong>
+      <div class="xs mut">{{ ins.descripcion }}</div>
+      {% if ins.obtenida %}<span class="xs" style="color:var(--gd);font-weight:800">Obtenida{% if ins.obtenida_en %} · {{ ins.obtenida_en|date:"j M Y" }}{% endif %}</span>{% else %}<span class="xs mut">Por desbloquear</span>{% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<h2>Mi progreso en la trivia</h2>
+{% if resumen %}
+<div class="grid">
+  <div class="card center"><div class="puntaje" style="font-size:40px">{{ resumen.mejor }}/5</div><div class="small mut">mejor puntaje</div></div>
+  <div class="card center"><div class="puntaje" style="font-size:40px">{{ resumen.jugadas }}</div><div class="small mut">partidas · {{ resumen.perfectas }} perfecta{{ resumen.perfectas|pluralize }}</div></div>
+</div>
+<div class="card" style="margin-top:10px"><table>{% for p in partidas %}<tr><td class="small">{{ p.iniciada_en|date:"j M Y, H:i" }} · <span class="tag">Nivel {{ p.nivel }}</span></td><td class="right"><strong>{{ p.puntaje }}/{{ p.total_preguntas }}</strong></td></tr>{% endfor %}</table></div>
+{% else %}
+<div class="card small mut">Aún no tienes partidas guardadas. <a href="{% url 'trivia:inicio' %}">Juega la trivia por niveles</a> y colecciona tus insignias.</div>
+{% endif %}
+
+{% if sugerencias %}
+<h2>Mis sugerencias</h2>
+<div class="card"><table>{% for s in sugerencias %}<tr><td><strong>{{ s.termino }}</strong><div class="xs mut">{{ s.fecha_hora|date:"j M Y" }}</div></td><td class="right"><span class="st {{ s.estado|clase_estado }}">{{ s.get_estado_display }}</span></td></tr>{% endfor %}</table></div>
+{% endif %}
+
+<h2>Seguridad y comunicaciones</h2>
+<div class="lista">
+  <a class="card row" href="{% url 'cuentas:comunicaciones' %}">{% icono 'msg' 24 '#1E7A46' %}<span><strong>Preferencias de correos y novedades</strong><br><span class="small mut">{% if consentimiento and consentimiento.acepta_marketing %}Novedades activadas (puedes darte de baja en 1 clic){% else %}Sin correos promocionales ni novedades{% endif %}</span></span><span class="ml">{% icono 'arrow' 22 '#1E7A46' %}</span></a>
+  <a class="card row" href="{% url 'mfa_index' %}">{% icono 'shield' 24 '#1E7A46' %}<span><strong>Verificación en dos pasos</strong><br><span class="small mut">{% if tiene_mfa %}Activa{% else %}Opcional para visitantes, obligatoria para administradores{% endif %}</span></span><span class="ml">{% icono 'arrow' 22 '#1E7A46' %}</span></a>
+  {% if user.has_usable_password %}<a class="card row" href="{% url 'account_change_password' %}">{% icono 'lock' 24 '#1E7A46' %}<strong>Cambiar contraseña</strong><span class="ml">{% icono 'arrow' 22 '#1E7A46' %}</span></a>
+  {% else %}<a class="card row" href="{% url 'account_set_password' %}">{% icono 'lock' 24 '#1E7A46' %}<span><strong>Crear una contraseña</strong><br><span class="small mut">Para entrar también sin Google</span></span><span class="ml">{% icono 'arrow' 22 '#1E7A46' %}</span></a>{% endif %}
+</div>
+
+<h2>Mis datos y cancelación</h2>
+<p class="small mut">Según la Ley 1581 de 2012 puedes conocer, descargar y suprimir tus datos cuando quieras.{% if consentimiento %} Aceptaste los Términos y la Política de Privacidad el <strong>{{ consentimiento.aceptado_en|date:"j M Y, H:i" }}</strong> (versión {{ consentimiento.version }}).{% endif %}</p>
+<a class="btn o full" href="{% url 'cuentas:exportar' %}">{% icono 'down' 20 '#1E7A46' %}Descargar mis datos (JSON)</a>
+<form method="post" action="{% url 'account_logout' %}" style="margin-top:10px">{% csrf_token %}<button class="btn o full" type="submit">{% icono 'logout' 20 '#1E7A46' %}Cerrar sesión</button></form>
+{% if not user.es_personal %}
+<section class="card" style="margin-top:16px;border-color:#F2C4BE">
+  <strong style="color:var(--r)">Eliminar mi cuenta</strong>
+  <p class="small mut" style="margin-top:6px">Cancelar es tan sencillo como registrarse: se borran tu nombre, correo, credenciales, insignias y autorizaciones. Tus partidas y sugerencias quedan anónimas.</p>
+  <form method="post" action="{% url 'cuentas:eliminar' %}" novalidate>{% csrf_token %}
+    {% include 'includes/campo.html' with campo=eliminar_form.confirmacion %}
+    <button class="btn r full" style="margin-top:12px" type="submit">{% icono 'trash' 20 '#C81E1E' %}Eliminar definitivamente</button>
+  </form>
+</section>
+{% endif %}
+{% endblock %}

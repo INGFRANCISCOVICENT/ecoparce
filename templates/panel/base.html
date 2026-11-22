@@ -1,0 +1,46 @@
+{% load static eco %}<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#14532D">
+<meta name="color-scheme" content="light">
+<title>{% block titulo %}Panel{% endblock %} · Panel EcoParce</title>
+<link rel="icon" href="{% static 'img/favicon-32.png' %}" sizes="32x32" type="image/png">
+<link rel="stylesheet" href="{% static 'css/ecoparce.css' %}">
+</head>
+<body>
+<a class="saltar" href="#contenido">Ir al contenido</a>
+<div class="adm">
+<aside class="side" aria-label="Menú del panel">
+  <a class="b" href="{% url 'estadisticas:resumen' %}"><img src="{% static 'img/logo-96.png' %}" alt="" width="40" height="40"><span class="brand"><span class="e">Eco</span><span class="p">Parce</span></span></a>
+  <a class="nav {% activo '/panel/' %}" {% aria_actual '/panel/' %} href="{% url 'estadisticas:resumen' %}">{% icono 'chart' 20 %}Resumen</a>
+  <a class="nav {% activo '/panel/contenidos/' %}" {% aria_actual '/panel/contenidos/' %} href="{% url 'panel_contenidos:lista' %}">{% icono 'file' 20 %}Guías y residuos</a>
+  <a class="nav {% activo '/panel/revision/' %}" {% aria_actual '/panel/revision/' %} href="{% url 'panel_contenidos:revision' %}">{% icono 'eye' 20 %}Revisión{% if PEND_REVISION %}<span class="cnt">{{ PEND_REVISION }}</span>{% endif %}</a>
+  <a class="nav {% activo '/panel/puntos/' %}" {% aria_actual '/panel/puntos/' %} href="{% url 'panel_contenidos:puntos' %}">{% icono 'pin' 20 %}Puntos de entrega</a>
+  <a class="nav {% activo '/panel/trivia/' %}" {% aria_actual '/panel/trivia/' %} href="{% url 'panel_trivia:lista' %}">{% icono 'game' 20 %}Trivia</a>
+  <a class="nav {% activo '/panel/sugerencias/' %}" {% aria_actual '/panel/sugerencias/' %} href="{% url 'panel_buscador:sugerencias' %}">{% icono 'msg' 20 %}Sugerencias{% if PEND_SUGERENCIAS %}<span class="cnt">{{ PEND_SUGERENCIAS }}</span>{% endif %}</a>
+  {% if user.es_admin_sistema %}
+  <div class="sep">Administrador del sistema</div>
+  <a class="nav {% activo '/panel/qr/' %}" {% aria_actual '/panel/qr/' %} href="{% url 'panel_qr:lista' %}">{% icono 'qr' 20 %}Códigos QR</a>
+  <a class="nav {% activo '/panel/estadisticas/' %}" {% aria_actual '/panel/estadisticas/' %} href="{% url 'estadisticas:detalle' %}">{% icono 'chart' 20 %}Estadísticas</a>
+  <a class="nav {% activo '/panel/usuarios/' %}" {% aria_actual '/panel/usuarios/' %} href="{% url 'cuentas:usuarios' %}">{% icono 'users' 20 %}Administradores</a>
+  <a class="nav {% activo '/panel/auditoria/' %}" {% aria_actual '/panel/auditoria/' %} href="{% url 'cuentas:auditoria' %}">{% icono 'history' 20 %}Auditoría</a>
+  {% endif %}
+  <div class="sep">Cuenta</div>
+  <a class="nav" href="{% url 'mfa_index' %}">{% icono 'shield' 20 %}Seguridad (2FA)</a>
+  <a class="nav" href="{% url 'core:inicio' %}">{% icono 'home' 20 %}Ver sitio público</a>
+  <form method="post" action="{% url 'account_logout' %}">{% csrf_token %}<button class="nav" type="submit">{% icono 'logout' 20 %}Cerrar sesión</button></form>
+</aside>
+<main class="main" id="contenido" tabindex="-1">
+  <div class="hd"><h1>{% block encabezado %}{% endblock %}</h1>
+    <div class="u"><span>{{ user.nombre_corto }} · {{ user.get_rol_display }}</span><a class="av" href="{% url 'cuentas:mi_cuenta' %}" title="Mi cuenta" aria-label="Mi cuenta ({{ user.nombre_corto }})">{{ user.iniciales }}</a></div>
+  </div>
+  {% for m in messages %}<div class="aviso {% if m.tags == 'error' %}error{% elif m.tags == 'warning' %}info{% else %}ok{% endif %}" role="{% if m.tags == 'error' %}alert{% else %}status{% endif %}">{% icono 'info' 20 %}<span>{{ m }}</span><button class="aviso-cerrar" type="button" aria-label="Cerrar aviso" data-cerrar-aviso>{% icono 'x' 16 %}</button></div>{% endfor %}
+  {% block contenido %}{% endblock %}
+</main>
+</div>
+<script src="{% static 'js/ecoparce.js' %}" defer></script>
+</body>
+</html>

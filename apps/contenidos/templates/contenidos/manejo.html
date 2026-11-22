@@ -1,0 +1,18 @@
+{% extends 'base.html' %}{% load eco %}
+{% block titulo %}Residuos especiales{% endblock %}
+{% block contenido %}
+<div class="crumb">Manejo de basuras</div>
+<h1>Residuos especiales</h1>
+<p class="mut">No van en ninguna bolsa. Elige el residuo y te mostramos los puntos oficiales de Bogotá donde lo reciben.</p>
+<div class="grid" style="margin-top:14px">
+  {% for r in especiales %}
+  <a class="card row" style="padding:12px" href="{% url 'contenidos:puntos' %}?residuo={{ r.pk }}">
+    {% icono r.nombre|icono_residuo 24 '#C81E1E' %}<strong>{{ r.nombre }}</strong></a>
+  {% empty %}<p class="mut">Pronto publicaremos los residuos especiales.</p>{% endfor %}
+</div>
+<a class="btn p full" style="margin-top:16px" href="{% url 'contenidos:puntos' %}">{% icono 'pin' 20 '#fff' %}Ver todos los puntos en el mapa</a>
+{% if guias_manejo %}
+<h2>Guías de manejo</h2>
+<div class="lista">{% for g in guias_manejo %}<a class="card row" href="{{ g.get_absolute_url }}">{% icono 'book' 24 '#1E7A46' %}<span><strong>{{ g.titulo }}</strong><br><span class="small mut">{{ g.resumen }}</span></span><span class="ml">{% icono 'arrow' 22 '#1E7A46' %}</span></a>{% endfor %}</div>
+{% endif %}
+{% endblock %}

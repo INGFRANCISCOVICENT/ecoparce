@@ -1,0 +1,39 @@
+{% extends 'base.html' %}{% load static eco %}
+{% block titulo %}{{ guia.titulo }}{% endblock %}
+{% block descripcion %}{{ guia.resumen }}{% endblock %}
+{% block og %}<meta property="og:title" content="{{ guia.titulo }} · EcoParce"><meta property="og:description" content="{{ guia.resumen }}"><meta property="og:image" content="{{ SITE_URL }}{% static 'img/logo-256.png' %}">{% endblock %}
+{% block contenido %}
+{% if origen %}
+<div class="aviso qr">{% icono 'qr' 22 '#1F4FA3' %}<div><strong>Llegaste por un código QR</strong><br><span class="mut">{% if origen.institucion %}{{ origen.institucion }} · {% endif %}{{ origen.ubicacion }}</span></div></div>
+{% endif %}
+<div class="crumb"><a href="{% url 'contenidos:guias' %}">Guías</a> › {{ guia.get_tipo_display }}</div>
+<div class="row top-al">
+  {% if guia.contenedor %}<span class="swatch chip-{{ guia.contenedor.codigo }}">{% if guia.contenedor.codigo == 'POSCONSUMO' %}{% icono 'battery' 26 '#fff' %}{% endif %}</span>{% endif %}
+  <div><h1>{{ guia.titulo }}</h1>
+    {% if guia.contenedor and guia.contenedor.codigo != 'NEGRA' and guia.contenedor.codigo != 'POSCONSUMO' %}<span class="pill" style="background:var(--gl);color:var(--gd)">{% icono 'check' 16 '#14532D' 3 %}Aprovechables</span>
+    {% elif guia.contenedor.codigo == 'NEGRA' %}<span class="pill" style="background:#ECEFF1;color:#37474F">No aprovechables</span>
+    {% elif guia.contenedor.codigo == 'POSCONSUMO' %}<span class="pill" style="background:var(--rl);color:#8E1414">Punto de entrega</span>{% endif %}
+  </div>
+</div>
+<p class="mut" style="margin-top:10px">{{ guia.resumen }}</p>
+{% if guia.parrafos %}<div class="prose">{% for p in guia.parrafos %}<p>{{ p }}</p>{% endfor %}</div>{% endif %}
+{% if guia.que_va %}<h2>{% if guia.tipo == 'MANEJO' %}Haz esto{% else %}Qué va{% endif %}</h2>
+<ul class="ok">{% for x in guia.que_va %}<li>{% icono 'check' 20 '#1E7A46' 3 %}{{ x }}</li>{% endfor %}</ul>{% endif %}
+{% if guia.que_no_va %}<h2>{% if guia.tipo == 'MANEJO' %}Evita esto{% else %}Qué no va{% endif %}</h2>
+<ul class="no">{% for x in guia.que_no_va %}<li>{% icono 'x' 20 '#C81E1E' 3 %}{{ x }}</li>{% endfor %}</ul>{% endif %}
+{% if residuos %}
+<h2>Residuos de esta guía</h2>
+<div class="grid">{% for r in residuos %}<a class="card small" href="{% url 'buscador:buscar' %}?q={{ r.nombre|urlencode }}"><strong>{{ r.nombre }}</strong></a>{% endfor %}</div>
+{% endif %}
+{% if guia.tipo == 'ESPECIAL' %}<a class="btn o full" style="margin-top:16px" href="{% url 'contenidos:manejo' %}">{% icono 'pin' 20 '#1E7A46' %}Ver puntos de entrega</a>{% endif %}
+<div class="speech" style="margin-top:16px"><img src="{% static 'img/logo-96.png' %}" alt="Escarlata, mascota de EcoParce"><div><strong>Tip de Escarlata:</strong>
+{% if guia.contenedor.codigo == 'BLANCA' %}entrégalo limpio y seco. Así el reciclador sí lo puede aprovechar.
+{% elif guia.contenedor.codigo == 'VERDE' %}escurre bien los restos de comida antes de echarlos a la bolsa verde.
+{% elif guia.contenedor.codigo == 'NEGRA' %}cierra bien la bolsa negra para que no se riegue en el camino.
+{% elif guia.contenedor.codigo == 'POSCONSUMO' %}nunca lo mezcles con la basura: guárdalo aparte hasta llevarlo al punto.
+{% else %}saca la basura solo en el horario de recolección de tu sector.{% endif %}</div></div>
+<p class="src">Fuente: {{ guia.fuente_oficial }}</p>
+<button class="btn o full" type="button" data-compartir data-url="{{ url_compartir }}" data-titulo="{{ guia.titulo }}">{% icono 'share' 20 '#1E7A46' %}Compartir esta guía</button>
+<a class="btn o full" style="margin-top:10px" href="https://wa.me/?text={{ guia.titulo|urlencode }}%20{{ url_compartir|urlencode }}" rel="noopener noreferrer" target="_blank">{% icono 'whatsapp' 20 '#1E7A46' %}Enviar por WhatsApp</a>
+<p id="aviso-copiado" class="aviso ok" role="status" aria-live="polite" hidden style="margin-top:10px">Enlace copiado. Pégalo donde quieras compartirlo.</p>
+{% endblock %}

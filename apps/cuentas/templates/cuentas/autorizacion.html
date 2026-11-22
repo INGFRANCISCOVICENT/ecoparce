@@ -1,0 +1,21 @@
+{% extends 'base.html' %}{% load eco %}
+{% block titulo %}Autorización de datos{% endblock %}
+{% block contenido %}
+<div class="entrada"><div class="card entrada-card">
+<h1 style="font-size:22px">Antes de continuar</h1>
+<p class="small">Hola, <strong>{{ user.nombre }}</strong>. Para tener una cuenta en EcoParce necesitamos tu autorización para tratar estos datos:</p>
+<ul class="ok small">
+  <li>{% icono 'check' 18 '#1E7A46' 3 %}Tu nombre y correo, para identificarte.</li>
+  <li>{% icono 'check' 18 '#1E7A46' 3 %}Tus puntajes de la trivia y tus sugerencias, para mostrarte tu progreso.</li>
+  <li>{% icono 'x' 18 '#C81E1E' 3 %}No vendemos ni compartimos tus datos, ni guardamos tu contraseña de Google.</li>
+</ul>
+<p class="xs mut" style="margin-top:10px">Puedes descargar o borrar tus datos cuando quieras desde «Mi cuenta». Versión: {{ version }}. <a href="{% url 'core:privacidad' %}" target="_blank" rel="noopener noreferrer">Política de privacidad</a> · <a href="{% url 'core:terminos' %}" target="_blank" rel="noopener noreferrer">Términos y condiciones</a>.</p>
+<form method="post" novalidate>{% csrf_token %}
+  <input type="hidden" name="next" value="{{ next }}">
+  {% include 'includes/campo.html' with campo=form.acepto %}
+  {% include 'includes/campo.html' with campo=form.acepta_marketing %}
+  <button class="btn p full" type="submit">Aceptar y continuar</button>
+  <button class="btn o full" style="margin-top:10px" type="submit" name="decision" value="rechazo" formnovalidate>No acepto, seguir sin cuenta</button>
+</form>
+</div></div>
+{% endblock %}

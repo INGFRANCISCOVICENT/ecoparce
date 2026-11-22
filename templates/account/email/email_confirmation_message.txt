@@ -1,0 +1,5 @@
+{% extends "account/email/base_message.txt" %}{% block content %}{% autoescape off %}{% if code %}Tu código para verificar tu correo en EcoParce es:
+
+    {{ code }}
+
+Escríbelo en la ventana del navegador donde creaste la cuenta. Vence en 15 minutos.{% else %}Para confirmar tu correo abre este enlace: {{ activate_url }}{% endif %}{% endautoescape %}{% endblock content %}

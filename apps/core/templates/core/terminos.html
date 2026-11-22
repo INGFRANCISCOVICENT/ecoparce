@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block titulo %}Términos y condiciones{% endblock %}
+{% block contenido %}
+<div class="crumb"><a href="{% url 'core:inicio' %}">Inicio</a> › Términos y condiciones</div>
+<h1>Términos y condiciones de uso</h1>
+<p class="xs mut">Versión 2026-11 · Última actualización: noviembre de 2026</p>
+<div class="card prose">
+<p><strong>1. Propósito y servicio 100 % gratuito (sin cargos ocultos).</strong> EcoParce es una plataforma web educativa y gratuita creada para enseñar a separar residuos en la fuente según la Resolución 2184 de 2019 (Ministerio de Ambiente y Desarrollo Sostenible de Colombia) y localizar puntos posconsumo oficiales. <strong>No existen cargos ocultos, suscripciones encubiertas ni renovaciones automáticas.</strong> Si en algún momento futuro se ofreciera una función de pago, se informaría el precio total antes de contratar y jamás se activaría una renovación automática sin aviso previo y consentimiento expreso.</p>
+
+<p><strong>2. Registro voluntario, consentimiento y cancelación sencilla.</strong> Crear cuenta es opcional. Al registrarte, aceptas estos Términos y la <a href="{% url 'core:privacidad' %}">Política de Privacidad</a> mediante una casilla sin marcar previamente; guardamos en base de datos la fecha y versión aceptadas. Cancelar tu cuenta es tan sencillo como crearla: puedes eliminarla directamente en <a href="{% url 'cuentas:mi_cuenta' %}">Mi cuenta</a> sin llamadas, encuestas obligatorias ni obstáculos.</p>
+
+<p><strong>3. Menores de edad.</strong> La consulta de guías, buscador, escáner, mapa y trivia sin cuenta es libre para todas las edades. Para abrir una cuenta personal debes ser mayor de 14 años o contar con la autorización expresa de tu madre, padre o acudiente.</p>
+
+<p><strong>4. Compromiso ético (sin patrones engañosos).</strong> En EcoParce nos comprometemos a no usar patrones oscuros: no mostramos cuentas regresivas falsas, ni reseñas inventadas, ni logotipos de clientes o entidades sin permiso expreso, ni promesas que no podamos comprobar.</p>
+
+<p><strong>5. Información de referencia y transparencia de IA.</strong> Cada guía cita su fuente oficial verificable. Las normas locales de tu municipio, conjunto o empresa de aseo pueden añadir indicaciones específicas que siempre debes priorizar. Los horarios de puntos posconsumo provienen de datos abiertos y pueden cambiar sin previo aviso: confírmalos antes de desplazarte. Las ilustraciones de la mascota Escarlata cuentan con asistencia de IA y están etiquetadas de forma transparente en <a href="{% url 'core:licencias' %}">Licencias y transparencia</a>.</p>
+
+<p><strong>6. Uso adecuado.</strong> No envíes datos personales de terceros ni contenido ofensivo en las sugerencias de residuos. Podemos moderar o descartar aportes que no correspondan al manejo de residuos.</p>
+
+<p><strong>7. Propiedad intelectual, licencias open source y reclamos de derechos de autor.</strong> El nombre EcoParce y los contenidos originales pertenecen al equipo del proyecto (Ley 23 de 1982). Cumplimos las licencias de todo el software libre, fuentes tipográficas y datos abiertos utilizados; puedes consultarlas en <a href="{% url 'core:licencias' %}">Licencias y atribuciones</a>. Si consideras que algún contenido vulnera derechos de autor, escríbenos a nuestro canal dedicado: <strong>derechos@ecoparce.com.co</strong> indicando la URL exacta, el material reclamado y tu contacto; revisaremos y retiraremos el contenido que corresponda a la mayor brevedad.</p>
+
+<p><strong>8. Disponibilidad realista.</strong> Operamos sobre infraestructura de alojamiento web estándar con nuestro mejor esfuerzo de continuidad, pero <strong>no garantizamos disponibilidad ininterrumpida del 100 %</strong> ni acuerdos de nivel de servicio comerciales: pueden ocurrir pausas breves por mantenimiento, actualizaciones de seguridad o caídas del proveedor de hosting o de servicios externos (Open Food Facts / OpenStreetMap).</p>
+
+<p><strong>9. Contacto de soporte.</strong> Para dudas, reportes de fallos o ayuda con tu cuenta, escribe a <strong>soporte@ecoparce.com.co</strong> (tiempo estimado de respuesta: 1 a 3 días hábiles).</p>
+</div>
+{% endblock %}

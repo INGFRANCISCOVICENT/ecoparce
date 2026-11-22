@@ -1,0 +1,36 @@
+{% extends 'base.html' %}{% load static eco %}
+{% block titulo %}Puntos de recolección{% if residuo %} · {{ residuo.nombre }}{% endif %}{% endblock %}
+{% block og %}<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}">{% endblock %}
+{% block contenido %}
+<div class="crumb"><a href="{% url 'contenidos:manejo' %}">Residuos especiales</a> › Puntos</div>
+<h1>Puntos de recolección{% if residuo %}: {{ residuo.nombre|lower }}{% endif %}</h1>
+{% if residuo and residuo.pasos %}
+<div class="card small" style="margin:8px 0 12px"><strong>Antes de llevarlo</strong>
+<ul class="ok" style="margin-top:4px">{% for p in residuo.pasos %}<li>{% icono 'check' 18 '#1E7A46' 3 %}{{ p|capfirst }}</li>{% endfor %}</ul></div>
+{% endif %}
+<form method="get" class="filtros" style="margin:10px 0">
+  <select name="residuo" aria-label="Residuo"><option value="">Todos los residuos</option>{% for r in especiales %}<option value="{{ r.pk }}" {% if residuo == r %}selected{% endif %}>{{ r.nombre }}</option>{% endfor %}</select>
+  <select name="localidad" aria-label="Localidad"><option value="">Todas las localidades</option>{% for l in localidades %}<option {% if l == localidad %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+  <button class="btn o sm" type="submit">{% icono 'filter' 16 %}Filtrar</button>
+</form>
+<button class="btn p full" type="button" id="cerca-de-mi">{% icono 'pin' 20 '#fff' %}Ver los más cercanos a mí</button>
+<p class="xs mut center" style="margin-top:6px">Tu ubicación se usa solo en tu teléfono para ordenar los puntos. No la enviamos ni la guardamos.</p>
+<div id="mapa" class="mapa" data-url="{% url 'contenidos:puntos_datos' %}?{{ request.GET.urlencode }}" role="region" aria-label="Mapa de puntos de recolección"></div>
+<p class="xs mut" id="estado-mapa">{{ total }} punto{{ total|pluralize }} {% if residuo %}que reciben {{ residuo.nombre|lower }}{% endif %}.</p>
+<div class="lista" id="lista-puntos">
+{% for p in primeros %}
+<div class="card"><strong>{{ p.nombre }}</strong>
+  <div class="dato">{% icono 'pin' 18 '#4B5A51' %}{{ p.direccion }} · {{ p.localidad }}{% if p.barrio %} ({{ p.barrio }}){% endif %}</div>
+  <div class="dato">{% icono 'clock' 18 '#4B5A51' %}{{ p.horario }}</div>
+  {% if p.telefono %}<div class="dato">{% icono 'phone' 18 '#4B5A51' %}{{ p.telefono }}</div>{% endif %}
+  <div class="xs mut" style="margin-top:6px">Recibe: {{ p.recibe|default:"—" }}</div>
+  <a class="btn o sm" style="margin-top:8px" href="{{ p.como_llegar }}" target="_blank" rel="noopener noreferrer">{% icono 'arrow' 16 %}Cómo llegar</a>
+</div>
+{% empty %}
+<div class="card mut">No hay puntos registrados con ese filtro. Prueba con otra localidad.</div>
+{% endfor %}
+</div>
+<p class="src">{% if hay_oficiales %}Fuente de los puntos: Secretaría Distrital de Ambiente de Bogotá, Visor Geográfico Ambiental (datos abiertos, licencia CC BY 4.0){% if actualizado %}, sincronizado el {{ actualizado|date:"j M Y" }}{% endif %}.{% else %}Puntos de ejemplo: aún no se han sincronizado los puntos oficiales.{% endif %} Mapa: © colaboradores de OpenStreetMap. Confirma el horario antes de ir.</p>
+<script src="{% static 'vendor/leaflet/leaflet.js' %}" defer></script>
+<script src="{% static 'js/puntos.js' %}" defer></script>
+{% endblock %}
