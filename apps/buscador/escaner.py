@@ -50,6 +50,43 @@ def _limpiar(tag):
     return str(tag or '').split(':', 1)[-1].lower()
 
 
+# Códigos y símbolos de reciclaje impresos en la base/etiqueta del envase (ISO 11469 / Res. 2184 de 2019).
+ETIQUETAS_RECICLAJE = [
+    (('pet', 'pete', 'polyethylene-terephthalate', '01-pet'), '1 · PET',
+     'Tereftalato de polietileno (botellas de agua, gaseosa y aceite). Es uno de los plásticos más reciclados en Colombia: vacíalo, enjuágalo y aplástalo para la bolsa blanca.'),
+    (('hdpe', 'pead', 'pe-hd', 'high-density', '02-hdpe'), '2 · HDPE',
+     'Polietileno de alta densidad (envases de detergente, shampoo, leche). Muy reciclable y resistente: entrégalo vacío, enjuagado y seco en la bolsa blanca.'),
+    (('pvc', '03-pvc', 'polyvinyl'), '3 · PVC',
+     'Policloruro de vinilo (blísters, ciertos empaques rígidos). Difícil de reciclar en recolección doméstica; consulta recicladores especializados o deposítalo en bolsa negra.'),
+    (('ldpe', 'pebd', 'pe-ld', 'low-density', '04-ldpe'), '4 · LDPE',
+     'Polietileno de baja densidad (bolsas flexibles, film plástico). Si está completamente limpio y seco va en bolsa blanca; si tiene comida o grasa, en bolsa negra.'),
+    (('pp', 'polypropylene', 'polipropileno', '05-pp'), '5 · PP',
+     'Polipropileno (tapas, vasos de yogur, envases rígidos). Aprovechable en bolsa blanca siempre que esté limpio y seco.'),
+    (('ps', 'polystyrene', 'icopor', '06-ps'), '6 · PS',
+     'Poliestireno / icopor (bandejas y vasos desechables). Si tiene restos de comida o grasa no es aprovechable y va en bolsa negra.'),
+    (('tetra', 'multilayer', 'brick', 'multicapa', 'beverage-carton', 'composite'), 'C/PAP 84 · Multicapa',
+     'Envase multicapa tipo Tetra Pak (cartón + polietileno + aluminio). En Colombia sí se recicla: vacíalo, enjuágalo, ábrelo o aplástalo y ponlo seco en la bolsa blanca.'),
+    (('glass', 'vidrio'), 'GL 70 · Vidrio',
+     'Vidrio 100 % reciclable infinitas veces sin perder calidad. Vacíalo y enjuágalo para la bolsa blanca; si está roto, envuélvelo en papel y márcalo.'),
+    (('aluminium', 'aluminum', 'aluminio', 'alu'), 'ALU 41 · Aluminio',
+     'Aluminio reciclable infinitas veces (ahorra hasta 95 % de energía). Vacía, enjuaga y aplasta la lata para la bolsa blanca.'),
+    (('steel', 'tin', 'acero', 'hojalata', 'metal', 'lata'), 'FE 40 · Acero',
+     'Acero u hojalata (latas de conserva). Vacía, enjuaga con cuidado de los bordes y deposita en bolsa blanca.'),
+    (('cardboard', 'paperboard', 'carton', 'paper', 'papel'), 'PAP 21 · Papel/Cartón',
+     'Papel o cartón reciclable. Debe ir seco, limpio y sin grasa en la bolsa blanca; si está manchado de comida va en la negra.'),
+    (('metallised', 'metallized', 'metalizado', 'aluminium-film', 'mixed-plastic-film'), '7 · Laminado',
+     'Empaque laminado o metalizado (paquetes de mecato/papas). No es aprovechable en recolección ordinaria: va en la bolsa negra.'),
+]
+
+
+def detectar_etiqueta(texto):
+    t = _limpiar(texto)
+    for claves, simbolo, significado in ETIQUETAS_RECICLAJE:
+        if any(c in t for c in claves):
+            return simbolo, significado
+    return None, None
+
+
 def clasificar_material(texto):
     t = _limpiar(texto)
     for claves, codigo, nombre, indicacion in MATERIALES:
@@ -113,7 +150,14 @@ def analizar(producto):
             continue
         vistos.add(clave)
         c = contenedores[codigo]
-        partes.append({'parte': parte, 'material': nombre_material, 'codigo': codigo, 'contenedor': c.nombre, 'indicacion': indicacion})
+        simbolo, significado = detectar_etiqueta(material)
+        if not simbolo:
+            simbolo, significado = detectar_etiqueta(forma)
+        item = {'parte': parte, 'material': nombre_material, 'codigo': codigo, 'contenedor': c.nombre, 'indicacion': indicacion}
+        if simbolo:
+            item['simbolo'] = simbolo
+            item['significado'] = significado
+        partes.append(item)
 
     if not partes:  # respaldo: etiquetas de empaque y de materiales
         for tag in (producto.get('packaging_materials_tags') or []) + (producto.get('packaging_tags') or []):
@@ -127,5 +171,10 @@ def analizar(producto):
                 continue
             vistos.add((parte, codigo))
             c = contenedores[codigo]
-            partes.append({'parte': parte, 'material': nombre_material, 'codigo': codigo, 'contenedor': c.nombre, 'indicacion': indicacion})
+            simbolo, significado = detectar_etiqueta(tag)
+            item = {'parte': parte, 'material': nombre_material, 'codigo': codigo, 'contenedor': c.nombre, 'indicacion': indicacion}
+            if simbolo:
+                item['simbolo'] = simbolo
+                item['significado'] = significado
+            partes.append(item)
     return partes

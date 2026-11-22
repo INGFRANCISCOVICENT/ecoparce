@@ -1,4 +1,5 @@
 // Escáner de EcoParce: usa BarcodeDetector del navegador si existe; si no, ZXing (incluido en el sitio).
+// Incluye decodificador interactivo de símbolos de reciclaje impresos en la base de los envases.
 (function () {
   'use strict';
   var script = document.getElementById('escaner-js');
@@ -21,18 +22,21 @@
     if (d.error) { aviso('error', esc(d.error)); return; }
     if (!d.encontrado) {
       aviso('info', 'No encontramos el producto <strong>' + esc(d.codigo) + '</strong> en las bases abiertas. ' +
-        '<a href="' + BUSCAR + '">Búscalo por su nombre</a> o revisa el símbolo de reciclaje del empaque.');
+        'Revisa el símbolo de reciclaje en la base del envase abajo o <a href="' + BUSCAR + '">búscalo por su nombre</a>.');
       return;
     }
     var h = '<section class="card" style="margin-top:14px;padding:16px"><div class="small mut">' + esc(d.marca) + '</div>' +
       '<strong style="font-size:18px">' + esc(d.nombre) + '</strong>';
     if (!d.partes.length) {
-      h += '<p class="small" style="margin-top:8px">Este producto aún no tiene registrado su empaque. Mira el material: plástico, vidrio, metal, papel y cartón limpios van en la <strong>bolsa blanca</strong>; empaques metalizados o con comida, en la <strong>negra</strong>.</p>';
+      h += '<p class="small" style="margin-top:8px">Este producto aún no tiene registrado su empaque. Mira el símbolo en la base del envase abajo: plástico, vidrio, metal, papel y cartón limpios van en la <strong>bolsa blanca</strong>; empaques metalizados o con comida, en la <strong>negra</strong>.</p>';
     } else {
       d.partes.forEach(function (p) {
         h += '<div class="row" style="margin-top:12px;align-items:flex-start"><span class="swatch chip-' + esc(p.codigo) + '" style="width:44px;height:44px;border-radius:12px"></span>' +
-          '<div><strong>' + esc(p.parte) + '</strong> <span class="small mut">· ' + esc(p.material) + '</span><br>va en: <strong>' + esc(p.contenedor) + '</strong>' +
+          '<div><strong>' + esc(p.parte) + '</strong> <span class="small mut">· ' + esc(p.material) + '</span>' +
+          (p.simbolo ? ' <span class="tag">' + esc(p.simbolo) + '</span>' : '') +
+          '<br>va en: <strong>' + esc(p.contenedor) + '</strong>' +
           '<div class="small mut">' + esc(p.indicacion) + '</div>' +
+          (p.significado ? '<div class="xs mut" style="margin-top:4px;padding:6px 8px;background:var(--bg);border-radius:8px"><strong>Etiqueta ' + esc(p.simbolo) + ':</strong> ' + esc(p.significado) + '</div>' : '') +
           (p.puntos_url ? '<a class="btn o sm" style="margin-top:6px" href="' + esc(p.puntos_url) + '">Ver puntos de recolección</a>' : '') + '</div></div>';
       });
       h += '<p class="xs mut" style="margin-top:10px">Si sobra comida, va en la bolsa verde antes de separar el empaque.</p>';
@@ -117,4 +121,41 @@
     e.preventDefault(); consultar(document.getElementById('codigo').value.trim());
   });
   window.addEventListener('pagehide', parar);
+
+  // Decodificador interactivo de símbolos de reciclaje (base del envase)
+  var SIMBOLOS = {
+    PET: { titulo: '♳ 1 · PET (Tereftalato de polietileno)', chip: 'chip-BLANCA', bolsa: 'Bolsa Blanca (Aprovechables)', desc: 'Presente en botellas de agua, gaseosa y aceite. Es uno de los plásticos más aprovechados por recicladores en Colombia.', prep: 'Preparación: Vacía el líquido, enjuaga rápido, aplasta y ponle la tapa.' },
+    HDPE: { titulo: '♴ 2 · HDPE / PEAD (Polietileno alta densidad)', chip: 'chip-BLANCA', bolsa: 'Bolsa Blanca (Aprovechables)', desc: 'Envases opacos y resistentes: detergente, suavizante, shampoo y leche. Altamente reciclable.', prep: 'Preparación: Enjuaga el interior para quitar jabón o restos y déjalo escurrir.' },
+    PVC: { titulo: '♵ 3 · PVC (Policloruro de vinilo)', chip: 'chip-NEGRA', bolsa: 'Bolsa Negra (No aprovechables en hogar)', desc: 'Usado en blísters, tarjetas y algunos empaques rígidos. Contiene cloro y es difícil de reciclar en recolección doméstica.', prep: 'Recomendación: Evita mezclarlo con PET o HDPE en la bolsa blanca.' },
+    LDPE: { titulo: '♶ 4 · LDPE / PEBD (Polietileno baja densidad)', chip: 'chip-BLANCA', bolsa: 'Bolsa Blanca si está limpio (Negra si tiene comida)', desc: 'Bolsas flexibles, empaques de pan y film plástico transparente.', prep: 'Preparación: Solo va en bolsa blanca si está completamente seco y sin grasa ni migas.' },
+    PP: { titulo: '♷ 5 · PP (Polipropileno)', chip: 'chip-BLANCA', bolsa: 'Bolsa Blanca (Aprovechables)', desc: 'Tapas de botellas, vasos de yogur, envases de margarina y recipientes rígidos.', prep: 'Preparación: Retira restos de alimento, enjuaga y seca antes de depositarlo.' },
+    PS: { titulo: '♸ 6 · PS (Poliestireno / Icopor)', chip: 'chip-NEGRA', bolsa: 'Bolsa Negra (No aprovechables)', desc: 'Bandejas de comida, platos y vasos desechables de icopor. Al tener grasa o comida no se aprovecha en la ruta ordinaria.', prep: 'Recomendación: Quita restos de comida a la bolsa verde y deposita el icopor en la negra.' },
+    OTROS: { titulo: '♹ 7 · Otros plásticos y laminados', chip: 'chip-NEGRA', bolsa: 'Bolsa Negra (salvo reciclaje especializado)', desc: 'Mezclas de varios plásticos o empaques metalizados (paquetes de papas/mecato). Difíciles de separar mecánicamente.', prep: 'Recomendación: Deposítalo en la bolsa negra bien cerrada.' },
+    TETRA: { titulo: 'C/PAP 84 · Multicapa (Tetra Pak)', chip: 'chip-BLANCA', bolsa: 'Bolsa Blanca (Aprovechables)', desc: 'Cajas de leche y jugo compuestas por cartón, polietileno y aluminio. En Colombia sí tienen cadena de reciclaje.', prep: 'Preparación: Vacía, enjuaga, abre las esquinas, aplasta y deja secar.' },
+    PAP: { titulo: 'PAP 20 / 21 / 22 · Cartón y Papel', chip: 'chip-BLANCA', bolsa: 'Bolsa Blanca (Aprovechables)', desc: 'Cajas de cartón corrugado, plegadizas de cereal, cuadernos y papel de oficina.', prep: 'Preparación: Desarma y aplasta las cajas; nunca mezcles cartón con grasa o aceite.' },
+    GL: { titulo: 'GL 70 / 71 / 72 · Vidrio', chip: 'chip-BLANCA', bolsa: 'Bolsa Blanca (Aprovechables)', desc: 'Frascos y botellas de vidrio transparente, verde o ámbar. Se recicla infinitas veces sin perder calidad.', prep: 'Preparación: Enjuaga y seca. Si está roto, envuélvelo en papel/cartón y márcalo «vidrio roto».' },
+    ALU: { titulo: 'ALU 41 · Aluminio (y FE 40 Acero)', chip: 'chip-BLANCA', bolsa: 'Bolsa Blanca (Aprovechables)', desc: 'Latas de bebidas y conservas. Reciclar aluminio ahorra hasta un 95 % de energía.', prep: 'Preparación: Vacía, enjuaga y aplasta las latas para reducir volumen.' },
+    RAEE: { titulo: 'Contenedor tachado · Residuo Posconsumo / RAEE', chip: 'chip-POSCONSUMO', bolsa: 'Punto de entrega Posconsumo (¡Nunca a la bolsa!)', desc: 'Indica pilas, baterías, bombillos ahorradores, medicamentos vencidos o aparatos electrónicos con sustancias peligrosas.', prep: 'Acción: Guárdalo aparte sin romperlo y ubícalo en el mapa de Puntos Oficiales.' }
+  };
+
+  var botonesSim = document.querySelectorAll('[data-simbolo]');
+  var sSwatch = document.getElementById('sim-swatch');
+  var sTit = document.getElementById('sim-titulo');
+  var sBolsa = document.getElementById('sim-bolsa');
+  var sDesc = document.getElementById('sim-desc');
+  var sPrep = document.getElementById('sim-prep');
+  botonesSim.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var info = SIMBOLOS[b.getAttribute('data-simbolo')];
+      if (!info) { return; }
+      botonesSim.forEach(function (x) { x.classList.remove('activo'); x.setAttribute('aria-pressed', 'false'); });
+      b.classList.add('activo');
+      b.setAttribute('aria-pressed', 'true');
+      if (sSwatch) { sSwatch.className = 'swatch ' + info.chip; }
+      if (sTit) { sTit.textContent = info.titulo; }
+      if (sBolsa) { sBolsa.textContent = info.bolsa; }
+      if (sDesc) { sDesc.textContent = info.desc; }
+      if (sPrep) { sPrep.textContent = info.prep; }
+    });
+  });
 })();

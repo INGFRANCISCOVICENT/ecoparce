@@ -1,8 +1,8 @@
 {% extends 'base.html' %}{% load static eco %}
-{% block titulo %}Escanear{% endblock %}
+{% block titulo %}Escanear producto y etiquetas{% endblock %}
 {% block contenido %}
 <h1>Escanea y separa</h1>
-<p class="mut">Apunta la cámara al <strong>código de barras</strong> del empaque y te digo en qué bolsa va cada parte. También lee los códigos QR de EcoParce.</p>
+<p class="mut">Apunta la cámara al <strong>código de barras</strong> del empaque para saber en qué bolsa va cada parte y qué significa su <strong>etiqueta de reciclaje</strong>. También lee códigos QR de EcoParce.</p>
 <div class="escaner" id="escaner">
   <video id="video" playsinline muted aria-label="Vista de la cámara"></video>
   <div class="marco" aria-hidden="true"></div>
@@ -14,11 +14,41 @@
 
 <form id="form-codigo" class="search" style="margin-top:16px" autocomplete="off">
   {% icono 'search' 22 '#1E7A46' %}<label class="sr" for="codigo">Número del código de barras</label>
-  <input id="codigo" name="codigo" inputmode="numeric" pattern="[0-9]{8,14}" maxlength="14" placeholder="O escribe el número del código" required>
+  <input id="codigo" name="codigo" inputmode="numeric" pattern="[0-9]{8,14}" maxlength="14" placeholder="O escribe el número del código de barras" required>
   <button type="submit">Ver</button>
 </form>
 
 <div id="resultado" aria-live="polite"></div>
+
+<section class="card" style="margin-top:20px" aria-labelledby="tit-simbolos">
+  <h2 id="tit-simbolos" style="margin-top:0">¿Qué significa el símbolo en la base del envase?</h2>
+  <p class="small mut">Toca la etiqueta o triángulo de reciclaje que ves debajo del producto para conocer su significado exacto y su bolsa en Colombia (Res. 2184 de 2019).</p>
+  <div class="simbolos-grid" role="group" aria-label="Símbolos de reciclaje">
+    <button type="button" class="simbolo-btn activo" aria-pressed="true" data-simbolo="PET"><strong>♳ 1</strong><span>PET</span></button>
+    <button type="button" class="simbolo-btn" aria-pressed="false" data-simbolo="HDPE"><strong>♴ 2</strong><span>HDPE</span></button>
+    <button type="button" class="simbolo-btn" aria-pressed="false" data-simbolo="PVC"><strong>♵ 3</strong><span>PVC</span></button>
+    <button type="button" class="simbolo-btn" aria-pressed="false" data-simbolo="LDPE"><strong>♶ 4</strong><span>LDPE</span></button>
+    <button type="button" class="simbolo-btn" aria-pressed="false" data-simbolo="PP"><strong>♷ 5</strong><span>PP</span></button>
+    <button type="button" class="simbolo-btn" aria-pressed="false" data-simbolo="PS"><strong>♸ 6</strong><span>PS / Icopor</span></button>
+    <button type="button" class="simbolo-btn" aria-pressed="false" data-simbolo="OTROS"><strong>♹ 7</strong><span>Otros</span></button>
+    <button type="button" class="simbolo-btn" aria-pressed="false" data-simbolo="TETRA"><strong>84</strong><span>Tetra Pak</span></button>
+    <button type="button" class="simbolo-btn" aria-pressed="false" data-simbolo="PAP"><strong>21</strong><span>Cartón/Papel</span></button>
+    <button type="button" class="simbolo-btn" aria-pressed="false" data-simbolo="GL"><strong>70</strong><span>Vidrio</span></button>
+    <button type="button" class="simbolo-btn" aria-pressed="false" data-simbolo="ALU"><strong>41</strong><span>Aluminio</span></button>
+    <button type="button" class="simbolo-btn" aria-pressed="false" data-simbolo="RAEE"><strong>✕</strong><span>Posconsumo</span></button>
+  </div>
+  <div id="detalle-simbolo" class="simbolo-detalle" aria-live="polite">
+    <div class="row top-al">
+      <span class="swatch chip-BLANCA" id="sim-swatch" style="width:48px;height:48px;border-radius:12px"></span>
+      <div>
+        <strong id="sim-titulo">♳ 1 · PET (Tereftalato de polietileno)</strong>
+        <div class="small" style="margin-top:2px">Va en: <strong id="sim-bolsa">Bolsa Blanca (Aprovechables)</strong></div>
+        <p class="small mut" id="sim-desc" style="margin:6px 0 4px">Presente en botellas de agua, gaseosa y aceite. Es uno de los plásticos más aprovechados por recicladores en Colombia.</p>
+        <p class="xs" id="sim-prep" style="margin:0;color:var(--gd);font-weight:700">Preparación: Vacía el líquido, enjuaga rápido, aplasta y ponle la tapa.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
 <div class="speech" style="margin-top:16px"><img src="{% static 'img/logo-96.png' %}" alt="Escarlata, mascota de EcoParce"><div>¿El producto no tiene código? <a href="{% url 'buscador:buscar' %}">Búscalo por su nombre</a>: «botella», «icopor», «pilas»…</div></div>
 <script src="{% static 'vendor/zxing/zxing.min.js' %}" defer></script>
