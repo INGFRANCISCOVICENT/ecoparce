@@ -1,11 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240">
-  <!-- Patrón de fondo de EcoParce: hojas y flechas de reciclaje muy tenues (dibujo propio) -->
-  <g fill="none" stroke="#1E7A46" stroke-opacity="0.07" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M30 70c0-24 15-40 42-40 0 27-17 42-40 42"/><path d="M30 70c8-11 17-20 30-27"/>
-    <path d="M170 40c14 0 26 10 26 26-16 0-26-10-26-26z"/><path d="M170 40c8 8 15 16 26 26"/>
-    <path d="M150 170a22 22 0 0 1 32-19"/><path d="M178 146l5 5-6 4"/>
-    <path d="M196 182a22 22 0 0 1-32 19"/><path d="M168 206l-5-5 6-4"/>
-    <path d="M58 168c0-18 11-30 32-30 0 20-13 32-31 32"/><path d="M58 168c6-9 13-15 23-21"/>
-    <circle cx="118" cy="110" r="3"/><circle cx="214" cy="118" r="2"/><circle cx="22" cy="214" r="2"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="280" viewBox="0 0 280 280">
+  <!-- Patrón temático de reciclaje y naturaleza de EcoParce (dibujo vectorial propio) -->
+  <g fill="none" stroke="#14532D" stroke-opacity="0.16" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Triángulo de reciclaje (flechas circulares) -->
+    <path d="M54 44l10-18h20l10 18"/><path d="M90 36l4 8-9 1"/>
+    <path d="M96 58l-10 18H66l-10-18"/><path d="M64 66l-8-8 9-2"/>
+    <path d="M46 66l-10-18 10-18"/><path d="M42 36l4-6 3 7"/>
+
+    <!-- Hoja botánica grande -->
+    <path d="M188 76c0-26 16-44 46-44 0 29-18 46-44 46"/><path d="M188 76c9-12 19-22 33-30"/>
+
+    <!-- Botella reutilizable / PET -->
+    <rect x="206" y="168" width="24" height="44" rx="7"/>
+    <path d="M213 168v-8h10v8M211 160h14"/>
+    <path d="M210 186h16M210 198h16" stroke-opacity="0.12"/>
+
+    <!-- Ciclo de reciclaje curvo -->
+    <path d="M42 194a24 24 0 0 1 36-20"/><path d="M74 169l5 6-7 4"/>
+    <path d="M90 208a24 24 0 0 1-36 20"/><path d="M58 233l-5-6 7-4"/>
+
+    <!-- Brote / semilla verde -->
+    <path d="M142 152v-22"/>
+    <path d="M142 138c0-13 9-21 22-21 0 13-8 21-22 21z"/>
+    <path d="M142 142c0-11-8-18-19-18 0 11 7 18 19 18z"/>
+  </g>
+  <g fill="#1E7A46" fill-opacity="0.10">
+    <!-- Gota de agua limpia -->
+    <path d="M142 42s11 12 11 20a11 11 0 0 1-22 0c0-8 11-20 11-20z"/>
+    <circle cx="24" cy="130" r="4"/>
+    <circle cx="256" cy="122" r="3.5"/>
+    <circle cx="146" cy="248" r="4"/>
   </g>
 </svg>

@@ -28,10 +28,10 @@ body{
   color:var(--ink);
   background:
     url(../img/fondo.svg) repeat,
-    radial-gradient(circle at 12% 28%,rgba(34,197,94,.16) 0%,transparent 46%),
-    radial-gradient(circle at 88% 72%,rgba(14,165,233,.11) 0%,transparent 44%),
-    linear-gradient(180deg,#D3EADB 0%,#E2F1E7 42%,#EAF4ED 100%);
-  background-size:240px 240px,100% 100%,100% 100%,100% 100%;
+    radial-gradient(circle at 10% 18%,rgba(30,122,70,.22) 0%,transparent 48%),
+    radial-gradient(circle at 90% 78%,rgba(14,165,233,.15) 0%,transparent 46%),
+    linear-gradient(180deg,#C5E6D2 0%,#D8EFE1 45%,#E5F4EB 100%);
+  background-size:280px 280px,100% 100%,100% 100%,100% 100%;
   background-attachment:scroll,fixed,fixed,fixed;
   font-size:16px;
   line-height:1.5;
@@ -515,12 +515,15 @@ a.tag.on{background:var(--g);color:#fff;border-color:var(--g)}
 
 /* modo de alto contraste (WCAG AAA) */
 html[data-contraste="alto"]{
-  --g:#0B5D2E;--gd:#063B1D;--gh:#063B1D;--gl:#E1F4E8;
+  --g:#0B5D2E;--gd:#063B1D;--gh:#063B1D;--gl:#D4EEDF;
   --r:#9B0E0E;--rl:#FDE8E8;--b:#0D3B8E;--bl:#E1ECFF;
-  --ink:#000000;--mut:#1F2B24;--line:#495950;--line-strong:#1F2B24;--bg:#FFFFFF;
+  --ink:#000000;--mut:#18241E;--line:#35473D;--line-strong:#18241E;--bg:#E4F2E9;
 }
 html[data-contraste="alto"] body,
-html[data-contraste="alto"] .adm .main{background:#fff}
+html[data-contraste="alto"] .adm .main{
+  background:url(../img/fondo.svg) repeat,linear-gradient(180deg,#D8ECE0 0%,#E9F5EE 100%);
+  background-size:280px 280px,100% 100%;
+}
 html[data-contraste="alto"] .card,
 html[data-contraste="alto"] .bag,
 html[data-contraste="alto"] .kpi,
