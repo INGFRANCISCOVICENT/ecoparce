@@ -29,10 +29,10 @@ body{
   font-family:Nunito,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
   color:var(--ink);
   background:
-    radial-gradient(ellipse 68% 46% at 18% 12%,rgba(52,211,153,.24) 0%,rgba(16,185,129,.10) 42%,transparent 72%),
-    radial-gradient(ellipse 62% 48% at 84% 26%,rgba(34,197,94,.20) 0%,rgba(20,83,45,.08) 46%,transparent 74%),
-    radial-gradient(ellipse 74% 52% at 50% 92%,rgba(16,185,129,.22) 0%,rgba(6,78,59,.10) 48%,transparent 76%),
-    linear-gradient(180deg,#040D09 0%,#071A11 46%,#05130C 100%);
+    radial-gradient(ellipse 72% 48% at 14% 10%,rgba(52,211,153,.30) 0%,rgba(16,185,129,.12) 40%,transparent 72%),
+    radial-gradient(ellipse 66% 50% at 86% 24%,rgba(34,197,94,.24) 0%,rgba(20,83,45,.10) 44%,transparent 74%),
+    radial-gradient(ellipse 80% 54% at 50% 94%,rgba(16,185,129,.28) 0%,rgba(6,78,59,.12) 46%,transparent 76%),
+    linear-gradient(180deg,#030B07 0%,#061810 46%,#04100A 100%);
   background-attachment:fixed;
   font-size:16px;
   line-height:1.5;
@@ -179,9 +179,9 @@ main.wrap > .aviso a{color:inherit;text-decoration:underline}
 
 .search{
   margin-top:14px;display:flex;align-items:center;gap:8px;
-  background:var(--surf);border:2px solid var(--g);border-radius:16px;
+  background:rgba(255,255,255,.98);border:2px solid rgba(74,222,128,.65);border-radius:16px;
   padding:0 6px 0 14px;height:56px;
-  box-shadow:var(--sh-sm);
+  box-shadow:0 0 0 1px rgba(74,222,128,.22),0 0 24px rgba(16,185,129,.22),var(--sh-sm);
   transition:box-shadow var(--tr),border-color var(--tr);
 }
 .search input{flex:1;min-width:0;border:0;outline:0;font:inherit;font-size:16.5px;color:var(--ink);background:transparent;height:100%}
@@ -204,12 +204,12 @@ main.wrap > .aviso a{color:inherit;text-decoration:underline}
 .bag{
   border-radius:var(--rad-lg);padding:15px;min-height:112px;
   display:flex;flex-direction:column;gap:7px;
-  border:1px solid var(--line);background:var(--surf);
+  border:1.5px solid rgba(74,222,128,.38);background:rgba(255,255,255,.97);
   text-decoration:none;color:var(--ink);
-  box-shadow:var(--sh-xs);
+  box-shadow:0 0 0 1px rgba(74,222,128,.16),0 8px 24px rgba(16,185,129,.14);
   transition:transform var(--tr),box-shadow var(--tr),border-color var(--tr);
 }
-.bag:hover{transform:translateY(-2px);box-shadow:var(--sh-md);border-color:var(--g);color:var(--ink)}
+.bag:hover{transform:translateY(-2px);box-shadow:0 0 0 1px rgba(74,222,128,.45),0 0 24px rgba(52,211,153,.32),0 12px 28px rgba(4,16,10,.35);border-color:#4ADE80;color:var(--ink)}
 .bag:active{transform:translateY(0)}
 .bag.bag-BLANCA{border-top:3px solid #9AA8A0}
 .bag.bag-NEGRA{border-top:3px solid #263238}
@@ -225,14 +225,17 @@ main.wrap > .aviso a{color:inherit;text-decoration:underline}
 .chip-POSCONSUMO{background:var(--r);border-color:var(--r)!important}
 
 .card{
-  background:var(--surf);border:1px solid var(--line);border-radius:var(--rad-lg);
-  padding:15px 16px;box-shadow:var(--sh-xs);
+  background:rgba(255,255,255,.97);
+  border:1.5px solid rgba(74,222,128,.36);
+  border-radius:var(--rad-lg);
+  padding:15px 16px;
+  box-shadow:0 0 0 1px rgba(74,222,128,.14),0 8px 26px rgba(16,185,129,.14),0 2px 8px rgba(4,16,10,.22);
 }
 a.card{
   display:block;color:var(--ink);text-decoration:none;
   transition:transform var(--tr),box-shadow var(--tr),border-color var(--tr);
 }
-a.card:hover{transform:translateY(-2px);box-shadow:var(--sh-md);border-color:var(--g);color:var(--ink)}
+a.card:hover{transform:translateY(-2px);box-shadow:0 0 0 1px rgba(74,222,128,.45),0 0 24px rgba(52,211,153,.32),0 12px 28px rgba(4,16,10,.35);border-color:#4ADE80;color:var(--ink)}
 a.card:active{transform:translateY(0)}
 a.card.row{display:flex}
 a.card .ml svg{transition:transform var(--tr)}
@@ -683,6 +686,18 @@ html[data-contraste="alto"] :focus-visible{outline:4px solid #000;outline-offset
 .faq-item summary::-webkit-details-marker{display:none}
 .faq-item summary::after{content:"+";font-size:20px;font-weight:800;color:var(--g);flex:none;transition:transform var(--tr)}
 .faq-item[open] summary::after{content:"−";color:var(--gd)}
+
+/* puntos de progreso de la trivia y tarjetas bloqueadas para visitantes */
+.trivia-dots{display:flex;gap:8px;justify-content:center;margin:10px 0 4px}
+.tdot{
+  width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:800;border:2px solid rgba(74,222,128,.35);color:#CBE8D7;background:rgba(12,34,24,.75);
+}
+.tdot-actual{border-color:#4ADE80;background:rgba(34,197,94,.28);color:#fff;box-shadow:0 0 12px rgba(74,222,128,.45)}
+.tdot-bien{border-color:#22C55E;background:#22C55E;color:#052E16}
+.tdot-mal{border-color:#EF4444;background:#EF4444;color:#fff}
+.bloqueo-card{border-style:dashed;border-color:rgba(250,204,21,.55);background:rgba(255,253,245,.96)}
+.rango-card{border-color:rgba(74,222,128,.55);box-shadow:0 0 24px rgba(16,185,129,.22)}
 
 /* decodificador interactivo de etiquetas y símbolos de reciclaje */
 .simbolos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 14px}

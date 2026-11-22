@@ -19,6 +19,32 @@ def _partida(request):
     return PartidaTrivia.objects.filter(pk=pid).first() if pid else None
 
 
+def _rango_jugador(puntos):
+    if puntos >= 30:
+        return {'nombre': 'Maestro Guacamaya', 'siguiente': None, 'pct': 100}
+    if puntos >= 15:
+        return {'nombre': 'Guardián del Bosque', 'siguiente': 30, 'pct': round(100 * (puntos - 15) / 15)}
+    if puntos >= 6:
+        return {'nombre': 'Brote Verde', 'siguiente': 15, 'pct': round(100 * (puntos - 6) / 9)}
+    return {'nombre': 'Semilla Inicial', 'siguiente': 6, 'pct': round(100 * puntos / 6)}
+
+
+def _ranking_top():
+    from django.db.models import Count, Sum
+    from apps.cuentas.models import Usuario
+    filas = (
+        Usuario.objects.filter(partidas__finalizada_en__isnull=False)
+        .annotate(
+            puntos=Sum('partidas__puntaje'),
+            medallas=Count('insignias', distinct=True),
+        )
+        .filter(puntos__gt=0)
+        .order_by('-puntos', '-medallas', 'nombre')[:8]
+    )
+    return [{'posicion': i + 1, 'nombre': u.nombre_corto, 'puntos': u.puntos or 0, 'medallas': u.medallas or 0, 'pk': u.pk}
+            for i, u in enumerate(filas)]
+
+
 def inicio(request):
     usuario = request.user if request.user.is_authenticated else None
     progreso = progreso_niveles(usuario=usuario, sesion=request.session)
@@ -29,6 +55,8 @@ def inicio(request):
         'niveles': progreso['niveles'],
         'partidas_totales': progreso['partidas_totales'],
         'puntos_totales': progreso['puntos_totales'],
+        'rango': _rango_jugador(progreso['puntos_totales']),
+        'ranking': _ranking_top() if usuario else [],
         'insignias': insignias,
         'total_obtenidas': sum(1 for i in insignias if i['obtenida']),
     })
@@ -82,12 +110,22 @@ def jugar(request):
         if pregunta is None:
             return redirect('trivia:resultado')
     numero = partida.ids.index(pregunta.pk) + 1
+    mapa_resp = {r.pregunta_id: r.es_correcta for r in partida.respuestas.all()}
+    puntos_estado = []
+    for pid in partida.ids:
+        if pid in mapa_resp:
+            puntos_estado.append('bien' if mapa_resp[pid] else 'mal')
+        elif pid == pregunta.pk:
+            puntos_estado.append('actual')
+        else:
+            puntos_estado.append('pendiente')
     return render(request, 'trivia/jugar.html', {
         'partida': partida, 'pregunta': pregunta, 'opciones': pregunta.opciones.all(), 'respuesta': respuesta,
         'numero': numero, 'avance': round(100 * (partida.respondidas if respuesta else numero - 1) / partida.total_preguntas),
         'ultima': partida.respondidas >= partida.total_preguntas,
         'nivel_info': info_nivel(partida.nivel),
         'racha': partida.racha_actual,
+        'puntos_estado': puntos_estado,
     })
 
 

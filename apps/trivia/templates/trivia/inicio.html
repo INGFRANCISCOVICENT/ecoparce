@@ -2,13 +2,26 @@
 {% block titulo %}Trivia por niveles{% endblock %}
 {% block contenido %}
 <section class="center" style="padding-top:6px">
-  <img src="{% static 'img/logo-256.png' %}" alt="Escarlata, guacamaya roja mascota de EcoParce (ilustración asistida con IA)" style="width:116px;height:116px;border-radius:50%;box-shadow:var(--sh-sm)">
+  <img src="{% static 'img/logo-256.png' %}" alt="Escarlata, guacamaya roja mascota de EcoParce (ilustración asistida con IA)" style="width:116px;height:116px;border-radius:50%;box-shadow:0 0 24px rgba(52,211,153,.35)">
   <h1 style="margin-top:8px">Trivia de Escarlata</h1>
-  <p class="mut">3 modos de juego educativos y adictivos. Sube de nivel y colecciona medallas ecológicas 3D según tus puntos.</p>
-  <div class="row" style="justify-content:center;gap:8px;margin-top:6px;flex-wrap:wrap">
-    <span class="tag">Puntos acumulados: <strong>{{ puntos_totales }}</strong></span>
-    <span class="tag">Medallas 3D: <strong>{{ total_obtenidas }}/{{ insignias|length }}</strong></span>
+  <p class="mut">3 modos de juego educativos y adictivos. Sube de nivel, compite en el ranking y colecciona medallas ecológicas 3D según tus puntos.</p>
+</section>
+
+<!-- Tarjeta de Rango y Progreso del Jugador -->
+<section class="card rango-card" style="margin-top:12px">
+  <div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <div>
+      <span class="st s-pub">Rango actual: {{ rango.nombre }}</span>
+      <div class="small mut" style="margin-top:4px">
+        {% if rango.siguiente %}Te faltan <strong>{{ rango.siguiente|add:0 }}</strong> pts de meta para subir de rango.{% else %}¡Alcanzaste el rango máximo ambiental!{% endif %}
+      </div>
+    </div>
+    <div class="row" style="gap:8px;flex-wrap:wrap">
+      <span class="tag">Puntos: <strong>{{ puntos_totales }}</strong></span>
+      <span class="tag">Medallas 3D: <strong>{{ total_obtenidas }}/{{ insignias|length }}</strong></span>
+    </div>
   </div>
+  <div class="prog" style="margin-top:10px" role="progressbar" aria-label="Progreso de rango" aria-valuenow="{{ rango.pct }}" aria-valuemin="0" aria-valuemax="100"><i style="width:{{ rango.pct }}%"></i></div>
 </section>
 
 {% if partida and not partida.terminada and partida.respondidas %}
@@ -25,6 +38,7 @@
     <p class="xs mut" style="margin:4px 0 12px">Reto relámpago: clasifica residuos reales en Blanca, Negra, Verde o Posconsumo.</p>
     <button class="btn p sm full" type="submit">Jugar reto rápido</button>
   </form>
+  {% if user.is_authenticated %}
   <form method="post" action="{% url 'trivia:nueva' %}" class="card modo-card">{% csrf_token %}
     <input type="hidden" name="modo" value="MITOS">
     <span class="ic" style="background:var(--yl);margin-bottom:8px">{% icono 'bulb' 24 '#7A5A00' %}</span>
@@ -32,29 +46,44 @@
     <p class="xs mut" style="margin:4px 0 12px">Desmiente creencias falsas sobre aceite, tetrapak, vidrio y pilas.</p>
     <button class="btn o sm full" type="submit">Desmentir mitos</button>
   </form>
+  {% else %}
+  <div class="card modo-card bloqueo-card">
+    <span class="ic" style="background:#ECEFF1;margin-bottom:8px">{% icono 'lock' 22 '#3F5347' %}</span>
+    <div class="row" style="gap:6px;flex-wrap:wrap"><strong>Mitos vs. Realidad</strong><span class="st s-rev">Solo con cuenta</span></div>
+    <p class="xs mut" style="margin:4px 0 12px">Regístrate gratis en 10 segundos para desbloquear este modo y guardar tus puntos.</p>
+    <a class="btn o sm full" href="{% url 'account_signup' %}?next={% url 'trivia:inicio' %}">Crear cuenta gratis</a>
+  </div>
+  {% endif %}
 </div>
 
 <h2>Modo Carrera · 3 niveles progresivos</h2>
 <div class="lista">
   {% for n in niveles %}
-  <div class="card nivel-card {% if n.desbloqueado %}desbloqueado{% else %}bloqueado{% endif %}">
+  <div class="card nivel-card {% if n.desbloqueado and n.numero == 1 or user.is_authenticated and n.desbloqueado %}desbloqueado{% else %}bloqueado{% endif %}">
     <div class="row top-al">
-      <span class="ic" style="background:{% if n.superado %}var(--gl){% elif n.desbloqueado %}var(--yl){% else %}#ECEFF1{% endif %}">
-        {% if n.desbloqueado %}{% icono n.icono 24 '#14532D' %}{% else %}{% icono 'lock' 22 '#4B5A51' %}{% endif %}
+      <span class="ic" style="background:{% if n.superado %}var(--gl){% elif n.desbloqueado and user.is_authenticated or n.numero == 1 %}var(--yl){% else %}#ECEFF1{% endif %}">
+        {% if n.numero == 1 or user.is_authenticated and n.desbloqueado %}{% icono n.icono 24 '#14532D' %}{% else %}{% icono 'lock' 22 '#4B5A51' %}{% endif %}
       </span>
       <div style="flex:1">
         <div class="row" style="gap:8px;flex-wrap:wrap">
           <strong>Nivel {{ n.numero }} · {{ n.nombre }}</strong>
           <span class="tag">Dificultad: {{ n.dificultad_etiqueta }}</span>
-          {% if n.superado %}<span class="st s-pub">Superado{% if n.mejor is not None %} ({{ n.mejor }}/5){% endif %}</span>
+          {% if not user.is_authenticated and n.numero > 1 %}<span class="st s-rev">Solo con cuenta</span>
+          {% elif n.superado %}<span class="st s-pub">Superado{% if n.mejor is not None %} ({{ n.mejor }}/5){% endif %}</span>
           {% elif n.mejor is not None %}<span class="st s-rev">Mejor: {{ n.mejor }}/5 (meta {{ n.meta }}/5)</span>
           {% elif not n.desbloqueado %}<span class="st s-bor">Bloqueado</span>{% endif %}
         </div>
         <div class="small mut" style="margin-top:2px">{{ n.subtitulo }}</div>
-        {% if not n.desbloqueado %}<div class="xs mut" style="margin-top:4px">{{ n.requisito }}</div>{% endif %}
+        {% if not user.is_authenticated and n.numero > 1 %}
+        <div class="xs mut" style="margin-top:4px">Crea una cuenta gratis para avanzar a los niveles avanzados y coleccionar medallas 3D.</div>
+        {% elif not n.desbloqueado %}
+        <div class="xs mut" style="margin-top:4px">{{ n.requisito }}</div>
+        {% endif %}
       </div>
     </div>
-    {% if n.desbloqueado %}
+    {% if not user.is_authenticated and n.numero > 1 %}
+    <a class="btn o sm full" style="margin-top:12px" href="{% url 'account_signup' %}?next={% url 'trivia:inicio' %}">{% icono 'lock' 16 %}Regístrate gratis para desbloquear Nivel {{ n.numero }}</a>
+    {% elif n.desbloqueado %}
     <form method="post" action="{% url 'trivia:nueva' %}" style="margin-top:12px">{% csrf_token %}
       <input type="hidden" name="modo" value="NIVELES">
       <input type="hidden" name="nivel" value="{{ n.numero }}">
@@ -68,8 +97,42 @@
 <div class="aviso info" style="margin-top:16px">{% icono 'info' 20 %}<span>Estamos preparando las preguntas. ¡Vuelve pronto!</span></div>
 {% endif %}
 
+<h2>Ranking EcoParce · Top recicladores</h2>
+{% if user.is_authenticated %}
+<section class="card tabla">
+  <table>
+    <thead><tr><th>#</th><th>Participante</th><th class="right">Medallas 3D</th><th class="right">Puntos</th></tr></thead>
+    <tbody>
+      {% for r in ranking %}
+      <tr{% if r.pk == user.pk %} style="background:var(--gl)"{% endif %}>
+        <td><strong>#{{ r.posicion }}</strong></td>
+        <td><strong>{{ r.nombre }}</strong>{% if r.pk == user.pk %} <span class="tag">tú</span>{% endif %}</td>
+        <td class="right">{{ r.medallas }}/6</td>
+        <td class="right"><strong>{{ r.puntos }} pts</strong></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4" class="mut">Aún no hay puntajes registrados. ¡Sé el primero en liderar el ranking!</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% else %}
+<section class="card bloqueo-registro">
+  <div class="row top-al">
+    <span class="ic" style="background:var(--yl)">{% icono 'lock' 22 '#7A5A00' %}</span>
+    <div style="flex:1">
+      <strong>Ranking y Medallas 3D exclusivas para usuarios registrados</strong>
+      <p class="small mut" style="margin:4px 0 12px">Crea tu cuenta gratis en segundos para aparecer en el Top de recicladores, guardar tus medallas 3D y desbloquear los niveles 2 y 3.</p>
+      <div class="row" style="gap:8px;flex-wrap:wrap">
+        <a class="btn p sm" href="{% url 'account_signup' %}?next={% url 'trivia:inicio' %}">Crear cuenta gratis →</a>
+        <a class="btn o sm" href="{% url 'account_login' %}?next={% url 'trivia:inicio' %}">Ya tengo cuenta</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
 <h2>Vitrina de Medallas Ecológicas 3D ({{ total_obtenidas }}/{{ insignias|length }})</h2>
-<p class="small mut" style="margin-top:-4px">{% if user.is_authenticated %}Tus medallas se guardan en la base de datos de tu cuenta.{% else %}Juega sin cuenta o <a href="{% url 'account_login' %}?next={% url 'trivia:inicio' %}">inicia sesión</a> para guardar tus medallas permanentemente.{% endif %}</p>
 <div class="grid insignias-grid">
   {% for ins in insignias %}
   <div class="insignia {% if ins.obtenida %}obtenida{% else %}bloqueada{% endif %}">

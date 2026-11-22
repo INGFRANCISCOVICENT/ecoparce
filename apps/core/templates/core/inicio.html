@@ -167,16 +167,17 @@
   </article>
 </div>
 
-<!-- Calculadora interactiva de impacto ambiental en casa -->
+<!-- Calculadora interactiva de impacto ambiental en casa (exclusiva para usuarios registrados) -->
 <section class="card calc-eco" style="margin-top:26px" aria-labelledby="tit-calc">
   <div class="calc-head">
     <div>
-      <span class="st s-pub">Herramienta interactiva</span>
+      <span class="st {% if user.is_authenticated %}s-pub{% else %}s-rev{% endif %}">{% if user.is_authenticated %}Herramienta interactiva{% else %}Exclusivo con cuenta gratis{% endif %}</span>
       <h2 id="tit-calc" style="margin:6px 0 4px">Calcula tu impacto ambiental anual</h2>
-      <p class="small mut" style="margin:0">Mueve los controles según lo que separas en casa y descubre cuánto ayudas al planeta en un año.</p>
+      <p class="small mut" style="margin:0">{% if user.is_authenticated %}Mueve los controles según lo que separas en casa y descubre cuánto ayudas al planeta en un año.{% else %}Inicia sesión o regístrate gratis en 10 segundos para usar la calculadora interactiva de CO₂, agua y energía.{% endif %}</p>
     </div>
-    <span class="calc-rango" id="calc-nivel">Hogar Guardián</span>
+    {% if user.is_authenticated %}<span class="calc-rango" id="calc-nivel">Hogar Guardián</span>{% endif %}
   </div>
+  {% if user.is_authenticated %}
   <div class="calc-grid">
     <div class="calc-controles">
       <div class="calc-ctrl">
@@ -212,6 +213,14 @@
       <p class="xs mut" style="margin:6px 0 0">Estimación educativa basada en factores estándar de aprovechamiento (PET, aluminio, cartón y aceite usado).</p>
     </div>
   </div>
+  {% else %}
+  <div class="bloqueo-registro" style="margin-top:8px">
+    <div class="row" style="gap:10px;flex-wrap:wrap">
+      <a class="btn p sm" href="{% url 'account_signup' %}">{% icono 'lock' 16 '#fff' %}Crear cuenta gratis para desbloquear</a>
+      <a class="btn o sm" href="{% url 'account_login' %}">Ya tengo cuenta</a>
+    </div>
+  </div>
+  {% endif %}
 </section>
 
 <!-- Línea de tiempo de degradación -->

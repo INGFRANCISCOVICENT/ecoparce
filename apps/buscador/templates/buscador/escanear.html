@@ -26,9 +26,10 @@
   <div class="simbolos-grid" role="group" aria-label="Símbolos de reciclaje">
     <button type="button" class="simbolo-btn activo" aria-pressed="true" data-simbolo="PET"><strong>♳ 1</strong><span>PET</span></button>
     <button type="button" class="simbolo-btn" aria-pressed="false" data-simbolo="HDPE"><strong>♴ 2</strong><span>HDPE</span></button>
+    <button type="button" class="simbolo-btn" aria-pressed="false" data-simbolo="PP"><strong>♷ 5</strong><span>PP</span></button>
+    {% if user.is_authenticated %}
     <button type="button" class="simbolo-btn" aria-pressed="false" data-simbolo="PVC"><strong>♵ 3</strong><span>PVC</span></button>
     <button type="button" class="simbolo-btn" aria-pressed="false" data-simbolo="LDPE"><strong>♶ 4</strong><span>LDPE</span></button>
-    <button type="button" class="simbolo-btn" aria-pressed="false" data-simbolo="PP"><strong>♷ 5</strong><span>PP</span></button>
     <button type="button" class="simbolo-btn" aria-pressed="false" data-simbolo="PS"><strong>♸ 6</strong><span>PS / Icopor</span></button>
     <button type="button" class="simbolo-btn" aria-pressed="false" data-simbolo="OTROS"><strong>♹ 7</strong><span>Otros</span></button>
     <button type="button" class="simbolo-btn" aria-pressed="false" data-simbolo="TETRA"><strong>84</strong><span>Tetra Pak</span></button>
@@ -36,7 +37,11 @@
     <button type="button" class="simbolo-btn" aria-pressed="false" data-simbolo="GL"><strong>70</strong><span>Vidrio</span></button>
     <button type="button" class="simbolo-btn" aria-pressed="false" data-simbolo="ALU"><strong>41</strong><span>Aluminio</span></button>
     <button type="button" class="simbolo-btn" aria-pressed="false" data-simbolo="RAEE"><strong>✕</strong><span>Posconsumo</span></button>
+    {% endif %}
   </div>
+  {% if not user.is_authenticated %}
+  <div class="aviso info" style="margin-bottom:12px">{% icono 'lock' 18 '#5C4400' %}<span>Mostrando 3 símbolos básicos. <a href="{% url 'account_signup' %}?next={% url 'buscador:escanear' %}">Crea tu cuenta gratis</a> para desbloquear los 12 símbolos oficiales (Tetra Pak, Vidrio, Aluminio, PVC, Icopor y RAEE).</span></div>
+  {% endif %}
   <div id="detalle-simbolo" class="simbolo-detalle" aria-live="polite">
     <div class="row top-al">
       <span class="swatch chip-BLANCA" id="sim-swatch" style="width:48px;height:48px;border-radius:12px"></span>
