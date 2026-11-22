@@ -165,4 +165,68 @@
     });
     actualizarCalc();
   }
+
+  // 5. Infografía interactiva: El viaje del residuo (Economía Circular)
+  var VIAJES = {
+    pet: [
+      ['En tu casa', 'Vacías, enjuagas, escurres y aplastas la botella en la Bolsa Blanca.'],
+      ['Reciclador de oficio', 'La recoge limpia y la lleva a la estación de clasificación y aprovechamiento.'],
+      ['Transformación', 'Se lava, se tritura en escamas y se funde en pellets de poliéster reciclado.'],
+      ['Nueva vida', 'Vuelve como camisetas deportivas, morrales, fibras textiles o nuevas botellas.']
+    ],
+    lata: [
+      ['En tu casa', 'Escurres la lata de aluminio y la depositas limpia en la Bolsa Blanca.'],
+      ['Recolección', 'Se compacta en pacas de aluminio puro, uno de los materiales más valiosos.'],
+      ['Fundición limpia', 'Se funde usando 95 % menos energía que fabricar aluminio desde cero.'],
+      ['Ciclo infinito', 'En solo 60 días puede volver al estante como una lata nueva, infinitas veces.']
+    ],
+    carton: [
+      ['En tu casa', 'Desarmas cajas secas sin grasa ni comida y las guardas en la Bolsa Blanca.'],
+      ['Clasificación', 'Se agrupa por tipo de fibra (cartón corrugado, archivo, cuadernos).'],
+      ['Pulpa reciclada', 'Se remoja, se limpia de tintas y se prensa en nuevas láminas de papel.'],
+      ['Bosques salvos', 'Se transforma en nuevas cajas y cuadernos, ahorrando agua y árboles.']
+    ],
+    organico: [
+      ['En tu casa', 'Separas cáscaras de frutas, verduras y cuncho de café en la Bolsa Verde.'],
+      ['Compostaje', 'Microorganismos y lombrices descomponen la materia de forma natural.'],
+      ['Maduración', 'Sin generar lixiviados tóxicos ni gases de efecto invernadero en rellenos.'],
+      ['Abono fértil', 'Regresa a parques, fincas y huertas urbanas como tierra rica en nutrientes.']
+    ],
+    aceite: [
+      ['En tu casa', 'Dejas enfriar el aceite de cocina y lo envasas en una botella plástica cerrada.'],
+      ['Punto Posconsumo', 'Lo entregas en un contenedor autorizado en supermercados o centros comerciales.'],
+      ['Filtrado y refino', 'Se purifica y se procesa mediante transesterificación controlada.'],
+      ['Energía limpia', 'Se convierte en biodiésel, jabones biodegradables y lubricantes ecológicos.']
+    ]
+  };
+  var viajeTabs = document.querySelectorAll('[data-viaje]');
+  if (viajeTabs.length) {
+    viajeTabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        var key = tab.getAttribute('data-viaje');
+        var data = VIAJES[key];
+        if (!data) return;
+        viajeTabs.forEach(function (t) {
+          t.classList.remove('activo');
+          t.setAttribute('aria-selected', 'false');
+        });
+        tab.classList.add('activo');
+        tab.setAttribute('aria-selected', 'true');
+        for (var i = 0; i < 4; i++) {
+          var tEl = document.getElementById('vj-p' + (i + 1) + '-t');
+          var dEl = document.getElementById('vj-p' + (i + 1) + '-d');
+          if (tEl) tEl.textContent = data[i][0];
+          if (dEl) dEl.textContent = data[i][1];
+        }
+      });
+    });
+  }
+
+  // 6. Tarjetas volteables 3D: Mitos vs. Realidad
+  document.querySelectorAll('[data-flip-card]').forEach(function (card) {
+    card.addEventListener('click', function () {
+      var flipped = card.classList.toggle('volteada');
+      card.setAttribute('aria-pressed', String(flipped));
+    });
+  });
 })();

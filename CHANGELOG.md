@@ -2,6 +2,14 @@
 
 Este proyecto sigue el [Versionado Semántico (SemVer 2.0.0)](https://semver.org/lang/es/) y control de versiones en Git.
 
+## [2.3.0] - 2026-11-22
+### Agregado
+- **Contenido visual interactivo enriquecido en `/` y `/guias/`**:
+  - **Banner de experiencias interactivas** en el inicio con accesos directos al Video Interactivo 60 s, Arcade Atrapa y Separa y Diploma HD.
+  - **Infografía interactiva «¿En qué se transforma lo que separas?»** (Economía Circular en 4 pasos para Botella PET, Lata aluminio, Cartón/Papel, Orgánicos y Aceite usado).
+  - **Tarjetas volteables 3D «Mitos vs. Realidad»** en el inicio con giro suave al tocar o hacer clic.
+  - **Checklist interactivo «Prepara tu cocina EcoParce en 5 minutos»** (persistido en el navegador con barra de progreso) y comparativa visual **«Sí va vs. No va»** en `/guias/`.
+
 ## [2.2.0] - 2026-11-22
 ### Agregado
 - **Video educativo interactivo en `/trivia/`**: reproductor cinematográfico HTML5 Canvas 100 % local y compatible con CSP estricta, con Escarlata animada, 4 capítulos (Blanca, Negra, Verde y Posconsumo), subtítulos sincronizados, narración opcional en voz en español (`es-CO`) y **4 pausas interactivas con retos en vivo** dentro del video.

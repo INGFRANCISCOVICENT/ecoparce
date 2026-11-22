@@ -177,4 +177,40 @@
       try { rec.start(); } catch (_) {}
     });
   }
+
+  // Checklist interactivo del hogar en /guias/ (persistido en localStorage).
+  var checksEco = document.querySelectorAll('[data-eco-check]');
+  if (checksEco.length) {
+    var claveCheck = 'ecoparce_checklist_hogar';
+    var estadoCheck = {};
+    try { estadoCheck = JSON.parse(localStorage.getItem(claveCheck) || '{}'); } catch (_) {}
+    var txtProg = document.getElementById('check-progreso-txt');
+    var barProg = document.getElementById('check-progreso-bar');
+    var avisoOk = document.getElementById('check-felicitacion');
+
+    var actualizarCheck = function () {
+      var hechos = 0;
+      checksEco.forEach(function (cb) {
+        if (cb.checked) hechos++;
+      });
+      var pct = Math.round((hechos / checksEco.length) * 100);
+      if (txtProg) txtProg.textContent = hechos + ' / ' + checksEco.length + ' listos';
+      if (barProg) {
+        barProg.style.width = pct + '%';
+        if (barProg.parentElement) barProg.parentElement.setAttribute('aria-valuenow', String(pct));
+      }
+      if (avisoOk) avisoOk.hidden = hechos < checksEco.length;
+    };
+
+    checksEco.forEach(function (cb) {
+      var id = cb.getAttribute('data-eco-check');
+      cb.checked = Boolean(estadoCheck[id]);
+      cb.addEventListener('change', function () {
+        estadoCheck[id] = cb.checked;
+        try { localStorage.setItem(claveCheck, JSON.stringify(estadoCheck)); } catch (_) {}
+        actualizarCheck();
+      });
+    });
+    actualizarCheck();
+  }
 })();

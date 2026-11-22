@@ -1,8 +1,50 @@
 {% extends 'base.html' %}{% load eco %}
 {% block titulo %}Guías{% endblock %}
 {% block contenido %}
-<h1>Guías</h1>
-<p class="mut">Todo lo que necesitas para separar en la fuente y manejar bien la basura en casa.</p>
+<h1>Guías de reciclaje</h1>
+<p class="mut">Todo lo que necesitas para separar en la fuente y manejar bien la basura en casa según la Resolución 2184 de 2019.</p>
+
+<!-- Checklist interactivo: prepara tu hogar EcoParce -->
+<section class="card checklist-eco" aria-labelledby="tit-check-hogar" style="margin-top:14px">
+  <div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <div>
+      <span class="st s-pub">Checklist interactivo</span>
+      <h2 id="tit-check-hogar" style="margin:6px 0 2px;font-size:19px">Prepara tu cocina EcoParce en 5 minutos</h2>
+    </div>
+    <span class="tag" id="check-progreso-txt">0 / 5 listos</span>
+  </div>
+  <div class="prog" style="margin:10px 0 12px" role="progressbar" aria-label="Progreso de checklist del hogar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="check-progreso-bar" style="width:0%"></i></div>
+  <div class="checklist-items">
+    <label class="check-item"><input type="checkbox" data-eco-check="bolsa_blanca"><span>Tener una bolsa o caneca <strong>blanca</strong> exclusiva para envases limpios y secos.</span></label>
+    <label class="check-item"><input type="checkbox" data-eco-check="bolsa_negra"><span>Ubicar la bolsa <strong>negra</strong> para servilletas, residuos de baño y empaques con grasa.</span></label>
+    <label class="check-item"><input type="checkbox" data-eco-check="bolsa_verde"><span>Separar un recipiente con tapa para orgánicos (<strong>bolsa verde</strong>: cáscaras y cuncho de café).</span></label>
+    <label class="check-item"><input type="checkbox" data-eco-check="frasco_aceite"><span>Guardar una botella vacía con tapa para acumular <strong>aceite de cocina usado</strong> frío.</span></label>
+    <label class="check-item"><input type="checkbox" data-eco-check="caja_pilas"><span>Destinar un frasco seco para <strong>pilas y bombillos</strong> antes de llevarlos a Posconsumo.</span></label>
+  </div>
+  <p id="check-felicitacion" class="aviso ok" style="margin:12px 0 0" hidden>{% icono 'check' 18 '#14532D' 3 %}<span>¡Felicidades! Tu hogar ya tiene el sistema completo de separación EcoParce.</span></p>
+</section>
+
+<!-- Guía visual rápida: Sí va vs. No va -->
+<h2>Errores más frecuentes (Sí va vs. No va)</h2>
+<div class="grid" style="margin-bottom:8px">
+  <article class="card si-no-card">
+    <span class="st s-pub">✓ SÍ en Bolsa Blanca</span>
+    <ul class="ok" style="margin-top:8px">
+      <li>{% icono 'check' 18 '#1E7A46' 3 %}Botellas PET, vidrio intacto y latas enjuagadas</li>
+      <li>{% icono 'check' 18 '#1E7A46' 3 %}Cajas de leche (Tetra Pak) escurridas y aplastadas</li>
+      <li>{% icono 'check' 18 '#1E7A46' 3 %}Cartón, cuadernos y papel limpios y secos</li>
+    </ul>
+  </article>
+  <article class="card si-no-card">
+    <span class="st s-ret">✕ NO en Bolsa Blanca</span>
+    <ul class="no" style="margin-top:8px">
+      <li>{% icono 'x' 18 '#C81E1E' 3 %}Cajas de pizza con grasa o servilletas usadas (van a Negra)</li>
+      <li>{% icono 'x' 18 '#C81E1E' 3 %}Vidrio roto sin envolver (envolver en cartón → Negra)</li>
+      <li>{% icono 'x' 18 '#C81E1E' 3 %}Pilas, aceite, bombillos o medicinas (van a Posconsumo)</li>
+    </ul>
+  </article>
+</div>
+
 {% for titulo, lista in secciones %}{% if lista %}
 <h2>{{ titulo }}</h2>
 <div class="lista">

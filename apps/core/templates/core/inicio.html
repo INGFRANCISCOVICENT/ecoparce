@@ -132,6 +132,32 @@
   <a class="btn o" href="{% url 'trivia:inicio' %}">{% icono 'game' 20 '#1E7A46' %}Trivia y medallas 3D</a>
 </div>
 
+<!-- Banner destacado de experiencias interactivas -->
+<section class="eco-showcase" aria-label="Experiencias interactivas de EcoParce">
+  <div class="eco-showcase-head">
+    <span class="video-badge">NUEVO EN ECOPARCE</span>
+    <h2>Aprende jugando, mirando y midiendo tu impacto</h2>
+    <p class="small" style="margin:4px 0 0;color:#CBE8D7">Explora nuestras experiencias interactivas diseñadas para aprender a reciclar en minutos.</p>
+  </div>
+  <div class="eco-showcase-grid">
+    <a class="eco-feat" href="{% url 'trivia:inicio' %}#eco-video-player">
+      <span class="eco-feat-ic" aria-hidden="true">🎬</span>
+      <strong>Video Interactivo 60 s</strong>
+      <span>Con Escarlata, voz en español y 4 retos en vivo.</span>
+    </a>
+    <a class="eco-feat" href="{% url 'trivia:inicio' %}#eco-arcade">
+      <span class="eco-feat-ic" aria-hidden="true">⚡</span>
+      <strong>Arcade Atrapa y Separa</strong>
+      <span>30 segundos contrarreloj con combos hasta x4.</span>
+    </a>
+    <a class="eco-feat" href="{% url 'trivia:inicio' %}#reto-diario-btn">
+      <span class="eco-feat-ic" aria-hidden="true">🏆</span>
+      <strong>Diploma HD y Racha</strong>
+      <span>Cumple el reto del día y descarga tu certificado PNG.</span>
+    </a>
+  </div>
+</section>
+
 <h2>¿En qué bolsa va?</h2>
 <div class="grid g4">
   {% for c, guia in bolsas %}
@@ -222,6 +248,85 @@
   </div>
   {% endif %}
 </section>
+
+<!-- Infografía interactiva: El viaje de tu residuo (Economía Circular) -->
+<h2>¿En qué se transforma lo que separas?</h2>
+<section class="viaje-eco" id="eco-viaje" aria-label="Economía circular: transformación de residuos">
+  <div class="viaje-tabs" role="tablist" aria-label="Selecciona un residuo">
+    <button type="button" class="viaje-tab activo" role="tab" aria-selected="true" data-viaje="pet">Botella PET</button>
+    <button type="button" class="viaje-tab" role="tab" aria-selected="false" data-viaje="lata">Lata aluminio</button>
+    <button type="button" class="viaje-tab" role="tab" aria-selected="false" data-viaje="carton">Cartón / Papel</button>
+    <button type="button" class="viaje-tab" role="tab" aria-selected="false" data-viaje="organico">Orgánicos</button>
+    <button type="button" class="viaje-tab" role="tab" aria-selected="false" data-viaje="aceite">Aceite usado</button>
+  </div>
+  <div class="viaje-pasos" aria-live="polite">
+    <div class="viaje-paso"><span class="viaje-num">1</span><strong id="vj-p1-t">En tu casa</strong><p id="vj-p1-d">Vacías, enjuagas, escurres y aplastas la botella en la Bolsa Blanca.</p></div>
+    <div class="viaje-paso"><span class="viaje-num">2</span><strong id="vj-p2-t">Reciclador de oficio</strong><p id="vj-p2-d">La recoge limpia y la lleva a la estación de clasificación y aprovechamiento.</p></div>
+    <div class="viaje-paso"><span class="viaje-num">3</span><strong id="vj-p3-t">Transformación</strong><p id="vj-p3-d">Se lava, se tritura en escamas y se funde en pellets de poliéster reciclado.</p></div>
+    <div class="viaje-paso viaje-final"><span class="viaje-num">4</span><strong id="vj-p4-t">Nueva vida</strong><p id="vj-p4-d">Vuelve como camisetas deportivas, morrales, fibras textiles o nuevas botellas.</p></div>
+  </div>
+</section>
+
+<!-- Tarjetas volteables 3D: Mitos vs. Realidad -->
+<h2>Mitos vs. Realidad · Toca cada tarjeta para voltearla</h2>
+<div class="grid flip-grid">
+  <button type="button" class="flip-card" data-flip-card aria-pressed="false">
+    <span class="flip-inner">
+      <span class="flip-front">
+        <span class="st s-ret">MITO COMÚN</span>
+        <strong>«Las cajas de leche (Tetra Pak) no se pueden reciclar.»</strong>
+        <span class="xs mut">Toca para ver la realidad ↻</span>
+      </span>
+      <span class="flip-back">
+        <span class="st s-pub">✓ REALIDAD</span>
+        <strong>¡Sí se reciclan en Colombia!</strong>
+        <span class="xs">Vacíalas, enjuágalas, aplástalas y llévalas a la Bolsa Blanca. Se convierten en láminas y mobiliario ecológico.</span>
+      </span>
+    </span>
+  </button>
+  <button type="button" class="flip-card" data-flip-card aria-pressed="false">
+    <span class="flip-inner">
+      <span class="flip-front">
+        <span class="st s-ret">MITO COMÚN</span>
+        <strong>«Un poquito de aceite por el lavaplatos no pasa nada.»</strong>
+        <span class="xs mut">Toca para ver la realidad ↻</span>
+      </span>
+      <span class="flip-back">
+        <span class="st s-pub">✓ REALIDAD</span>
+        <strong>1 litro contamina 1.000 L de agua.</strong>
+        <span class="xs">Déjalo enfriar, envasa en botella plástica bien tapada y llévalo a un punto Posconsumo para hacer biodiésel.</span>
+      </span>
+    </span>
+  </button>
+  <button type="button" class="flip-card" data-flip-card aria-pressed="false">
+    <span class="flip-inner">
+      <span class="flip-front">
+        <span class="st s-ret">MITO COMÚN</span>
+        <strong>«El vidrio roto va en la bolsa blanca porque es vidrio.»</strong>
+        <span class="xs mut">Toca para ver la realidad ↻</span>
+      </span>
+      <span class="flip-back">
+        <span class="st s-pub">✓ REALIDAD</span>
+        <strong>Peligro para quien recicla.</strong>
+        <span class="xs">Envuelve los trozos en cartón o periódico marcado («Vidrio roto») y deposítalo en la Bolsa Negra.</span>
+      </span>
+    </span>
+  </button>
+  <button type="button" class="flip-card" data-flip-card aria-pressed="false">
+    <span class="flip-inner">
+      <span class="flip-front">
+        <span class="st s-ret">MITO COMÚN</span>
+        <strong>«Toda la caja de pizza va en la bolsa blanca.»</strong>
+        <span class="xs mut">Toca para ver la realidad ↻</span>
+      </span>
+      <span class="flip-back">
+        <span class="st s-pub">✓ REALIDAD</span>
+        <strong>La grasa daña el cartón reciclable.</strong>
+        <span class="xs">Separa la tapa limpia (Bolsa Blanca) y pon la parte manchada de grasa y queso en la Bolsa Negra.</span>
+      </span>
+    </span>
+  </button>
+</div>
 
 <!-- Línea de tiempo de degradación -->
 <h2>¿Cuánto tarda en degradarse si NO lo reciclas?</h2>

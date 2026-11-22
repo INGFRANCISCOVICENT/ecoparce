@@ -180,3 +180,14 @@ class TriviaTests(TestCase):
         r_busc = self.client.get('/buscar/')
         self.assertEqual(r_busc.status_code, 200)
         self.assertContains(r_busc, 'btn-voz-buscar')
+
+        # Contenido visual enriquecido en inicio (/) y guías (/guias/)
+        r_home = self.client.get('/')
+        self.assertEqual(r_home.status_code, 200)
+        self.assertContains(r_home, 'eco-viaje')
+        self.assertContains(r_home, 'data-flip-card')
+        self.assertContains(r_home, 'eco-showcase')
+
+        r_guias = self.client.get('/guias/')
+        self.assertEqual(r_guias.status_code, 200)
+        self.assertContains(r_guias, 'data-eco-check')
