@@ -13,7 +13,17 @@ from .models import CodigoQR, Institucion
 
 @sistema_requerido
 def lista(request):
-    """RF-07: generar códigos y ver cuántas lecturas tiene cada uno."""
+    """RF-07: genera un QR automáticamente si no existe ninguno, ofrece creación en 1 clic y muestra siempre la vista previa."""
+    if request.method == 'POST' and request.POST.get('rapido'):
+        destino = request.POST.get('rapido')
+        etiquetas = {'INICIO': 'Acceso principal EcoParce', 'GUIAS': 'Guías de separación',
+                     'BUSCADOR': 'Buscador de residuos', 'TRIVIA': 'Trivia ecológica'}
+        if destino in etiquetas:
+            qr = CodigoQR.objects.create(destino_tipo=destino, ubicacion=etiquetas[destino], creado_por=request.user)
+            RegistroAuditoria.registrar(request.user, Accion.CREAR, qr, f'{qr.codigo_corto} → {qr.destino_texto()} ({qr.ubicacion})')
+            messages.success(request, f'Código QR {qr.codigo_corto} generado automáticamente para {qr.destino_texto()}.')
+            return redirect(f"{request.path}?nuevo={qr.pk}")
+
     form = CodigoQRForm(request.POST or None)
     if request.method == 'POST' and form.is_valid():
         qr = form.save(commit=False)
@@ -22,10 +32,18 @@ def lista(request):
         RegistroAuditoria.registrar(request.user, Accion.CREAR, qr, f'{qr.codigo_corto} → {qr.destino_texto()} ({qr.ubicacion})')
         messages.success(request, f'Se creó el código {qr.codigo_corto}. Descárgalo e imprímelo.')
         return redirect(f"{request.path}?nuevo={qr.pk}")
+
+    # Si aún no hay ningún QR, generamos uno principal automáticamente para que esté listo al instante.
+    if not CodigoQR.objects.exists():
+        qr_auto = CodigoQR.objects.create(destino_tipo='INICIO', ubicacion='Acceso principal EcoParce', creado_por=request.user)
+        RegistroAuditoria.registrar(request.user, Accion.CREAR, qr_auto, f'{qr_auto.codigo_corto} → Inicio (generado automáticamente)')
+
     codigos = CodigoQR.objects.select_related('guia', 'institucion').annotate(lecturas=Count('escaneos'))
     nuevo = None
     if request.GET.get('nuevo', '').isdigit():
         nuevo = codigos.filter(pk=request.GET['nuevo']).first()
+    if nuevo is None:
+        nuevo = codigos.filter(activo=True).first() or codigos.first()
     return render(request, 'qr/panel/lista.html', {'form': form, 'codigos': codigos, 'nuevo': nuevo})
 
 

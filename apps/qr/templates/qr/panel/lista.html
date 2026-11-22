@@ -1,26 +1,46 @@
 {% extends 'panel/base.html' %}{% load eco %}
 {% block titulo %}Códigos QR{% endblock %}{% block encabezado %}Códigos QR{% endblock %}
 {% block contenido %}
+{% if nuevo %}
+<section class="card" style="margin-bottom:16px">
+  <div class="row top-al" style="flex-wrap:wrap;gap:18px">
+    <img class="qrimg" src="{% url 'panel_qr:imagen' nuevo.pk 'png' %}" alt="Código QR {{ nuevo.codigo_corto }}">
+    <div style="flex:1;min-width:220px">
+      <span class="st s-pub">QR listo para escanear e imprimir</span>
+      <h2 style="margin:6px 0 4px">{{ nuevo.destino_texto }} · {{ nuevo.ubicacion }}</h2>
+      <div class="xs mut">Enlace corto: <strong style="color:var(--ink);word-break:break-all">{{ nuevo.url_corta }}</strong></div>
+      <div class="row" style="gap:8px;flex-wrap:wrap;margin-top:12px">
+        <a class="btn p sm" href="{% url 'panel_qr:imagen' nuevo.pk 'png' %}?descargar=1">{% icono 'down' 16 '#fff' %}Descargar PNG</a>
+        <a class="btn o sm" href="{% url 'panel_qr:imagen' nuevo.pk 'svg' %}?descargar=1">{% icono 'down' 16 '#1E7A46' %}Descargar SVG</a>
+        <button class="btn o sm" type="button" data-compartir data-url="{{ nuevo.url_corta }}" data-titulo="QR EcoParce · {{ nuevo.destino_texto }}">{% icono 'copy' 16 '#1E7A46' %}Copiar enlace</button>
+      </div>
+      <p id="aviso-copiado" class="aviso ok" role="status" aria-live="polite" hidden style="margin:10px 0 0">Enlace corto copiado.</p>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="card" style="margin-bottom:16px">
+  <strong style="font-size:15.5px">Generación automática en 1 clic</strong>
+  <p class="xs mut" style="margin:2px 0 10px">Crea al instante un código QR listo para imprimir sin llenar formularios:</p>
+  <form method="post" class="row" style="gap:8px;flex-wrap:wrap">{% csrf_token %}
+    <button class="btn o sm" type="submit" name="rapido" value="INICIO">{% icono 'qr' 16 %}QR Inicio</button>
+    <button class="btn o sm" type="submit" name="rapido" value="GUIAS">{% icono 'book' 16 %}QR Guías</button>
+    <button class="btn o sm" type="submit" name="rapido" value="BUSCADOR">{% icono 'search' 16 %}QR Buscador</button>
+    <button class="btn o sm" type="submit" name="rapido" value="TRIVIA">{% icono 'game' 16 %}QR Trivia</button>
+  </form>
+</section>
+
 <div class="dos qrg">
-<section class="card"><strong style="font-size:17px">Nuevo código</strong>
+<section class="card"><strong style="font-size:17px">QR personalizado</strong>
 <form method="post" novalidate>{% csrf_token %}
   {% include 'includes/campo.html' with campo=form.destino_tipo %}
   <div id="campo-guia">{% include 'includes/campo.html' with campo=form.guia %}</div>
   {% include 'includes/campo.html' with campo=form.institucion %}
   <div class="ayuda"><a href="{% url 'panel_qr:instituciones' %}">Registrar una institución</a></div>
   {% include 'includes/campo.html' with campo=form.ubicacion %}
-  <button class="btn p full" style="margin-top:16px" type="submit">{% icono 'qr' 20 '#fff' %}Generar código</button>
+  <button class="btn p full" style="margin-top:16px" type="submit">{% icono 'qr' 20 '#fff' %}Generar código personalizado</button>
 </form>
-{% if nuevo %}
-<div style="margin-top:18px;border-top:1px solid var(--line);padding-top:16px;display:grid;grid-template-columns:170px 1fr;gap:16px">
-  <img class="qrimg" src="{% url 'panel_qr:imagen' nuevo.pk 'png' %}" alt="Código QR {{ nuevo.codigo_corto }}">
-  <div><div class="xs mut">URL corta</div><strong style="font-size:15px;word-break:break-all">{{ nuevo.url_corta }}</strong>
-  <div class="small mut" style="margin-top:4px">{{ nuevo.destino_texto }} · {{ nuevo.ubicacion }}</div>
-  <div class="acciones" style="margin-top:10px">
-    <a class="btn p sm" href="{% url 'panel_qr:imagen' nuevo.pk 'png' %}?descargar=1">{% icono 'down' 18 '#fff' %}Descargar PNG</a>
-    <a class="btn o sm" href="{% url 'panel_qr:imagen' nuevo.pk 'svg' %}?descargar=1">{% icono 'down' 18 '#1E7A46' %}Descargar SVG</a></div></div>
-</div>
-{% endif %}
 </section>
 <section class="card tabla"><table>
 <tr><th>Código</th><th>Destino</th><th>Ubicación</th><th class="right">Lecturas</th><th>Estado</th><th></th></tr>
@@ -32,6 +52,6 @@
 <td class="right"><form method="post" action="{% url 'panel_qr:activar' c.pk %}" {% if c.activo %}data-confirmar="¿Desactivar {{ c.codigo_corto }}? Quien lo lea verá «código no disponible»."{% endif %}>{% csrf_token %}<button class="btn o sm" type="submit">{% if c.activo %}Desactivar{% else %}Activar{% endif %}</button></form></td></tr>
 {% empty %}<tr><td colspan="6" class="mut">Aún no hay códigos.</td></tr>{% endfor %}
 </table>
-<p class="xs mut" style="margin:8px 4px">Un código inactivo muestra «código no disponible» con un enlace al inicio. Los códigos no se borran para conservar sus estadísticas (RN-06).</p></section>
+<p class="xs mut" style="margin:8px 4px">Haz clic en cualquier código para ver y descargar su imagen QR. Los códigos inactivos se conservan para mantener sus estadísticas (RN-06).</p></section>
 </div>
 {% endblock %}
