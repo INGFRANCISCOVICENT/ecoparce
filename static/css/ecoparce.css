@@ -547,36 +547,30 @@ html[data-contraste="alto"] :focus-visible{outline:4px solid #000;outline-offset
 }
 @keyframes pulso{0%{box-shadow:0 0 0 0 rgba(34,197,94,.7)}70%{box-shadow:0 0 0 9px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
 
-.portada-col-vuelo{display:flex;flex-direction:column;align-items:center;gap:16px}
+.portada-col-vuelo{display:flex;flex-direction:column;align-items:center;gap:14px}
 .escarlata-derecha-escena{
-  position:relative;width:100%;max-width:500px;min-height:230px;
-  display:flex;align-items:center;justify-content:center;perspective:850px;
-  animation:ondular-vuelo 4.2s ease-in-out infinite;
+  position:relative;width:100%;max-width:520px;min-height:250px;
+  display:flex;align-items:center;justify-content:center;overflow:visible;
 }
 .escarlata-ave{
-  position:relative;z-index:2;width:clamp(260px,34vw,440px);height:auto;
-  filter:drop-shadow(0 22px 34px rgba(0,0,0,.62)) drop-shadow(0 0 28px rgba(34,197,94,.28)) contrast(1.04) saturate(1.06);
-  transform-origin:50% 48%;
-  animation:aleteo-real 2.1s ease-in-out infinite;
+  position:relative;z-index:2;width:clamp(290px,36vw,450px);height:auto;
+  filter:drop-shadow(0 22px 36px rgba(0,0,0,.6)) drop-shadow(0 0 28px rgba(34,197,94,.28)) contrast(1.04) saturate(1.06);
+  animation:vuelo-escarlata-real 8s ease-in-out infinite;
   user-select:none;
 }
 .ala-estela-real{
-  position:absolute;left:-2%;bottom:24%;width:72%;height:38px;border-radius:999px;
-  background:linear-gradient(90deg,transparent,rgba(34,197,94,.34),rgba(250,204,21,.48),rgba(239,68,68,.36));
-  filter:blur(15px);transform:rotate(-7deg);animation:estela 2.1s ease-in-out infinite;
+  position:absolute;left:-4%;bottom:24%;width:76%;height:38px;border-radius:999px;
+  background:linear-gradient(90deg,transparent,rgba(34,197,94,.42),rgba(250,204,21,.52),rgba(239,68,68,.38));
+  filter:blur(15px);transform:rotate(-8deg);animation:estela 2.4s ease-in-out infinite;
 }
-@keyframes ondular-vuelo{
-  0%,100%{transform:translate(0,8px) rotate(-3deg)}
-  50%{transform:translate(10px,-16px) rotate(2.5deg)}
+@keyframes vuelo-escarlata-real{
+  0%{transform:translate(-26px,10px) rotate(-7deg) scale(.95)}
+  25%{transform:translate(16px,-24px) rotate(4deg) scale(1.04)}
+  50%{transform:translate(38px,6px) rotate(6deg) scale(1.02)}
+  75%{transform:translate(-4px,-18px) rotate(-4deg) scale(1.05)}
+  100%{transform:translate(-26px,10px) rotate(-7deg) scale(.95)}
 }
-@keyframes aleteo-real{
-  0%{transform:perspective(750px) rotateX(0deg) scaleY(1) scaleX(1)}
-  20%{transform:perspective(750px) rotateX(26deg) scaleY(.82) scaleX(1.03) translateY(-4px)}
-  42%{transform:perspective(750px) rotateX(-12deg) scaleY(1.05) scaleX(.98) translateY(2px)}
-  64%{transform:perspective(750px) rotateX(20deg) scaleY(.88) scaleX(1.02) translateY(-3px)}
-  100%{transform:perspective(750px) rotateX(0deg) scaleY(1) scaleX(1)}
-}
-@keyframes estela{0%,100%{opacity:.45;transform:rotate(-7deg) scaleX(.88)}50%{opacity:.9;transform:rotate(-7deg) scaleX(1.12)}}
+@keyframes estela{0%,100%{opacity:.45;transform:rotate(-8deg) scaleX(.9)}50%{opacity:.9;transform:rotate(-8deg) scaleX(1.12)}}
 
 .portada-dock-fila{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
 .impacto-card{display:flex;flex-direction:column;gap:4px}
