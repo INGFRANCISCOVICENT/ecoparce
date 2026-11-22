@@ -1072,33 +1072,53 @@ html[data-contraste="alto"] :focus-visible{outline:4px solid #000;outline-offset
 
 /* ---------- medidor de seguridad de contraseña y mostrar/ocultar ---------- */
 .pw-wrap{position:relative;display:flex;align-items:center}
-.pw-wrap input{padding-right:76px}
+.pw-wrap input{padding-right:78px}
 .pw-toggle{
-  position:absolute;right:8px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);
-  background:var(--gl);color:var(--gd);font:inherit;font-size:12.5px;font-weight:800;cursor:pointer;
+  position:absolute;right:8px;padding:6px 11px;border-radius:999px;border:1px solid rgba(30,122,70,.25);
+  background:var(--gl);color:var(--gd);font:inherit;font-size:12px;font-weight:800;cursor:pointer;
+  transition:background var(--tr),transform var(--tr);
 }
-.pw-toggle:hover{background:#D1FAE5}
+.pw-toggle:hover{background:#C6F6D5;transform:scale(1.03)}
 .clave-medidor{
-  margin:10px 0 4px;padding:12px 14px;border-radius:14px;
-  background:#F4FBF6;border:1.5px solid var(--line);
+  margin:10px 0 6px;padding:14px 16px;border-radius:18px;
+  background:radial-gradient(ellipse 80% 60% at 90% 10%,rgba(52,211,153,.2) 0%,transparent 65%),
+             linear-gradient(155deg,#061B11 0%,#0B2D1D 100%);
+  border:1.5px solid rgba(74,222,128,.4);
+  box-shadow:0 8px 22px rgba(4,18,11,.22),0 0 18px rgba(52,211,153,.14);
+  color:#ECFDF5;
 }
-.clave-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
-.clave-nivel{font-size:12.5px;font-weight:800;color:var(--mut)}
-.clave-nivel.nivel-debil{color:#C81E1E}
-.clave-nivel.nivel-media{color:#B45309}
-.clave-nivel.nivel-buena{color:#047857}
-.clave-nivel.nivel-fuerte{color:#15803D}
-.clave-barra{height:8px;border-radius:999px;background:#E2ECE6;overflow:hidden}
-.clave-barra i{display:block;height:100%;border-radius:999px;transition:width .25s ease,background .25s ease}
-.clave-barra i.nivel-debil{background:#DC2626}
-.clave-barra i.nivel-media{background:#F59E0B}
-.clave-barra i.nivel-buena{background:#10B981}
-.clave-barra i.nivel-fuerte{background:linear-gradient(90deg,#16A34A,#34D399)}
-.clave-reglas{list-style:none;margin:10px 0 0;padding:0;display:grid;grid-template-columns:1fr;gap:4px}
-@media (min-width:520px){.clave-reglas{grid-template-columns:1fr 1fr}}
-.clave-reglas li{font-size:12.5px;font-weight:700;color:var(--mut);display:flex;align-items:center;gap:6px;transition:color var(--tr)}
-.clave-reglas li span{font-weight:900;width:14px;text-align:center}
-.clave-reglas li.ok{color:#15803D}
+.clave-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.clave-titulo{font-size:12.5px;font-weight:800;letter-spacing:.03em;color:#A7F3D0;text-transform:uppercase}
+.clave-nivel{
+  font-size:12px;font-weight:800;padding:3px 10px;border-radius:999px;
+  background:rgba(255,255,255,.08);color:#CBD5E1;
+}
+.clave-nivel.nivel-debil{background:rgba(239,68,68,.22);color:#FCA5A5}
+.clave-nivel.nivel-media{background:rgba(245,158,11,.24);color:#FDE68A}
+.clave-nivel.nivel-buena{background:rgba(16,185,129,.25);color:#6EE7B7}
+.clave-nivel.nivel-fuerte{background:rgba(34,197,94,.3);color:#BBF7D0;box-shadow:0 0 12px rgba(74,222,128,.35)}
+.clave-barra{height:9px;border-radius:999px;background:rgba(255,255,255,.12);overflow:hidden}
+.clave-barra i{display:block;height:100%;border-radius:999px;transition:width .3s cubic-bezier(.22,1,.36,1),background .3s ease}
+.clave-barra i.nivel-debil{background:linear-gradient(90deg,#EF4444,#F87171)}
+.clave-barra i.nivel-media{background:linear-gradient(90deg,#F59E0B,#FBBF24)}
+.clave-barra i.nivel-buena{background:linear-gradient(90deg,#10B981,#34D399)}
+.clave-barra i.nivel-fuerte{background:linear-gradient(90deg,#22C55E,#4ADE80);box-shadow:0 0 12px rgba(74,222,128,.65)}
+.clave-reglas{list-style:none;margin:12px 0 0;padding:0;display:grid;grid-template-columns:1fr;gap:6px}
+@media (min-width:500px){.clave-reglas{grid-template-columns:1fr 1fr}}
+.clave-reglas li{
+  font-size:12px;font-weight:700;color:#CBD5E1;display:flex;align-items:center;gap:7px;
+  padding:6px 10px;border-radius:10px;background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.1);transition:all .22s ease;
+}
+.clave-reglas li span{
+  display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;
+  border-radius:50%;font-size:11px;font-weight:900;background:rgba(255,255,255,.1);color:#94A3B8;flex:none;
+}
+.clave-reglas li.ok{
+  color:#ECFDF5;background:rgba(34,197,94,.2);border-color:rgba(74,222,128,.55);
+  box-shadow:0 0 12px rgba(52,211,153,.18);
+}
+.clave-reglas li.ok span{background:#22C55E;color:#052E16}
 .clave-coincide{margin:6px 0 0;font-weight:800}
 .clave-coincide.ok{color:#15803D}
 .clave-coincide.mal{color:#C81E1E}

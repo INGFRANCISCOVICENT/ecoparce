@@ -35,7 +35,6 @@
       <div class="portada-col-texto">
         <div class="portada-top-row">
           <span class="portada-badge"><span class="pulso-verde"></span>{% if user.is_authenticated %}SESIÓN ACTIVA · {{ user.get_rol_display|upper }}{% else %}BOGOTÁ · RED ECOLÓGICA · RES. 2184{% endif %}</span>
-          <span class="ai-etiqueta" title="Ilustración realista de Escarlata asistida con IA">Ilustración IA</span>
         </div>
 
         {% if user.is_authenticated %}

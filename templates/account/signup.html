@@ -15,21 +15,20 @@
   {% include 'includes/campo.html' with campo=form.password1 %}
   <div id="clave-medidor" class="clave-medidor" aria-live="polite">
     <div class="clave-head">
-      <span class="xs" style="font-weight:800">Seguridad de la contraseña</span>
+      <span class="clave-titulo">Nivel de seguridad</span>
       <span id="clave-nivel" class="clave-nivel">Sin escribir</span>
     </div>
     <div class="clave-barra" role="progressbar" aria-label="Nivel de seguridad de la contraseña" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
       <i id="clave-barra-fill" style="width:0%"></i>
     </div>
     <ul class="clave-reglas" id="clave-reglas">
-      <li data-regla="largo"><span>○</span> Más de 8 caracteres (mínimo 9)</li>
-      <li data-regla="minus"><span>○</span> Al menos 1 letra minúscula (a-z)</li>
-      <li data-regla="mayus"><span>○</span> Al menos 1 letra mayúscula (A-Z)</li>
-      <li data-regla="num"><span>○</span> Al menos 1 número (0-9)</li>
-      <li data-regla="esp"><span>○</span> Al menos 1 carácter especial (! @ # $ % - _)</li>
-      <li data-regla="personal"><span>○</span> No contiene tu correo ni tu nombre</li>
+      <li data-regla="largo"><span>○</span> Más de 8 caracteres</li>
+      <li data-regla="minus"><span>○</span> 1 letra minúscula</li>
+      <li data-regla="mayus"><span>○</span> 1 letra mayúscula</li>
+      <li data-regla="num"><span>○</span> 1 número</li>
+      <li data-regla="esp"><span>○</span> 1 carácter especial</li>
+      <li data-regla="personal"><span>○</span> Sin tu correo ni nombre</li>
     </ul>
-    <p class="xs mut" style="margin:6px 0 0">{% icono 'lock' 14 '#1E7A46' %} Se guarda encriptada con <strong>Argon2id</strong>; nunca se almacena en texto plano.</p>
   </div>
   {% include 'includes/campo.html' with campo=form.password2 %}
   <p id="clave-coincide" class="clave-coincide xs" aria-live="polite" hidden></p>

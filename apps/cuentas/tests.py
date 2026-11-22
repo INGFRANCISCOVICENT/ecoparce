@@ -427,11 +427,11 @@ class EncabezadosTests(TestCase):
         from django.core.exceptions import ValidationError
         from apps.cuentas.validadores import ClaveSeguraValidator
 
-        # 1. La página de registro incluye el medidor en vivo y las 6 reglas
+        # 1. La página de registro incluye el medidor en vivo sin jerga técnica visible
         r = self.client.get('/accounts/signup/')
         self.assertEqual(r.status_code, 200)
         self.assertContains(r, 'clave-medidor')
-        self.assertContains(r, 'Argon2id')
+        self.assertNotContains(r, 'Argon2id')
 
         # 2. Validador rechaza contraseñas sin mayúscula, número, especial, cortas o con correo/nombre
         val = ClaveSeguraValidator()
@@ -466,10 +466,11 @@ class EncabezadosTests(TestCase):
         self.assertEqual(r_ver.json()['version'], ver)
         self.assertIn('no-store', r_ver['Cache-Control'])
 
-        # 2. Pie de página incluye la marca y el banner de actualización
+        # 2. Pie de página incluye la marca, el banner de actualización y sin etiqueta «Ilustración IA»
         r_home = self.client.get('/')
         self.assertContains(r_home, 'Francisco Navarro, Danixa Herrera y Darien García')
         self.assertContains(r_home, 'banner-actualizacion')
+        self.assertNotContains(r_home, 'Ilustración IA')
 
         # 3. /panel/versiones/ exige administrador y muestra el historial de versiones
         self.assertEqual(self.client.get('/panel/versiones/').status_code, 302)

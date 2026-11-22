@@ -2,6 +2,11 @@
 
 Este proyecto sigue el [Versionado Semántico (SemVer 2.0.0)](https://semver.org/lang/es/) y control de versiones en Git.
 
+## [2.4.1] - 2026-11-22
+### Mejorado
+- **Medidor de contraseña rediseñado**: tarjeta esmeralda luminosa con barra animada y chips interactivos que se iluminan al cumplir cada requisito; se retiró la mención técnica de Argon2id de la vista del usuario (manteniendo el cifrado real Argon2id en el servidor).
+- **Portada más limpia**: se eliminó la etiqueta visible «Ilustración IA» de la pantalla de inicio.
+
 ## [2.4.0] - 2026-11-22
 ### Agregado
 - **Aviso automático de nueva versión y botón «Actualizar ahora»**: nuevo endpoint `/version.json` sin caché, versionado `?v=` en CSS/JS y banner emergente que detecta cuando hay una versión más reciente en el servidor para limpiar caché y recargar con un toque en celular o PC.
