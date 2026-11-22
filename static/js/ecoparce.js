@@ -213,4 +213,127 @@
     });
     actualizarCheck();
   }
+
+  // Botón Mostrar/Ocultar en campos de contraseña (registro e inicio de sesión).
+  document.querySelectorAll('input[type="password"]').forEach(function (inp) {
+    if (inp.parentElement && inp.parentElement.classList.contains('pw-wrap')) return;
+    var wrap = document.createElement('div');
+    wrap.className = 'pw-wrap';
+    inp.parentNode.insertBefore(wrap, inp);
+    wrap.appendChild(inp);
+    var toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'pw-toggle';
+    toggle.setAttribute('aria-label', 'Mostrar contraseña');
+    toggle.textContent = 'Ver';
+    toggle.addEventListener('click', function () {
+      var esOculta = inp.type === 'password';
+      inp.type = esOculta ? 'text' : 'password';
+      toggle.textContent = esOculta ? 'Ocultar' : 'Ver';
+      toggle.setAttribute('aria-label', esOculta ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    });
+    wrap.appendChild(toggle);
+  });
+
+  // Medidor en tiempo real de seguridad de contraseña en /accounts/signup/.
+  var medidor = document.getElementById('clave-medidor');
+  var pw1 = document.getElementById('id_password1');
+  var pw2 = document.getElementById('id_password2');
+  var campoEmail = document.getElementById('id_email');
+  var campoNombre = document.getElementById('id_nombre');
+  if (medidor && pw1) {
+    var fill = document.getElementById('clave-barra-fill');
+    var nivelTxt = document.getElementById('clave-nivel');
+    var coincideEl = document.getElementById('clave-coincide');
+    var reglasEls = {
+      largo: medidor.querySelector('[data-regla="largo"]'),
+      minus: medidor.querySelector('[data-regla="minus"]'),
+      mayus: medidor.querySelector('[data-regla="mayus"]'),
+      num: medidor.querySelector('[data-regla="num"]'),
+      esp: medidor.querySelector('[data-regla="esp"]'),
+      personal: medidor.querySelector('[data-regla="personal"]')
+    };
+
+    var norm = function (s) {
+      return (s || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    };
+    var contienePersonal = function (val) {
+      if (!val) return false;
+      var low = norm(val);
+      var partes = [];
+      if (campoEmail && campoEmail.value) {
+        var em = norm(campoEmail.value);
+        if (em) partes.push(em);
+        var loc = em.split('@')[0];
+        if (loc && loc.length >= 3) partes.push(loc);
+      }
+      if (campoNombre && campoNombre.value) {
+        norm(campoNombre.value).split(/[\s._-]+/).forEach(function (w) {
+          if (w.length >= 3) partes.push(w);
+        });
+      }
+      return partes.some(function (p) { return low.indexOf(p) !== -1; });
+    };
+
+    var evaluarCoincidencia = function () {
+      if (!pw2 || !coincideEl) return;
+      if (!pw2.value) { coincideEl.hidden = true; return; }
+      coincideEl.hidden = false;
+      if (pw1.value === pw2.value) {
+        coincideEl.textContent = '✓ Las contraseñas coinciden';
+        coincideEl.className = 'clave-coincide xs ok';
+      } else {
+        coincideEl.textContent = '✕ Las contraseñas aún no coinciden';
+        coincideEl.className = 'clave-coincide xs mal';
+      }
+    };
+
+    var evaluarClave = function () {
+      var val = pw1.value || '';
+      var checks = {
+        largo: val.length > 8,
+        minus: /[a-z]/.test(val),
+        mayus: /[A-Z]/.test(val),
+        num: /\d/.test(val),
+        esp: /[^A-Za-z0-9\s]/.test(val),
+        personal: val.length > 0 && !contienePersonal(val)
+      };
+      var cumplidas = 0;
+      Object.keys(checks).forEach(function (k) {
+        var ok = checks[k];
+        if (ok) cumplidas++;
+        var li = reglasEls[k];
+        if (li) {
+          li.classList.toggle('ok', ok);
+          var sp = li.querySelector('span');
+          if (sp) sp.textContent = ok ? '✓' : '○';
+        }
+      });
+      var pct = val.length === 0 ? 0 : Math.round((cumplidas / 6) * 100);
+      var clase = 'debil';
+      var etiqueta = 'Sin escribir';
+      if (val.length > 0) {
+        if (cumplidas <= 2) { clase = 'debil'; etiqueta = 'Débil (' + pct + '%)'; }
+        else if (cumplidas <= 4) { clase = 'media'; etiqueta = 'En progreso (' + pct + '%)'; }
+        else if (cumplidas === 5) { clase = 'buena'; etiqueta = 'Casi lista (' + pct + '%)'; }
+        else { clase = 'fuerte'; etiqueta = '¡Segura! (100%)'; }
+      }
+      if (fill) {
+        fill.style.width = pct + '%';
+        fill.className = 'nivel-' + clase;
+        if (fill.parentElement) fill.parentElement.setAttribute('aria-valuenow', String(pct));
+      }
+      if (nivelTxt) {
+        nivelTxt.textContent = etiqueta;
+        nivelTxt.className = 'clave-nivel nivel-' + clase;
+      }
+      evaluarCoincidencia();
+    };
+
+    [pw1, campoEmail, campoNombre].forEach(function (el) {
+      if (el) el.addEventListener('input', evaluarClave);
+    });
+    if (pw2) pw2.addEventListener('input', evaluarCoincidencia);
+    evaluarClave();
+  }
 })();

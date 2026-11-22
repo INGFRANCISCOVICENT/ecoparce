@@ -1070,6 +1070,39 @@ html[data-contraste="alto"] :focus-visible{outline:4px solid #000;outline-offset
 .check-item input{width:20px;height:20px;margin-top:2px;flex:none;accent-color:var(--g)}
 .check-item:has(input:checked){background:var(--gl);border-color:#86EFAC}
 
+/* ---------- medidor de seguridad de contraseña y mostrar/ocultar ---------- */
+.pw-wrap{position:relative;display:flex;align-items:center}
+.pw-wrap input{padding-right:76px}
+.pw-toggle{
+  position:absolute;right:8px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);
+  background:var(--gl);color:var(--gd);font:inherit;font-size:12.5px;font-weight:800;cursor:pointer;
+}
+.pw-toggle:hover{background:#D1FAE5}
+.clave-medidor{
+  margin:10px 0 4px;padding:12px 14px;border-radius:14px;
+  background:#F4FBF6;border:1.5px solid var(--line);
+}
+.clave-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.clave-nivel{font-size:12.5px;font-weight:800;color:var(--mut)}
+.clave-nivel.nivel-debil{color:#C81E1E}
+.clave-nivel.nivel-media{color:#B45309}
+.clave-nivel.nivel-buena{color:#047857}
+.clave-nivel.nivel-fuerte{color:#15803D}
+.clave-barra{height:8px;border-radius:999px;background:#E2ECE6;overflow:hidden}
+.clave-barra i{display:block;height:100%;border-radius:999px;transition:width .25s ease,background .25s ease}
+.clave-barra i.nivel-debil{background:#DC2626}
+.clave-barra i.nivel-media{background:#F59E0B}
+.clave-barra i.nivel-buena{background:#10B981}
+.clave-barra i.nivel-fuerte{background:linear-gradient(90deg,#16A34A,#34D399)}
+.clave-reglas{list-style:none;margin:10px 0 0;padding:0;display:grid;grid-template-columns:1fr;gap:4px}
+@media (min-width:520px){.clave-reglas{grid-template-columns:1fr 1fr}}
+.clave-reglas li{font-size:12.5px;font-weight:700;color:var(--mut);display:flex;align-items:center;gap:6px;transition:color var(--tr)}
+.clave-reglas li span{font-weight:900;width:14px;text-align:center}
+.clave-reglas li.ok{color:#15803D}
+.clave-coincide{margin:6px 0 0;font-weight:800}
+.clave-coincide.ok{color:#15803D}
+.clave-coincide.mal{color:#C81E1E}
+
 /* impresión limpia de guías y páginas informativas */
 @media print{
   body,.adm .main{background:#fff!important}

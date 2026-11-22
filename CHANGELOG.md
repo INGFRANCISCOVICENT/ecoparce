@@ -2,6 +2,13 @@
 
 Este proyecto sigue el [Versionado Semántico (SemVer 2.0.0)](https://semver.org/lang/es/) y control de versiones en Git.
 
+## [2.3.1] - 2026-11-22
+### Seguridad y UX
+- **Política estricta de contraseñas seguras + Medidor visual en tiempo real (`/accounts/signup/`)**:
+  - Validador en servidor (`apps.cuentas.validadores.ClaveSeguraValidator`) y en `RegistroForm.clean()`: exige más de 8 caracteres (mínimo 9), letra minúscula, mayúscula, número, carácter especial y prohíbe incluir el correo o el nombre.
+  - Barra de avance de seguridad en vivo (`0 %` a `100 %`), lista interactiva de los 6 requisitos, indicador de coincidencia de confirmación y botón **Ver / Ocultar** en todos los campos de contraseña.
+  - Cifrado (hash) verificado con **Argon2id** en base de datos.
+
 ## [2.3.0] - 2026-11-22
 ### Agregado
 - **Contenido visual interactivo enriquecido en `/` y `/guias/`**:

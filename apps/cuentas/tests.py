@@ -422,3 +422,36 @@ class EncabezadosTests(TestCase):
 
     def test_flujos_desactivados(self):
         self.assertEqual(self.client.get('/accounts/email/').status_code, 404)
+
+    def test_contrasena_segura_medidor_y_argon2id(self):
+        from django.core.exceptions import ValidationError
+        from apps.cuentas.validadores import ClaveSeguraValidator
+
+        # 1. La página de registro incluye el medidor en vivo y las 6 reglas
+        r = self.client.get('/accounts/signup/')
+        self.assertEqual(r.status_code, 200)
+        self.assertContains(r, 'clave-medidor')
+        self.assertContains(r, 'Argon2id')
+
+        # 2. Validador rechaza contraseñas sin mayúscula, número, especial, cortas o con correo/nombre
+        val = ClaveSeguraValidator()
+        dummy = Usuario(correo='andres.lopez@gmail.com', nombre='Andrés López')
+        for mala in [
+            'Ab1!cort',               # 8 caracteres (no mayor a 8)
+            'sinmayuscula1!',         # falta mayúscula
+            'SINMINUSCULA1!',         # falta minúscula
+            'SinNumeroEspecial!',     # falta número
+            'SinEspecial1234',        # falta carácter especial
+            'Andres#2026Segura',      # contiene su nombre
+            'andres.lopez#2026A',     # contiene su correo
+        ]:
+            with self.assertRaises(ValidationError, msg=f'Debió rechazar: {mala}'):
+                val.validate(mala, user=dummy)
+
+        # 3. Contraseña segura pasa y se almacena encriptada con Argon2id (nunca texto plano)
+        fuerte = 'EcoParce#2026!'
+        val.validate(fuerte, user=dummy)
+        u = Usuario.objects.create_user('seguro@gmail.com', 'Andrés López', fuerte)
+        self.assertTrue(u.password.startswith('argon2$'))
+        self.assertNotIn(fuerte, u.password)
+        self.assertTrue(u.check_password(fuerte))

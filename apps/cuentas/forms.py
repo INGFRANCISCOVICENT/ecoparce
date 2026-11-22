@@ -99,6 +99,28 @@ class RegistroForm(forms.Form):
         required=False,
         label='Opcional: quiero recibir novedades educativas y tips de reciclaje por correo (puedes darte de baja en cualquier momento).')
 
+    def clean(self):
+        import re
+        from .validadores import _normalizar
+        datos = super().clean()
+        clave = datos.get('password1') or ''
+        if clave:
+            low = _normalizar(clave)
+            correo = _normalizar(datos.get('email'))
+            nombre = _normalizar(datos.get('nombre'))
+            partes = []
+            if correo:
+                partes.append(correo)
+                local = correo.split('@')[0]
+                if len(local) >= 3:
+                    partes.append(local)
+            for palabra in re.split(r'[\s._-]+', nombre):
+                if len(palabra) >= 3:
+                    partes.append(palabra)
+            if any(p in low for p in partes):
+                self.add_error('password1', 'La contraseña no puede contener tu correo ni tu nombre.')
+        return datos
+
     def signup(self, request, user):
         from django.conf import settings
 

@@ -100,9 +100,10 @@ AUTHENTICATION_BACKENDS = [
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {'min_length': 10}},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {'min_length': 9}},
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+    {'NAME': 'apps.cuentas.validadores.ClaveSeguraValidator'},
 ]
 
 LOGIN_URL = 'account_login'
@@ -140,7 +141,7 @@ ACCOUNT_EMAIL_NOTIFICATIONS = True                  # alerta por correo al cambi
 ACCOUNT_EMAIL_SUBJECT_PREFIX = '[EcoParce] '
 ACCOUNT_CHANGE_EMAIL = False
 ACCOUNT_MAX_EMAIL_ADDRESSES = 1
-ACCOUNT_PASSWORD_MIN_LENGTH = 10
+ACCOUNT_PASSWORD_MIN_LENGTH = 9
 VERIFICAR_MX_CORREO = env('VERIFICAR_MX_CORREO', '1') == '1'   # el dominio del correo debe recibir email
 ACCOUNT_SESSION_REMEMBER = False           # la sesión termina al cerrar el navegador
 ACCOUNT_LOGOUT_ON_GET = False              # cerrar sesión solo por POST (evita CSRF de cierre)
