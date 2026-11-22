@@ -131,32 +131,6 @@
   <a class="btn o" href="{% url 'trivia:inicio' %}">{% icono 'game' 20 '#1E7A46' %}Trivia y medallas 3D</a>
 </div>
 
-<!-- Banner destacado de experiencias interactivas -->
-<section class="eco-showcase" aria-label="Experiencias interactivas de EcoParce">
-  <div class="eco-showcase-head">
-    <span class="video-badge">NUEVO EN ECOPARCE</span>
-    <h2>Aprende jugando, mirando y midiendo tu impacto</h2>
-    <p class="small" style="margin:4px 0 0;color:#CBE8D7">Explora nuestras experiencias interactivas diseñadas para aprender a reciclar en minutos.</p>
-  </div>
-  <div class="eco-showcase-grid">
-    <a class="eco-feat" href="{% url 'trivia:inicio' %}#eco-video-player">
-      <span class="eco-feat-ic" aria-hidden="true">🎬</span>
-      <strong>Video Interactivo 60 s</strong>
-      <span>Con Escarlata, voz en español y 4 retos en vivo.</span>
-    </a>
-    <a class="eco-feat" href="{% url 'trivia:inicio' %}#eco-arcade">
-      <span class="eco-feat-ic" aria-hidden="true">⚡</span>
-      <strong>Arcade Atrapa y Separa</strong>
-      <span>30 segundos contrarreloj con combos hasta x4.</span>
-    </a>
-    <a class="eco-feat" href="{% url 'trivia:inicio' %}#reto-diario-btn">
-      <span class="eco-feat-ic" aria-hidden="true">🏆</span>
-      <strong>Diploma HD y Racha</strong>
-      <span>Cumple el reto del día y descarga tu certificado PNG.</span>
-    </a>
-  </div>
-</section>
-
 <h2>¿En qué bolsa va?</h2>
 <div class="grid g4">
   {% for c, guia in bolsas %}

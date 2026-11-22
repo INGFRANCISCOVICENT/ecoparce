@@ -2,6 +2,10 @@
 
 Este proyecto sigue el [Versionado Semántico (SemVer 2.0.0)](https://semver.org/lang/es/) y control de versiones en Git.
 
+## [2.4.2] - 2026-11-22
+### Mejorado
+- **Inicio más limpio y profesional**: se retiró el bloque promocional «Nuevo en EcoParce» con emojis de la pantalla de inicio para evitar redundancia visual y mantener una jerarquía limpia hacia las bolsas, impacto, economía circular y tarjetas 3D.
+
 ## [2.4.1] - 2026-11-22
 ### Mejorado
 - **Medidor de contraseña rediseñado**: tarjeta esmeralda luminosa con barra animada y chips interactivos que se iluminan al cumplir cada requisito; se retiró la mención técnica de Argon2id de la vista del usuario (manteniendo el cifrado real Argon2id en el servidor).

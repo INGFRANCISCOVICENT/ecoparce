@@ -186,7 +186,7 @@ class TriviaTests(TestCase):
         self.assertEqual(r_home.status_code, 200)
         self.assertContains(r_home, 'eco-viaje')
         self.assertContains(r_home, 'data-flip-card')
-        self.assertContains(r_home, 'eco-showcase')
+        self.assertNotContains(r_home, 'eco-showcase')
 
         r_guias = self.client.get('/guias/')
         self.assertEqual(r_guias.status_code, 200)
