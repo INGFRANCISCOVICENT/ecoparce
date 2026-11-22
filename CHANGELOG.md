@@ -2,6 +2,10 @@
 
 Este proyecto sigue el [Versionado Semántico (SemVer 2.0.0)](https://semver.org/lang/es/) y control de versiones en Git.
 
+## [2.6.1] - 2026-11-22
+### Corregido
+- **Altura adaptable del chat EcoBot en pantallas móviles**: ajuste `max-height: calc(100dvh - 148px)` con desplazamiento interno para que el encabezado del chat (botón «Limpiar» y «✕») permanezca siempre visible incluso en pantallas pequeñas.
+
 ## [2.6.0] - 2026-11-22
 ### Seguridad, Arquitectura y Chat Profesional
 - **Asistente EcoBot conectado en tiempo real a la base oficial (`/asistente/consultar/`)**: consulta el catálogo real de residuos y guías con rate-limiting (45 req/min), tarjetas estructuradas por color de bolsa, pasos de preparación, chips relacionados, botón «Limpiar», memoria de sesión (`sessionStorage`) y renderizado DOM 100 % seguro contra XSS.

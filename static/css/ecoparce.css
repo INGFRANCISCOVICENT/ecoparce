@@ -1149,13 +1149,14 @@ html[data-contraste="alto"] :focus-visible{outline:4px solid #000;outline-offset
 @media (min-width:860px){.ecobot-fab{bottom:22px;right:22px}}
 .ecobot-panel{
   position:fixed;right:14px;bottom:132px;z-index:88;width:min(92vw,370px);
+  max-height:calc(100dvh - 148px);
   border-radius:20px;overflow:hidden;
   background:#061A10;border:1.5px solid rgba(74,222,128,.55);
   box-shadow:0 16px 40px rgba(0,0,0,.55),0 0 28px rgba(52,211,153,.22);
   display:flex;flex-direction:column;
 }
 .ecobot-panel[hidden]{display:none}
-@media (min-width:860px){.ecobot-panel{bottom:78px;right:22px}}
+@media (min-width:860px){.ecobot-panel{bottom:78px;right:22px;max-height:calc(100dvh - 104px)}}
 .ecobot-head{
   display:flex;align-items:center;justify-content:space-between;padding:12px 14px;
   background:linear-gradient(90deg,#092D1B,#11472B);border-bottom:1px solid rgba(74,222,128,.25);
@@ -1177,7 +1178,7 @@ html[data-contraste="alto"] :focus-visible{outline:4px solid #000;outline-offset
 }
 .ecobot-close:hover{background:rgba(255,255,255,.22)}
 .ecobot-msgs{
-  padding:12px;max-height:290px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;
+  padding:12px;flex:1;min-height:110px;max-height:290px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;
 }
 .ecobot-msg{
   padding:10px 12px;border-radius:14px;font-size:13.5px;line-height:1.42;max-width:94%;
