@@ -192,6 +192,36 @@ PREGUNTAS = [
      [('Por el desagüe con abundante agua', False), ('En su empaque original en un punto posconsumo de medicamentos veterinarios', True), ('En la bolsa negra junto a los residuos sanitarios', False)]),
 ]
 
+PREGUNTAS_BOLSAS = [
+    ('Reto rápido: Lata de gaseosa vacía y enjuagada', 'El aluminio es 100 % reciclable y ahorra hasta un 95 % de energía frente a producirlo desde cero: va en la bolsa blanca.', 1,
+     [('Bolsa blanca', True), ('Bolsa negra', False), ('Bolsa verde', False), ('Punto posconsumo', False)]),
+    ('Reto rápido: Cáscaras de papa y restos de ensalada', 'Son residuos orgánicos aprovechables ideales para compostaje: van en la bolsa verde.', 1,
+     [('Bolsa blanca', False), ('Bolsa negra', False), ('Bolsa verde', True), ('Punto posconsumo', False)]),
+    ('Reto rápido: Servilleta usada con salsa y grasa', 'El papel absorbente con restos de comida o grasa no se puede reciclar: va en la bolsa negra.', 1,
+     [('Bolsa blanca', False), ('Bolsa negra', True), ('Bolsa verde', False), ('Punto posconsumo', False)]),
+    ('Reto rápido: Cargador de celular dañado y audífonos viejos', 'Son residuos de aparatos eléctricos y electrónicos (RAEE): entrégalos en un punto posconsumo.', 2,
+     [('Bolsa blanca', False), ('Bolsa negra', False), ('Bolsa verde', False), ('Punto posconsumo', True)]),
+    ('Reto rápido: Botella de vidrio limpia de salsa o jugo', 'El vidrio limpio se recicla infinitas veces sin perder calidad: va en la bolsa blanca.', 1,
+     [('Bolsa blanca', True), ('Bolsa negra', False), ('Bolsa verde', False), ('Punto posconsumo', False)]),
+    ('Reto rápido: Frasco con pastillas vencidas', 'Los medicamentos vencidos nunca van a la basura ni al inodoro: llévalos a un punto posconsumo de medicamentos.', 2,
+     [('Bolsa blanca', False), ('Bolsa negra', False), ('Bolsa verde', False), ('Punto posconsumo', True)]),
+]
+
+PREGUNTAS_MITOS = [
+    ('Mito o Realidad: «Un solo litro de aceite de cocina usado echado por el lavaplatos puede contaminar hasta 1.000 litros de agua».', '¡REALIDAD! El aceite forma una película que impide el paso del oxígeno en ríos y humedales y obstruye las tuberías. Guárdalo frío en una botella y llévalo a un punto posconsumo.', 2,
+     [('Realidad', True), ('Mito', False)]),
+    ('Mito o Realidad: «Todas las bolsas plásticas sucias con comida se pueden meter en la bolsa blanca porque igual las lavan».', '¡MITO! Los restos de comida y líquidos contaminan el papel y cartón de la bolsa blanca, arruinando material que el reciclador sí podía aprovechar.', 1,
+     [('Realidad', False), ('Mito', True)]),
+    ('Mito o Realidad: «Las cajas de leche (tetrapak) NO se pueden reciclar en Colombia».', '¡MITO! En Colombia los envases multicapa limpios, secos y aplastados sí se aprovechan y van en la bolsa blanca.', 2,
+     [('Realidad', False), ('Mito', True)]),
+    ('Mito o Realidad: «El vidrio puede reciclarse una y otra vez sin perder su calidad ni pureza».', '¡REALIDAD! El vidrio limpio en la bolsa blanca es uno de los materiales más circulares que existen.', 1,
+     [('Realidad', True), ('Mito', False)]),
+    ('Mito o Realidad: «En Colombia, el color verde de la Resolución 2184 es para botellas plásticas y latas».', '¡MITO! Desde la Resolución 2184 de 2019, el verde es para residuos orgánicos aprovechables; los plásticos, latas, vidrio y papel limpios van en la bolsa blanca.', 2,
+     [('Realidad', False), ('Mito', True)]),
+    ('Mito o Realidad: «Las pilas usadas pueden liberar metales pesados como cadmio o mercurio si terminan en un relleno sanitario».', '¡REALIDAD! Por eso las pilas jamás van en las bolsas comunes; deben ir a contenedores posconsumo autorizados.', 3,
+     [('Realidad', True), ('Mito', False)]),
+]
+
 PUNTOS_DEMO = [
     ('Punto posconsumo del centro comercial (ejemplo)', 'Dirección de ejemplo', 'Chapinero', 'Lunes a domingo, 10:00 a. m. a 8:00 p. m.',
      ['Pilas', 'Batería de celular', 'Bombillo ahorrador', 'Medicamentos vencidos']),

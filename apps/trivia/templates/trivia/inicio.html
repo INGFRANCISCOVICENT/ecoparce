@@ -2,21 +2,39 @@
 {% block titulo %}Trivia por niveles{% endblock %}
 {% block contenido %}
 <section class="center" style="padding-top:6px">
-  <img src="{% static 'img/logo-256.png' %}" alt="Escarlata, guacamaya roja mascota de EcoParce (ilustración asistida con IA)" style="width:124px;height:124px;border-radius:50%;box-shadow:var(--sh-sm)">
+  <img src="{% static 'img/logo-256.png' %}" alt="Escarlata, guacamaya roja mascota de EcoParce (ilustración asistida con IA)" style="width:116px;height:116px;border-radius:50%;box-shadow:var(--sh-sm)">
   <h1 style="margin-top:8px">Trivia de Escarlata</h1>
-  <p class="mut">Cada nivel sube la dificultad y el puntaje exigido. Las insignias se otorgan solo según tus puntos.</p>
+  <p class="mut">3 modos de juego educativos y adictivos. Sube de nivel y colecciona medallas ecológicas 3D según tus puntos.</p>
   <div class="row" style="justify-content:center;gap:8px;margin-top:6px;flex-wrap:wrap">
     <span class="tag">Puntos acumulados: <strong>{{ puntos_totales }}</strong></span>
-    <span class="tag">Insignias: <strong>{{ total_obtenidas }}/{{ insignias|length }}</strong></span>
+    <span class="tag">Medallas 3D: <strong>{{ total_obtenidas }}/{{ insignias|length }}</strong></span>
   </div>
 </section>
 
 {% if partida and not partida.terminada and partida.respondidas %}
-<a class="btn p full" style="margin-top:14px;margin-bottom:14px" href="{% url 'trivia:jugar' %}">{% icono 'game' 20 '#fff' %}Seguir mi partida · Nivel {{ partida.nivel }} ({{ partida.respondidas }}/{{ partida.total_preguntas }})</a>
+<a class="btn p full" style="margin-top:14px;margin-bottom:14px" href="{% url 'trivia:jugar' %}">{% icono 'game' 20 '#fff' %}Seguir mi partida · {{ partida.get_modo_display }} ({{ partida.respondidas }}/{{ partida.total_preguntas }})</a>
 {% endif %}
 
 {% if hay_preguntas %}
-<h2>Elige tu nivel</h2>
+<h2>Modos de trivia rápidos</h2>
+<div class="grid" style="margin-bottom:8px">
+  <form method="post" action="{% url 'trivia:nueva' %}" class="card modo-card">{% csrf_token %}
+    <input type="hidden" name="modo" value="BOLSAS">
+    <span class="ic" style="background:var(--gl);margin-bottom:8px">{% icono 'leaf' 24 '#14532D' %}</span>
+    <strong>¿En qué bolsa va?</strong>
+    <p class="xs mut" style="margin:4px 0 12px">Reto relámpago: clasifica residuos reales en Blanca, Negra, Verde o Posconsumo.</p>
+    <button class="btn p sm full" type="submit">Jugar reto rápido</button>
+  </form>
+  <form method="post" action="{% url 'trivia:nueva' %}" class="card modo-card">{% csrf_token %}
+    <input type="hidden" name="modo" value="MITOS">
+    <span class="ic" style="background:var(--yl);margin-bottom:8px">{% icono 'bulb' 24 '#7A5A00' %}</span>
+    <strong>Mitos vs. Realidad</strong>
+    <p class="xs mut" style="margin:4px 0 12px">Desmiente creencias falsas sobre aceite, tetrapak, vidrio y pilas.</p>
+    <button class="btn o sm full" type="submit">Desmentir mitos</button>
+  </form>
+</div>
+
+<h2>Modo Carrera · 3 niveles progresivos</h2>
 <div class="lista">
   {% for n in niveles %}
   <div class="card nivel-card {% if n.desbloqueado %}desbloqueado{% else %}bloqueado{% endif %}">
@@ -38,6 +56,7 @@
     </div>
     {% if n.desbloqueado %}
     <form method="post" action="{% url 'trivia:nueva' %}" style="margin-top:12px">{% csrf_token %}
+      <input type="hidden" name="modo" value="NIVELES">
       <input type="hidden" name="nivel" value="{{ n.numero }}">
       <button class="btn {% if n.superado %}o{% else %}p{% endif %} sm full" type="submit">{% icono 'game' 18 %}Jugar Nivel {{ n.numero }}</button>
     </form>
@@ -49,12 +68,17 @@
 <div class="aviso info" style="margin-top:16px">{% icono 'info' 20 %}<span>Estamos preparando las preguntas. ¡Vuelve pronto!</span></div>
 {% endif %}
 
-<h2>Insignias ecológicas ({{ total_obtenidas }}/{{ insignias|length }})</h2>
-<p class="small mut" style="margin-top:-4px">{% if user.is_authenticated %}Tus insignias se guardan en tu cuenta.{% else %}Juega sin cuenta o <a href="{% url 'account_login' %}?next={% url 'trivia:inicio' %}">inicia sesión</a> para guardar tus insignias permanentemente.{% endif %}</p>
+<h2>Vitrina de Medallas Ecológicas 3D ({{ total_obtenidas }}/{{ insignias|length }})</h2>
+<p class="small mut" style="margin-top:-4px">{% if user.is_authenticated %}Tus medallas se guardan en la base de datos de tu cuenta.{% else %}Juega sin cuenta o <a href="{% url 'account_login' %}?next={% url 'trivia:inicio' %}">inicia sesión</a> para guardar tus medallas permanentemente.{% endif %}</p>
 <div class="grid insignias-grid">
   {% for ins in insignias %}
   <div class="insignia {% if ins.obtenida %}obtenida{% else %}bloqueada{% endif %}">
-    <span class="insignia-ic" style="background:{{ ins.fondo }};color:{{ ins.color }}">{% icono ins.icono 22 ins.color %}</span>
+    <div class="medalla-escena" aria-hidden="true">
+      <div class="medalla-3d {% if ins.obtenida %}medalla-activa{% else %}medalla-gris{% endif %}" style="--m-col:{{ ins.color }};--m-bg:{{ ins.fondo }}">
+        <div class="medalla-cara medalla-frente">{% icono ins.icono 24 '#fff' 2.4 %}</div>
+        <div class="medalla-cara medalla-reverso">{% icono 'star' 22 '#fff' 2.2 %}</div>
+      </div>
+    </div>
     <div>
       <strong>{{ ins.nombre }}</strong>
       <div class="xs mut">{{ ins.descripcion }}</div>

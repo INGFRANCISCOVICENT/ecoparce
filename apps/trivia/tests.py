@@ -132,3 +132,23 @@ class TriviaTests(TestCase):
         PartidaTrivia.objects.create(usuario=visitante, nivel=2, puntaje=3, total_preguntas=5,
                                      finalizada_en=PartidaTrivia.objects.first().finalizada_en)
         self.assertFalse(progreso_niveles(usuario=visitante)['desbloqueados'][3])
+
+    def test_modos_de_trivia_y_celebracion_3d(self):
+        # Modo BOLSAS y Modo MITOS inician correctamente
+        r_bolsas = self.client.post('/trivia/nueva/', {'modo': 'BOLSAS'})
+        self.assertRedirects(r_bolsas, '/trivia/jugar/')
+        self.assertEqual(PartidaTrivia.objects.order_by('-pk').first().modo, 'BOLSAS')
+
+        r_mitos = self.client.post('/trivia/nueva/', {'modo': 'MITOS'})
+        self.assertRedirects(r_mitos, '/trivia/jugar/')
+        self.assertEqual(PartidaTrivia.objects.order_by('-pk').first().modo, 'MITOS')
+
+        # Al pasar Nivel 1 (5/5) se muestra la celebración 3D "¡FELICIDADES, PASASTE DE NIVEL!"
+        self.client.post('/trivia/nueva/', {'modo': 'NIVELES', 'nivel': '1'})
+        for _ in range(5):
+            r = self.client.get('/trivia/jugar/')
+            p = r.context['pregunta']
+            self.client.post('/trivia/jugar/', {'pregunta': p.pk, 'opcion': p.opcion_correcta().pk})
+        r_res = self.client.get('/trivia/resultado/')
+        self.assertContains(r_res, '¡FELICIDADES, PASASTE DE NIVEL!')
+        self.assertContains(r_res, 'medalla-3d')

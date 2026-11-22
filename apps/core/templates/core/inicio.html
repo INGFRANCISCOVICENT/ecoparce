@@ -1,20 +1,120 @@
 {% extends 'base.html' %}{% load static eco %}
 {% block titulo %}Inicio{% endblock %}
 {% block contenido %}
-<section class="hero">
-  <img src="{% static 'img/logo-256.png' %}" alt="Escarlata, la guacamaya roja de EcoParce (ilustración asistida con IA)">
-  <div><h1>¡Hola, parce!<br>Soy Escarlata.</h1><p>Te ayudo a separar bien. Vuela limpio.</p><span class="ai-etiqueta" title="Ilustración creada con asistencia de herramientas de IA">Ilustración asistida con IA</span></div>
+<section class="portada-ciudad" aria-label="Portada interactiva de EcoParce">
+  <!-- Fondo isométrico de ciudad ecológica -->
+  <svg class="portada-iso" viewBox="0 0 800 520" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <linearGradient id="ecoGrad1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#22C55E" stop-opacity=".34"/><stop offset="100%" stop-color="#0B2419" stop-opacity=".05"/></linearGradient>
+      <linearGradient id="ecoGrad2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#38BDF8" stop-opacity=".30"/><stop offset="100%" stop-color="#0B2419" stop-opacity=".04"/></linearGradient>
+      <linearGradient id="ecoGrad3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#F59E0B" stop-opacity=".28"/><stop offset="100%" stop-color="#0B2419" stop-opacity=".04"/></linearGradient>
+      <linearGradient id="ecoGrad4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#EF4444" stop-opacity=".26"/><stop offset="100%" stop-color="#0B2419" stop-opacity=".04"/></linearGradient>
+    </defs>
+    <!-- Torres isométricas -->
+    <g stroke-width="1.2" fill="none">
+      <polygon points="80,290 140,258 200,290 140,322" fill="url(#ecoGrad1)" stroke="#22C55E" stroke-opacity=".55"/>
+      <polygon points="80,290 140,322 140,460 80,428" fill="url(#ecoGrad1)" stroke="#22C55E" stroke-opacity=".4"/>
+      <polygon points="200,290 140,322 140,460 200,428" fill="#0A2117" fill-opacity=".6" stroke="#22C55E" stroke-opacity=".35"/>
+
+      <polygon points="240,330 300,298 360,330 300,362" fill="url(#ecoGrad4)" stroke="#EF4444" stroke-opacity=".55"/>
+      <polygon points="240,330 300,362 300,480 240,448" fill="url(#ecoGrad4)" stroke="#EF4444" stroke-opacity=".4"/>
+      <polygon points="360,330 300,362 300,480 360,448" fill="#180F12" fill-opacity=".5" stroke="#EF4444" stroke-opacity=".35"/>
+
+      <polygon points="440,220 510,184 580,220 510,256" fill="url(#ecoGrad2)" stroke="#38BDF8" stroke-opacity=".55"/>
+      <polygon points="440,220 510,256 510,440 440,404" fill="url(#ecoGrad2)" stroke="#38BDF8" stroke-opacity=".38"/>
+      <polygon points="580,220 510,256 510,440 580,404" fill="#091C26" fill-opacity=".55" stroke="#38BDF8" stroke-opacity=".32"/>
+
+      <polygon points="590,340 650,308 710,340 650,372" fill="url(#ecoGrad3)" stroke="#F59E0B" stroke-opacity=".6"/>
+      <polygon points="590,340 650,372 650,490 590,458" fill="url(#ecoGrad3)" stroke="#F59E0B" stroke-opacity=".4"/>
+      <polygon points="710,340 650,372 650,490 710,458" fill="#1C180B" fill-opacity=".5" stroke="#F59E0B" stroke-opacity=".35"/>
+
+      <!-- Nodos / faros ecológicos -->
+      <line x1="140" y1="290" x2="140" y2="235" stroke="#22C55E" stroke-opacity=".6"/>
+      <circle cx="140" cy="235" r="4" fill="#22C55E"/><circle cx="140" cy="235" r="11" fill="#22C55E" fill-opacity=".2"/>
+      <line x1="300" y1="330" x2="300" y2="275" stroke="#EF4444" stroke-opacity=".6"/>
+      <circle cx="300" cy="275" r="4" fill="#EF4444"/><circle cx="300" cy="275" r="11" fill="#EF4444" fill-opacity=".2"/>
+      <line x1="510" y1="220" x2="510" y2="162" stroke="#38BDF8" stroke-opacity=".6"/>
+      <circle cx="510" cy="162" r="4" fill="#38BDF8"/><circle cx="510" cy="162" r="11" fill="#38BDF8" fill-opacity=".2"/>
+    </g>
+  </svg>
+
+  <div class="portada-contenido">
+    <div class="portada-top-row">
+      <span class="portada-badge"><span class="pulso-verde"></span>BOGOTÁ · RED ECOLÓGICA ACTIVA · RES. 2184</span>
+      <span class="ai-etiqueta" title="Ilustración de Escarlata asistida con IA">Escarlata · Ilustración IA</span>
+    </div>
+
+    <!-- Escarlata volando y dejando mensajes de sensibilización -->
+    <div class="vuelo-escena" aria-live="polite">
+      <div class="escarlata-volando">
+        <span class="estela-vuelo" aria-hidden="true"></span>
+        <img src="{% static 'img/logo-256.png' %}" alt="Escarlata, guacamaya roja de EcoParce volando con mensajes de reciclaje (ilustración asistida con IA)" width="62" height="62">
+      </div>
+      <div class="vuelo-mensaje">
+        <span class="vuelo-label">Escarlata dice al volar:</span>
+        <p id="escarlata-mensaje">Cada botella PET limpia que separas ahorra energía para encender un bombillo LED por 3 horas.</p>
+      </div>
+    </div>
+
+    <h1 class="portada-titulo">Transforma tu ciudad,<br><span class="portada-grad">separando bien.</span></h1>
+    <p class="portada-sub">Identifica en segundos en qué bolsa va cada residuo, escanea empaques, ubica puntos posconsumo en vivo y domina la trivia ecológica.</p>
+
+    <!-- Píldoras interactivas de las 4 rutas de separación -->
+    <div class="portada-pills" role="group" aria-label="Categorías de separación">
+      <button type="button" class="portada-pill activo" aria-pressed="true" data-eco-tab data-eco-color="#F8FAFC" data-eco-msg="Bolsa Blanca: plástico, vidrio, metales, papel y cartón siempre limpios y secos para el reciclador." data-eco-url="{% url 'contenidos:guias' %}">
+        <i style="background:#F8FAFC"></i>Bolsa Blanca
+      </button>
+      <button type="button" class="portada-pill" aria-pressed="false" data-eco-tab data-eco-color="#94A3B8" data-eco-msg="Bolsa Negra: papel higiénico, servilletas usadas, cartones con grasa y empaques metalizados no aprovechables." data-eco-url="{% url 'contenidos:guias' %}">
+        <i style="background:#64748B"></i>Bolsa Negra
+      </button>
+      <button type="button" class="portada-pill" aria-pressed="false" data-eco-tab data-eco-color="#22C55E" data-eco-msg="Bolsa Verde: restos de comida, cáscaras de frutas, verduras y cuncho de café para compostaje." data-eco-url="{% url 'contenidos:guias' %}">
+        <i style="background:#22C55E"></i>Bolsa Verde
+      </button>
+      <button type="button" class="portada-pill" aria-pressed="false" data-eco-tab data-eco-color="#EF4444" data-eco-msg="Posconsumo: pilas, aceite usado, bombillos, medicamentos vencidos y electrónicos a puntos oficiales." data-eco-url="{% url 'contenidos:manejo' %}">
+        <i style="background:#EF4444"></i>Posconsumo
+      </button>
+    </div>
+
+    <!-- Tarjeta inferior glass estilo CiudadReporta + Ubicación en vivo + 3 CTAs -->
+    <div class="portada-dock">
+      <div class="portada-dock-info">
+        <span id="eco-detalle-dot" class="dock-dot" style="background:#F8FAFC"></span>
+        <span id="eco-detalle-txt">Bolsa Blanca: plástico, vidrio, metales, papel y cartón siempre limpios y secos para el reciclador.</span>
+        <a id="eco-detalle-link" class="portada-link-claro" href="{% url 'contenidos:guias' %}">Ver guía →</a>
+      </div>
+
+      <div class="portada-ubicacion">
+        <span id="estado-ubicacion-viva" class="small" style="color:#CBD5E1">Activa tu ubicación en vivo para ubicar el punto posconsumo más cercano (privada en tu dispositivo).</span>
+        <button type="button" class="btn-ubi-viva" id="btn-ubicacion-viva" data-puntos-url="{% url 'contenidos:puntos_datos' %}">{% icono 'pin' 16 '#22C55E' %}Activar ubicación en vivo</button>
+      </div>
+
+      <div class="portada-ctas">
+        {% if user.is_authenticated %}
+        <a class="btn-cta-grad" href="{% url 'trivia:inicio' %}">Jugar Trivia por niveles →</a>
+        <a class="btn-cta-glass" href="{% url 'cuentas:mi_cuenta' %}">Mi cuenta e insignias</a>
+        {% else %}
+        <a class="btn-cta-grad" href="{% url 'account_signup' %}">Crear cuenta gratis →</a>
+        <a class="btn-cta-glass" href="{% url 'account_login' %}">Iniciar sesión</a>
+        {% endif %}
+        <a class="btn-cta-sin-cuenta" href="#explorar-plataforma">Explorar sin cuenta ↓</a>
+      </div>
+    </div>
+  </div>
 </section>
+
+<div id="explorar-plataforma" style="scroll-margin-top:74px">
 <form class="search" action="{% url 'buscador:buscar' %}" method="get" role="search">
   {% icono 'search' 24 '#1E7A46' %}
   <label class="sr" for="q">¿Qué vas a botar?</label>
-  <input id="q" name="q" type="search" placeholder="¿Qué vas a botar?" maxlength="100" autocomplete="off" required>
+  <input id="q" name="q" type="search" placeholder="¿Qué vas a botar? (ej. botella, pilas, icopor, aceite…)" maxlength="100" autocomplete="off" required>
   <button type="submit">Buscar</button>
 </form>
+
 <div class="grid" style="margin-top:12px">
   <a class="btn p" href="{% url 'buscador:escanear' %}">{% icono 'qr' 20 '#fff' %}Escanear producto</a>
   <a class="btn o" href="{% url 'contenidos:puntos' %}">{% icono 'pin' 20 '#1E7A46' %}Puntos cercanos</a>
 </div>
+
 <h2>¿En qué bolsa va?</h2>
 <div class="grid g4">
   {% for c, guia in bolsas %}
@@ -27,10 +127,11 @@
     <span>Pilas, aceite, medicamentos: a un punto de entrega</span>
   </a>
 </div>
+
 <h2>Aprende jugando</h2>
 <a class="card row" href="{% url 'trivia:inicio' %}">
   <span class="ic" style="background:var(--yl)">{% icono 'game' 26 '#7A5A00' %}</span>
-  <span><strong>Trivia de Escarlata por niveles</strong><br><span class="small mut">3 niveles · gana insignias según tus puntos</span></span>
+  <span><strong>Trivia de Escarlata · 3 modos y medallas 3D</strong><br><span class="small mut">Niveles progresivos, Reto de Bolsas y Mitos vs. Realidad</span></span>
   <span class="ml">{% icono 'arrow' 22 '#1E7A46' %}</span>
 </a>
 
@@ -53,6 +154,7 @@
     <p id="aviso-copiado" class="aviso ok" role="status" aria-live="polite" hidden style="margin:10px 0 0">Enlace de EcoParce copiado. ¡Compártelo donde quieras!</p>
   </section>
 </div>
+
 {% if manejo %}
 <h2>Manejo de basuras</h2>
 <div class="lista">
@@ -62,4 +164,6 @@
   {% endfor %}
 </div>
 {% endif %}
+</div>
+<script src="{% static 'js/portada.js' %}" defer></script>
 {% endblock %}

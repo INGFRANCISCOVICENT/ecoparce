@@ -11,11 +11,16 @@
 <a class="card row" style="margin-top:10px" href="{% url 'estadisticas:resumen' %}">{% icono 'chart' 24 '#1E7A46' %}<strong>Ir al panel de administración</strong><span class="ml">{% icono 'arrow' 22 '#1E7A46' %}</span></a>
 {% endif %}
 
-<h2>Mis insignias ecológicas ({{ insignias_obtenidas }}/{{ insignias|length }})</h2>
+<h2>Mis medallas ecológicas 3D ({{ insignias_obtenidas }}/{{ insignias|length }})</h2>
 <div class="grid insignias-grid">
   {% for ins in insignias %}
   <div class="insignia {% if ins.obtenida %}obtenida{% else %}bloqueada{% endif %}">
-    <span class="insignia-ic" style="background:{{ ins.fondo }};color:{{ ins.color }}">{% icono ins.icono 22 ins.color %}</span>
+    <div class="medalla-escena" aria-hidden="true">
+      <div class="medalla-3d {% if ins.obtenida %}medalla-activa{% else %}medalla-gris{% endif %}" style="--m-col:{{ ins.color }};--m-bg:{{ ins.fondo }}">
+        <div class="medalla-cara medalla-frente">{% icono ins.icono 24 '#fff' 2.4 %}</div>
+        <div class="medalla-cara medalla-reverso">{% icono 'star' 22 '#fff' 2.2 %}</div>
+      </div>
+    </div>
     <div>
       <strong>{{ ins.nombre }}</strong>
       <div class="xs mut">{{ ins.descripcion }}</div>

@@ -2,6 +2,15 @@
 
 Este proyecto sigue el [Versionado Semántico (SemVer 2.0.0)](https://semver.org/lang/es/) y control de versiones en Git.
 
+## [1.4.0] - 2026-11-21
+### Agregado
+- **Portada interactiva estilo ciudad ecológica (inspirada en CiudadReporta)**:
+  - Fondo isométrico nocturno en tonos esmeralda, píldoras interactivas de las 4 rutas de separación (`Bolsa Blanca`, `Bolsa Negra`, `Bolsa Verde`, `Posconsumo`), acceso directo **«Explorar sin cuenta»**, y **Escarlata volando** con mensajes dinámicos de sensibilización ambiental.
+  - **Ubicación en vivo privada** en la portada (`watchPosition` solo en el navegador, sin enviar coordenadas al servidor) que muestra en tiempo real el punto posconsumo oficial más cercano.
+- **Trivia educativa y adictiva con 3 modos + Medallas 3D**:
+  - Modos **Carrera por Niveles**, **¿En qué bolsa va?** (reto rápido) y **Mitos vs. Realidad** (12 preguntas nuevas; total 32 preguntas en base de datos).
+  - Indicador de **Racha** en vivo durante la partida y **medallas ecológicas reales en 3D** con giro y celebración **«¡Felicidades, pasaste de nivel!»** al superar un nivel o desbloquear insignias por puntos.
+
 ## [1.3.1] - 2026-11-21
 ### Agregado
 - **Centro de Sugerencias Ciudadanas (`/sugerencias/`)** estilo CiudadReporta: página dedicada para proponer residuos nuevos, reportar puntos o sugerir mejoras, con tablero transparente de aportes recientes (anónimo, RN-08) y seguimiento de estado (`Pendiente` / `Atendida` / `Descartada`) en «Mi cuenta».

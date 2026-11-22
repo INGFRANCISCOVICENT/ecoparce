@@ -54,15 +54,24 @@ class Command(BaseCommand):
                 'preparacion': prep, 'es_especial': cont == Contenedor.POSCONSUMO, **publicado})
 
         nuevas = 0
-        for enunciado, explicacion, dificultad, opciones in D.PREGUNTAS:
-            p, creada = PreguntaTrivia.objects.get_or_create(enunciado=enunciado, defaults={
-                'explicacion': explicacion, 'dificultad': dificultad, 'autor': autor})
-            if creada:
-                for i, (texto, correcta) in enumerate(opciones, start=1):
-                    OpcionTrivia.objects.create(pregunta=p, texto=texto, es_correcta=correcta, orden=i)
-                p.activa = p.validar()
-                p.save(update_fields=['activa'])
-                nuevas += 1
+        bloques = [
+            ('GENERAL', D.PREGUNTAS),
+            ('BOLSAS', D.PREGUNTAS_BOLSAS),
+            ('MITOS', D.PREGUNTAS_MITOS),
+        ]
+        for categoria, lista in bloques:
+            for enunciado, explicacion, dificultad, opciones in lista:
+                p, creada = PreguntaTrivia.objects.get_or_create(enunciado=enunciado, defaults={
+                    'explicacion': explicacion, 'dificultad': dificultad, 'categoria': categoria, 'autor': autor})
+                if creada:
+                    for i, (texto, correcta) in enumerate(opciones, start=1):
+                        OpcionTrivia.objects.create(pregunta=p, texto=texto, es_correcta=correcta, orden=i)
+                    p.activa = p.validar()
+                    p.save(update_fields=['activa'])
+                    nuevas += 1
+                elif p.categoria != categoria:
+                    p.categoria = categoria
+                    p.save(update_fields=['categoria'])
 
         if o['demo']:
             from apps.qr.models import Institucion

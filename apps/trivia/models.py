@@ -96,10 +96,23 @@ def info_nivel(numero):
     return next((n for n in NIVELES if n['numero'] == numero), NIVELES[0])
 
 
+class CategoriaTrivia(models.TextChoices):
+    GENERAL = 'GENERAL', 'General'
+    BOLSAS = 'BOLSAS', '¿En qué bolsa va?'
+    MITOS = 'MITOS', 'Mitos vs. Realidad'
+
+
+class ModoTrivia(models.TextChoices):
+    NIVELES = 'NIVELES', 'Por niveles'
+    BOLSAS = 'BOLSAS', '¿En qué bolsa va?'
+    MITOS = 'MITOS', 'Mitos vs. Realidad'
+
+
 class PreguntaTrivia(models.Model):
     enunciado = models.CharField(max_length=300)
     explicacion = models.CharField('explicación', max_length=500, help_text='Retroalimentación que muestra Escarlata.')
     dificultad = models.PositiveSmallIntegerField(default=1, choices=[(1, 'Fácil'), (2, 'Media'), (3, 'Difícil')])
+    categoria = models.CharField('categoría', max_length=12, choices=CategoriaTrivia.choices, default=CategoriaTrivia.GENERAL)
     activa = models.BooleanField(default=False)
     autor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.RESTRICT, related_name='+')
     creado_en = models.DateTimeField(auto_now_add=True)
@@ -157,6 +170,7 @@ class PartidaTrivia(models.Model):
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
                                 related_name='partidas', help_text='Solo si el visitante inició sesión y autorizó guardar su progreso.')
     nivel = models.PositiveSmallIntegerField('nivel', default=1, choices=NIVELES_CHOICES)
+    modo = models.CharField('modo de juego', max_length=12, choices=ModoTrivia.choices, default=ModoTrivia.NIVELES)
     iniciada_en = models.DateTimeField(auto_now_add=True)
     finalizada_en = models.DateTimeField(null=True, blank=True)
     puntaje = models.PositiveSmallIntegerField(default=0)
@@ -174,23 +188,39 @@ class PartidaTrivia(models.Model):
         ]
 
     @classmethod
-    def nueva(cls, codigo_qr=None, usuario=None, nivel=1):
+    def nueva(cls, codigo_qr=None, usuario=None, nivel=1, modo=ModoTrivia.NIVELES):
         nivel = nivel if nivel in (1, 2, 3) else 1
+        modo = modo if modo in ModoTrivia.values else ModoTrivia.NIVELES
         todas = [p for p in PreguntaTrivia.objects.filter(activa=True).prefetch_related('opciones') if p.validar()]
         n = min(settings.TRIVIA_PREGUNTAS_POR_PARTIDA, len(todas))
         if n == 0:
             raise ValidationError('No hay preguntas activas.')
         rng = secrets.SystemRandom()
-        del_nivel = [p for p in todas if p.dificultad == nivel]
-        otras = [p for p in todas if p.dificultad != nivel]
-        if len(del_nivel) >= n:
-            elegidas = rng.sample(del_nivel, n)
+        if modo in (ModoTrivia.BOLSAS, ModoTrivia.MITOS):
+            prioritarias = [p for p in todas if p.categoria == modo]
+            otras = [p for p in todas if p.categoria != modo]
         else:
-            faltan = n - len(del_nivel)
-            elegidas = del_nivel + rng.sample(otras, min(faltan, len(otras)))
+            prioritarias = [p for p in todas if p.dificultad == nivel]
+            otras = [p for p in todas if p.dificultad != nivel]
+        if len(prioritarias) >= n:
+            elegidas = rng.sample(prioritarias, n)
+        else:
+            faltan = n - len(prioritarias)
+            elegidas = prioritarias + rng.sample(otras, min(faltan, len(otras)))
             rng.shuffle(elegidas)
-        return cls.objects.create(codigo_qr=codigo_qr, usuario=usuario, nivel=nivel, total_preguntas=len(elegidas),
+        return cls.objects.create(codigo_qr=codigo_qr, usuario=usuario, nivel=nivel, modo=modo,
+                                  total_preguntas=len(elegidas),
                                   preguntas_ids=','.join(str(p.pk) for p in elegidas))
+
+    @property
+    def racha_actual(self):
+        racha = 0
+        for ok in self.respuestas.order_by('-respondida_en').values_list('es_correcta', flat=True):
+            if ok:
+                racha += 1
+            else:
+                break
+        return racha
 
     @property
     def ids(self):

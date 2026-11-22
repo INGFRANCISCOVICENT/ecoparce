@@ -6,7 +6,7 @@ from django.views.decorators.http import require_POST
 from apps.qr.models import CodigoQR
 
 from .models import (
-    OpcionTrivia, PartidaTrivia, PreguntaTrivia, RespuestaPartida,
+    ModoTrivia, OpcionTrivia, PartidaTrivia, PreguntaTrivia, RespuestaPartida,
     evaluar_insignias, info_nivel, obtener_insignias, progreso_niveles,
 )
 
@@ -40,16 +40,19 @@ def nueva(request):
     if request.session.get('qr_origen'):
         qr = CodigoQR.objects.filter(pk=request.session.pop('qr_origen')).first()
     usuario = request.user if request.user.is_authenticated else None
+    modo = request.POST.get('modo', ModoTrivia.NIVELES)
+    if modo not in ModoTrivia.values:
+        modo = ModoTrivia.NIVELES
     progreso = progreso_niveles(usuario=usuario, sesion=request.session)
     try:
         nivel = int(request.POST.get('nivel', '1'))
     except (TypeError, ValueError):
         nivel = 1
-    if nivel not in (1, 2, 3) or not progreso['desbloqueados'].get(nivel, False):
+    if modo == ModoTrivia.NIVELES and (nivel not in (1, 2, 3) or not progreso['desbloqueados'].get(nivel, False)):
         messages.info(request, info_nivel(nivel)['requisito'] + '.')
         nivel = max(nv for nv, ok in progreso['desbloqueados'].items() if ok)
     try:
-        partida = PartidaTrivia.nueva(codigo_qr=qr, usuario=usuario, nivel=nivel)
+        partida = PartidaTrivia.nueva(codigo_qr=qr, usuario=usuario, nivel=nivel, modo=modo)
     except ValidationError:
         return redirect('trivia:inicio')
     request.session['partida_id'] = partida.pk
@@ -84,6 +87,7 @@ def jugar(request):
         'numero': numero, 'avance': round(100 * (partida.respondidas if respuesta else numero - 1) / partida.total_preguntas),
         'ultima': partida.respondidas >= partida.total_preguntas,
         'nivel_info': info_nivel(partida.nivel),
+        'racha': partida.racha_actual,
     })
 
 
@@ -97,8 +101,10 @@ def resultado(request):
     nuevas_insignias = evaluar_insignias(partida, sesion=request.session)
     usuario = request.user if request.user.is_authenticated else None
     progreso = progreso_niveles(usuario=usuario, sesion=request.session)
+    nivel_info = info_nivel(partida.nivel)
+    paso_de_nivel = (partida.modo == ModoTrivia.NIVELES) and (puntaje >= nivel_info['meta'])
     siguiente_nivel = None
-    if partida.nivel < 3 and progreso['desbloqueados'].get(partida.nivel + 1):
+    if partida.modo == ModoTrivia.NIVELES and partida.nivel < 3 and progreso['desbloqueados'].get(partida.nivel + 1):
         siguiente_nivel = info_nivel(partida.nivel + 1)
     mensaje = next(m for minimo, m in MENSAJES if puntaje >= minimo)
     falladas = partida.respuestas.filter(es_correcta=False).select_related('pregunta')
@@ -106,7 +112,8 @@ def resultado(request):
         'partida': partida,
         'mensaje': mensaje,
         'falladas': falladas,
-        'nivel_info': info_nivel(partida.nivel),
+        'nivel_info': nivel_info,
+        'paso_de_nivel': paso_de_nivel,
         'nuevas_insignias': nuevas_insignias,
         'siguiente_nivel': siguiente_nivel,
     })

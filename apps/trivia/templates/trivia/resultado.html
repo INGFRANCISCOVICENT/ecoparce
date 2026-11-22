@@ -1,50 +1,76 @@
 {% extends 'base.html' %}{% load static eco %}
-{% block titulo %}Tu resultado · Nivel {{ partida.nivel }} · Trivia{% endblock %}
+{% block titulo %}Tu resultado · Trivia{% endblock %}
 {% block contenido %}
+{% if paso_de_nivel or nuevas_insignias %}
+<section class="celebracion-3d" role="status" aria-live="polite">
+  <div class="confeti" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  {% if paso_de_nivel %}
+  <div class="celebracion-kicker">¡FELICIDADES, PASASTE DE NIVEL!</div>
+  <h1 class="celebracion-titulo">{% if siguiente_nivel %}Desbloqueaste el Nivel {{ siguiente_nivel.numero }}: {{ siguiente_nivel.nombre }}{% else %}¡Dominaste el Nivel 3 · Maestro Guacamaya!{% endif %}</h1>
+  {% else %}
+  <div class="celebracion-kicker">¡MEDALLA ECOLÓGICA DESBLOQUEADA!</div>
+  <h1 class="celebracion-titulo">{{ mensaje }}</h1>
+  {% endif %}
+  <div class="celebracion-medallas">
+    {% for ins in nuevas_insignias %}
+    <div class="medalla-showcase">
+      <div class="medalla-escena grande" aria-hidden="true">
+        <div class="medalla-3d medalla-giro" style="--m-col:{{ ins.color }};--m-bg:{{ ins.fondo }}">
+          <div class="medalla-cara medalla-frente">{% icono ins.icono 38 '#fff' 2.4 %}</div>
+          <div class="medalla-cara medalla-reverso">{% icono 'star' 34 '#fff' 2.2 %}</div>
+        </div>
+      </div>
+      <strong>{{ ins.nombre }}</strong>
+      <span class="xs">{{ ins.descripcion }}</span>
+    </div>
+    {% empty %}
+    <div class="medalla-showcase">
+      <div class="medalla-escena grande" aria-hidden="true">
+        <div class="medalla-3d medalla-giro" style="--m-col:#1E7A46;--m-bg:#E8F3EC">
+          <div class="medalla-cara medalla-frente">{% icono nivel_info.icono 38 '#fff' 2.4 %}</div>
+          <div class="medalla-cara medalla-reverso">{% icono 'star' 34 '#fff' 2.2 %}</div>
+        </div>
+      </div>
+      <strong>Nivel {{ nivel_info.numero }} superado</strong>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="celebracion-puntaje">{{ partida.puntaje }} / {{ partida.total_preguntas }} puntos</div>
+</section>
+{% else %}
 <section class="center">
-  <img src="{% static 'img/logo-256.png' %}" alt="Escarlata, guacamaya roja de EcoParce (ilustración asistida con IA)" style="width:132px;height:132px;border-radius:50%;margin-top:6px;box-shadow:var(--sh-sm)">
-  <div style="margin-top:8px"><span class="tag">Nivel {{ nivel_info.numero }} · {{ nivel_info.nombre }}</span></div>
+  <img src="{% static 'img/logo-256.png' %}" alt="Escarlata, guacamaya roja de EcoParce (ilustración asistida con IA)" style="width:128px;height:128px;border-radius:50%;margin-top:6px;box-shadow:var(--sh-sm)">
+  <div style="margin-top:8px"><span class="tag">{% if partida.modo == 'NIVELES' %}Nivel {{ nivel_info.numero }} · {{ nivel_info.nombre }}{% else %}{{ partida.get_modo_display }}{% endif %}</span></div>
   <h1 style="font-size:26px;margin-top:8px">{{ mensaje }}</h1>
   <div class="puntaje" style="margin-top:10px">{{ partida.puntaje }} / {{ partida.total_preguntas }}</div>
   <p class="mut" style="margin:6px 0 16px">respuestas correctas</p>
 </section>
-
-{% if nuevas_insignias %}
-<section class="card" style="margin-bottom:14px;border-color:#BFDCC9;background:linear-gradient(180deg,#F3FBF6 0%,#FFFFFF 100%)">
-  <strong style="color:var(--gd)">¡Nueva{{ nuevas_insignias|pluralize }} insignia{{ nuevas_insignias|pluralize }} desbloqueada{{ nuevas_insignias|pluralize }}!</strong>
-  <div class="grid insignias-grid" style="margin-top:10px">
-    {% for ins in nuevas_insignias %}
-    <div class="insignia obtenida">
-      <span class="insignia-ic" style="background:{{ ins.fondo }};color:{{ ins.color }}">{% icono ins.icono 22 ins.color %}</span>
-      <div><strong>{{ ins.nombre }}</strong><div class="xs mut">{{ ins.descripcion }}</div></div>
-    </div>
-    {% endfor %}
-  </div>
-</section>
 {% endif %}
 
 {% if falladas %}
-<div class="card"><strong>Repasa esto:</strong>
+<div class="card" style="margin-top:14px"><strong>Repasa esto:</strong>
 <ul class="no" style="margin-top:6px">{% for r in falladas %}<li>{% icono 'x' 20 '#C81E1E' 3 %}<span><strong>{{ r.pregunta.enunciado }}</strong><br><span class="small">{{ r.pregunta.explicacion }}</span></span></li>{% endfor %}</ul></div>
 {% else %}
-<div class="speech"><img src="{% static 'img/logo-96.png' %}" alt="Escarlata, mascota de EcoParce"><div>¡Perfecto! Ahora enséñale a alguien de tu casa a separar.</div></div>
+<div class="speech" style="margin-top:14px"><img src="{% static 'img/logo-96.png' %}" alt="Escarlata, mascota de EcoParce"><div>¡Perfecto! Ahora enséñale a alguien de tu casa a separar.</div></div>
 {% endif %}
 
-{% if partida.usuario %}<div class="aviso ok" style="margin-top:14px">{% icono 'check' 20 '#14532D' 3 %}<span>Guardamos este puntaje y tus insignias en <a href="{% url 'cuentas:mi_cuenta' %}">tu cuenta</a>.</span></div>
-{% elif not user.is_authenticated %}<a class="card row" style="margin-top:14px" href="{% url 'account_login' %}?next={% url 'trivia:inicio' %}">{% icono 'star' 22 '#7A5A00' %}<span class="small"><strong>¿Quieres guardar tus niveles e insignias?</strong><br>Ingresa con Google o con tu correo.</span><span class="ml">{% icono 'arrow' 22 '#1E7A46' %}</span></a>{% endif %}
+{% if partida.usuario %}<div class="aviso ok" style="margin-top:14px">{% icono 'check' 20 '#14532D' 3 %}<span>Guardamos este puntaje y tus medallas 3D en <a href="{% url 'cuentas:mi_cuenta' %}">tu cuenta</a>.</span></div>
+{% elif not user.is_authenticated %}<a class="card row" style="margin-top:14px" href="{% url 'account_login' %}?next={% url 'trivia:inicio' %}">{% icono 'star' 22 '#7A5A00' %}<span class="small"><strong>¿Quieres guardar tus niveles y medallas 3D?</strong><br>Ingresa con Google o con tu correo.</span><span class="ml">{% icono 'arrow' 22 '#1E7A46' %}</span></a>{% endif %}
 
 {% if siguiente_nivel %}
 <form method="post" action="{% url 'trivia:nueva' %}" style="margin-top:16px">{% csrf_token %}
+  <input type="hidden" name="modo" value="NIVELES">
   <input type="hidden" name="nivel" value="{{ siguiente_nivel.numero }}">
   <button class="btn p full" type="submit">{% icono 'star' 20 '#fff' %}Avanzar al Nivel {{ siguiente_nivel.numero }}: {{ siguiente_nivel.nombre }}</button>
 </form>
 {% endif %}
 <form method="post" action="{% url 'trivia:nueva' %}" style="margin-top:10px">{% csrf_token %}
+  <input type="hidden" name="modo" value="{{ partida.modo }}">
   <input type="hidden" name="nivel" value="{{ partida.nivel }}">
-  <button class="btn {% if siguiente_nivel %}o{% else %}p{% endif %} full" type="submit">{% icono 'refresh' 20 %}Volver a jugar Nivel {{ partida.nivel }}</button>
+  <button class="btn {% if siguiente_nivel %}o{% else %}p{% endif %} full" type="submit">{% icono 'refresh' 20 %}Volver a jugar</button>
 </form>
-<a class="btn o full" style="margin-top:10px" href="{% url 'trivia:inicio' %}">{% icono 'game' 20 '#1E7A46' %}Ver todos los niveles e insignias</a>
-<button class="btn o full" style="margin-top:10px" type="button" data-compartir data-url="{{ SITE_URL }}{% url 'trivia:inicio' %}" data-titulo="Saqué {{ partida.puntaje }}/{{ partida.total_preguntas }} en el Nivel {{ partida.nivel }} de la Trivia EcoParce">{% icono 'share' 20 '#1E7A46' %}Compartir mi resultado y la app</button>
+<a class="btn o full" style="margin-top:10px" href="{% url 'trivia:inicio' %}">{% icono 'game' 20 '#1E7A46' %}Ver todos los modos, niveles y medallas</a>
+<button class="btn o full" style="margin-top:10px" type="button" data-compartir data-url="{{ SITE_URL }}{% url 'trivia:inicio' %}" data-titulo="Saqué {{ partida.puntaje }}/{{ partida.total_preguntas }} en la Trivia EcoParce">{% icono 'share' 20 '#1E7A46' %}Compartir mi resultado y la app</button>
 <p id="aviso-copiado" class="aviso ok" role="status" aria-live="polite" hidden style="margin-top:10px">Enlace copiado. ¡Reta a un amigo a superar tu puntaje!</p>
 <a class="btn o full" style="margin-top:10px" href="{% url 'core:inicio' %}">{% icono 'home' 20 '#1E7A46' %}Volver al inicio</a>
 {% endblock %}
