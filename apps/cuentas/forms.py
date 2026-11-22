@@ -85,7 +85,10 @@ def dominio_recibe_correo(correo):
 
 class RegistroForm(forms.Form):
     """Campos adicionales del registro con correo. Todas las casillas van sin marcar (Ley 1581, art. 9)."""
-    nombre = forms.CharField(label='Nombre', max_length=120, widget=forms.TextInput(attrs={'autocomplete': 'name'}))
+    nombre = forms.CharField(
+        label='Nombre (opcional)', max_length=120, required=False,
+        widget=forms.TextInput(attrs={'autocomplete': 'name', 'placeholder': 'Si lo dejas vacío, lo tomamos de tu correo'}),
+    )
     acepta_datos = forms.BooleanField(
         label='Acepto los Términos y Condiciones y autorizo el tratamiento de mis datos personales según la Política de Privacidad.',
         error_messages={'required': 'Debes aceptar los términos y autorizar el tratamiento de datos para crear la cuenta.'})
@@ -102,7 +105,10 @@ class RegistroForm(forms.Form):
         from apps.core.seguridad import evento
 
         from .models import Consentimiento
-        user.nombre = self.cleaned_data['nombre'].strip()
+        nombre = (self.cleaned_data.get('nombre') or '').strip()
+        if not nombre:
+            nombre = user.correo.split('@')[0].replace('.', ' ').replace('_', ' ').replace('-', ' ').title()[:120]
+        user.nombre = nombre
         user.rol = Rol.VISITANTE
         user.save(update_fields=['nombre', 'rol'])
         Consentimiento.objects.update_or_create(

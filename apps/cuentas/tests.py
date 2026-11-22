@@ -47,19 +47,19 @@ class RegistroConCorreoTests(TestCase):
         from django.core.cache import cache
         cache.clear()
 
-    def test_registro_exige_codigo_del_correo(self):
+    def test_registro_visitante_directo_y_nombre_desde_correo(self):
         r = self.client.post('/accounts/signup/', self.datos)
         u = Usuario.objects.get(correo='laura@ejemplo.co')
         self.assertEqual((u.rol, u.nombre), (Rol.VISITANTE, 'Laura Gómez'))
         self.assertTrue(Consentimiento.objects.filter(usuario=u).exists())
-        self.assertNotIn('_auth_user_id', self.client.session, 'no entra hasta verificar el correo')
-        self.assertEqual(len(mail.outbox), 1)
-        destino = r['Location']
-        r = self.client.post(destino, {'code': 'XXXXXX'})
-        self.assertNotIn('_auth_user_id', self.client.session)
-        r = self.client.post(destino, {'code': codigo_del_correo()})
-        self.assertTrue(EmailAddress.objects.get(user=u).verified)
-        self.assertEqual(self.client.session['_auth_user_id'], str(u.pk))
+        self.assertEqual(self.client.session.get('_auth_user_id'), str(u.pk), 'el visitante entra directo sin trabas')
+        self.assertEqual(r.status_code, 302)
+        # Si omite el nombre, se toma automáticamente del correo
+        self.client.post('/accounts/logout/')
+        sin_nombre = {**self.datos, 'nombre': '', 'email': 'carlos.perez@ejemplo.co'}
+        self.client.post('/accounts/signup/', sin_nombre)
+        u2 = Usuario.objects.get(correo='carlos.perez@ejemplo.co')
+        self.assertEqual(u2.nombre, 'Carlos Perez')
 
     def test_registro_sin_autorizacion_rechazado(self):
         datos = {**self.datos, 'acepta_datos': ''}

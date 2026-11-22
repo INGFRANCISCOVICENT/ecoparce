@@ -19,7 +19,7 @@
   {% include 'includes/campo.html' with campo=form.mayor_edad %}
   {% include 'includes/campo.html' with campo=form.acepta_marketing %}
   <button class="btn p full" style="margin-top:14px" type="submit">Crear cuenta</button>
-  <p class="xs mut center" style="margin-top:10px">Te enviaremos un código a tu correo para verificar que es tuyo.</p>
+  <p class="xs mut center" style="margin-top:10px">Registro inmediato: entras directo a tu cuenta. Si no escribes tu nombre, lo tomamos de tu correo.</p>
 </form>
 <p class="center small" style="margin-top:12px">¿Ya tienes cuenta? <a href="{% url 'account_login' %}">Ingresa</a></p>
 {% endblock content %}

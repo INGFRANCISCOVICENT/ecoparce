@@ -127,9 +127,9 @@ ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_FORMS = {'login': 'apps.cuentas.forms.IngresoForm'}
 ACCOUNT_SIGNUP_FORM_CLASS = 'apps.cuentas.forms.RegistroForm'   # nombre + autorizaciones (Ley 1581)
-# Verificación real del correo con un código de 6 caracteres que llega por email (igual que CiudadReporta)
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-ACCOUNT_EMAIL_VERIFICATION_BY_CODE_ENABLED = True
+# Registro ágil para visitantes (entran de inmediato); la 2FA TOTP sigue siendo obligatoria para administradores en /panel/.
+ACCOUNT_EMAIL_VERIFICATION = 'optional'
+ACCOUNT_EMAIL_VERIFICATION_BY_CODE_ENABLED = False
 ACCOUNT_EMAIL_VERIFICATION_BY_CODE_TIMEOUT = 15 * 60
 ACCOUNT_EMAIL_VERIFICATION_BY_CODE_MAX_ATTEMPTS = 5
 ACCOUNT_PASSWORD_RESET_BY_CODE_ENABLED = True       # recuperar contraseña con código, no con enlaces largos
