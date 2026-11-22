@@ -88,6 +88,32 @@ def escanear(request):
     return render(request, 'buscador/escanear.html')
 
 
+def autocompletar(request):
+    """Sugerencias instantáneas al escribir en el buscador (con color de bolsa y rate limit)."""
+    from django.http import JsonResponse
+
+    if not limitar(request, 'autocompletar', 90, 60):
+        resp = JsonResponse({'items': []}, status=429)
+        resp['Cache-Control'] = 'no-store'
+        return resp
+    q = (request.GET.get('q') or '').strip()[:60]
+    if len(q) < 2:
+        resp = JsonResponse({'items': []})
+        resp['Cache-Control'] = 'no-store'
+        return resp
+    items = [
+        {
+            'nombre': r.nombre,
+            'bolsa': r.contenedor.nombre,
+            'codigo': r.contenedor.codigo,
+        }
+        for r in buscar_residuos(q)[:6]
+    ]
+    resp = JsonResponse({'items': items})
+    resp['Cache-Control'] = 'no-store'
+    return resp
+
+
 def asistente_consultar(request):
     """API JSON del Asistente Experto EcoBot: consulta la base real de residuos y guías con rate limit."""
     from django.http import JsonResponse

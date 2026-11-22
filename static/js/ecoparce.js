@@ -574,4 +574,87 @@
       consultar(val);
     });
   }
+
+  // Autocompletado instantáneo en vivo para el buscador (#q) en / y /buscar/.
+  var inputBuscar = document.getElementById('q');
+  if (inputBuscar && inputBuscar.form && inputBuscar.form.classList.contains('search')) {
+    var formBuscar = inputBuscar.form;
+    formBuscar.style.position = 'relative';
+    var listaAuto = document.createElement('ul');
+    listaAuto.className = 'auto-lista';
+    listaAuto.setAttribute('role', 'listbox');
+    listaAuto.setAttribute('aria-label', 'Sugerencias de residuos');
+    listaAuto.hidden = true;
+    formBuscar.appendChild(listaAuto);
+
+    var timerAuto = null;
+    var cerrarAuto = function () { listaAuto.hidden = true; listaAuto.innerHTML = ''; };
+
+    inputBuscar.addEventListener('input', function () {
+      var val = (inputBuscar.value || '').trim();
+      clearTimeout(timerAuto);
+      if (val.length < 2) { cerrarAuto(); return; }
+      timerAuto = setTimeout(function () {
+        fetch('/buscar/autocompletar/?q=' + encodeURIComponent(val), {
+          credentials: 'same-origin',
+          headers: { 'Accept': 'application/json' },
+          cache: 'no-store'
+        })
+          .then(function (r) { return r.ok ? r.json() : { items: [] }; })
+          .then(function (d) {
+            listaAuto.innerHTML = '';
+            if (!d.items || !d.items.length) { listaAuto.hidden = true; return; }
+            d.items.forEach(function (it) {
+              var li = document.createElement('li');
+              var btn = document.createElement('button');
+              btn.type = 'button';
+              btn.className = 'auto-item';
+              var nom = document.createElement('strong');
+              nom.textContent = it.nombre;
+              var pill = document.createElement('span');
+              pill.className = 'ecobot-bolsa-badge bolsa-' + String(it.codigo || 'VERDE').toLowerCase();
+              pill.textContent = it.bolsa;
+              btn.appendChild(nom);
+              btn.appendChild(pill);
+              btn.addEventListener('click', function () {
+                inputBuscar.value = it.nombre;
+                cerrarAuto();
+                formBuscar.submit();
+              });
+              li.appendChild(btn);
+              listaAuto.appendChild(li);
+            });
+            listaAuto.hidden = false;
+          })
+          .catch(cerrarAuto);
+      }, 180);
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!formBuscar.contains(e.target)) cerrarAuto();
+    });
+    inputBuscar.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') cerrarAuto();
+    });
+  }
+
+  // Botón progresivo «Instalar app» (PWA nativa cuando el navegador lo soporta).
+  var eventoPwa = null;
+  var wrapPwa = document.getElementById('wrap-instalar-pwa');
+  var btnPwa = document.getElementById('btn-instalar-pwa');
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    eventoPwa = e;
+    if (wrapPwa) wrapPwa.hidden = false;
+  });
+  if (btnPwa) {
+    btnPwa.addEventListener('click', function () {
+      if (!eventoPwa) return;
+      eventoPwa.prompt();
+      eventoPwa.userChoice.finally(function () {
+        eventoPwa = null;
+        if (wrapPwa) wrapPwa.hidden = true;
+      });
+    });
+  }
 })();

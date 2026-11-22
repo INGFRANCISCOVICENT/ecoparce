@@ -33,13 +33,22 @@ def detalle(request):
     return render(request, 'estadisticas/detalle.html', {**servicios.detalle(_dias(request)), 'periodos': [7, 30, 90]})
 
 
+def _celda_csv_segura(valor):
+    """Protección OWASP contra inyección de fórmulas en Excel/Calc (=, +, -, @)."""
+    texto = str(valor) if valor is not None else ''
+    if texto and texto[0] in ('=', '+', '-', '@', '\t', '\r'):
+        return "'" + texto
+    return texto
+
+
 @sistema_requerido
 def exportar(request):
-    """Exporta la serie diaria del periodo a CSV (se abre en Excel)."""
+    """Exporta la serie diaria del periodo a CSV (se abre en Excel, protegido contra CSV Injection)."""
     datos = servicios.detalle(_dias(request))
     respuesta = HttpResponse(content_type='text/csv; charset=utf-8')
     respuesta['Content-Disposition'] = f'attachment; filename="ecoparce-estadisticas-{datos["inicio"]}-{datos["fin"]}.csv"'
-    respuesta.write('﻿')
+    respuesta['Cache-Control'] = 'no-store'
+    respuesta.write('\ufeff')
     w = csv.writer(respuesta, delimiter=';')
     w.writerow(['Fecha', 'Lecturas de QR', 'Búsquedas'])
     for e, b in zip(datos['serie_escaneos'], datos['serie_busquedas']):
@@ -47,5 +56,5 @@ def exportar(request):
     w.writerow([])
     w.writerow(['Búsquedas sin resultado', 'Veces'])
     for r in datos['sin_resultado']:
-        w.writerow([r['termino'], r['veces']])
+        w.writerow([_celda_csv_segura(r['termino']), r['veces']])
     return respuesta

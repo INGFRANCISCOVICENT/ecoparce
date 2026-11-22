@@ -5,6 +5,7 @@ from . import views
 app_name = 'buscador'
 urlpatterns = [
     path('buscar/', views.buscar, name='buscar'),
+    path('buscar/autocompletar/', views.autocompletar, name='autocompletar'),
     path('sugerencias/', views.sugerir, name='sugerir'),
     path('escanear/', views.escanear, name='escanear'),
     path('escanear/producto/<str:codigo>/', views.producto, name='producto'),

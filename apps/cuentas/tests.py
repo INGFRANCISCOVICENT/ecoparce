@@ -513,3 +513,15 @@ class EncabezadosTests(TestCase):
         r_no = self.client.get('/asistente/consultar/', {'q': '<script>alert(1)</script>'})
         self.assertEqual(r_no.status_code, 200)
         self.assertFalse(r_no.json()['encontrado'])
+
+        # 4. Autocompletado instantáneo devuelve coincidencias con color de bolsa
+        r_auto = self.client.get('/buscar/autocompletar/', {'q': 'bot'})
+        self.assertEqual(r_auto.status_code, 200)
+        self.assertTrue(any(i['codigo'] == 'BLANCA' for i in r_auto.json()['items']))
+        self.assertIn('no-store', r_auto['Cache-Control'])
+
+        # 5. Protección OWASP contra CSV Formula Injection en exportación
+        from apps.estadisticas.views import _celda_csv_segura
+        self.assertEqual(_celda_csv_segura('=HYPERLINK("http://x")'), '\'=HYPERLINK("http://x")')
+        self.assertEqual(_celda_csv_segura('+CMD'), "'+CMD")
+        self.assertEqual(_celda_csv_segura('botella pet'), 'botella pet')

@@ -2,6 +2,12 @@
 
 Este proyecto sigue el [Versionado Semántico (SemVer 2.0.0)](https://semver.org/lang/es/) y control de versiones en Git.
 
+## [2.7.0] - 2026-11-22
+### Agregado y Seguridad
+- **Buscador con autocompletado instantáneo en vivo (`/buscar/autocompletar/`)**: al escribir desde 2 caracteres muestra en tiempo real los residuos coincidentes con su etiqueta de color de bolsa (`Blanca`, `Negra`, `Verde`, `Posconsumo`), con rate-limiting y renderizado DOM seguro.
+- **Instalación como App PWA en 1 toque**: soporte progresivo de `beforeinstallprompt` («Instalar app») para agregar EcoParce a la pantalla de inicio del celular.
+- **Protección OWASP contra CSV Formula Injection**: sanitización de celdas en `/panel/estadisticas/exportar.csv` para impedir la ejecución de fórmulas maliciosas en Excel/Calc.
+
 ## [2.6.1] - 2026-11-22
 ### Corregido
 - **Altura adaptable del chat EcoBot en pantallas móviles**: ajuste `max-height: calc(100dvh - 148px)` con desplazamiento interno para que el encabezado del chat (botón «Limpiar» y «✕») permanezca siempre visible incluso en pantallas pequeñas.
