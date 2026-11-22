@@ -21,10 +21,11 @@
 }
 
 *,*::before,*::after{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;overflow-x:clip}
 body{
   margin:0;
   min-height:100vh;
+  overflow-x:clip;
   font-family:Nunito,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
   color:var(--ink);
   background:
@@ -146,6 +147,15 @@ main.wrap > .aviso a{color:inherit;text-decoration:underline}
 }
 .btn-salir:hover{background:rgba(200,30,30,.36);color:#fff;border-color:#F87171}
 .btn-salir[aria-busy="true"]{opacity:.65;cursor:wait}
+@media (max-width:440px){
+  .top{padding:8px 12px;gap:6px}
+  .brand{font-size:20px}
+  .top .cuenta{padding:6px 8px;font-size:13px}
+  .btn-salir{padding:6px 8px}
+  .btn-salir span{display:none}
+  .grid{grid-template-columns:1fr}
+  .grid.g4{grid-template-columns:1fr 1fr}
+}
 
 /* ---------- componentes públicos ---------- */
 .hero{
