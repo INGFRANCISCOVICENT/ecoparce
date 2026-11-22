@@ -26,7 +26,6 @@
   <a class="nav {% activo '/panel/qr/' %}" {% aria_actual '/panel/qr/' %} href="{% url 'panel_qr:lista' %}">{% icono 'qr' 20 %}Códigos QR</a>
   <a class="nav {% activo '/panel/estadisticas/' %}" {% aria_actual '/panel/estadisticas/' %} href="{% url 'estadisticas:detalle' %}">{% icono 'chart' 20 %}Estadísticas</a>
   <a class="nav {% activo '/panel/usuarios/' %}" {% aria_actual '/panel/usuarios/' %} href="{% url 'cuentas:usuarios' %}">{% icono 'users' 20 %}Administradores{% if PEND_SOLICITUDES %}<span class="cnt">{{ PEND_SOLICITUDES }}</span>{% endif %}</a>
-  <a class="nav {% activo '/panel/auditoria/' %}" {% aria_actual '/panel/auditoria/' %} href="{% url 'cuentas:auditoria' %}">{% icono 'history' 20 %}Auditoría</a>
   {% endif %}
   <div class="sep">Cuenta</div>
   <a class="nav" href="{% url 'mfa_index' %}">{% icono 'shield' 20 %}Seguridad (2FA)</a>

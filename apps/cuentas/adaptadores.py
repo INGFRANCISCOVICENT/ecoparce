@@ -82,17 +82,13 @@ class CuentaAdapter(DefaultAccountAdapter):
             if req is not None:
                 messages.error(req, 'No pudimos enviar el correo de verificación ahora mismo. Revisa la configuración SMTP o inténtalo de nuevo.')
             return None
-        # En desarrollo local sin SMTP real, mostrar el código en pantalla para evitar bloqueos silenciosos.
+        # En desarrollo local sin SMTP real, mostrar el código en pantalla con un mensaje limpio.
         if (settings.DEBUG
                 and settings.EMAIL_BACKEND == 'django.core.mail.backends.console.EmailBackend'
                 and context.get('code')):
             req = getattr(allauth_ctx, 'request', None)
             if req is not None:
-                messages.info(
-                    req,
-                    f"Modo local sin SMTP configurado: tu código es {context['code']}. "
-                    'Para recibirlo en tu correo real, configura SMTP_HOST y SMTP_PASSWORD en .env.',
-                )
+                messages.info(req, f"Tu código de verificación es {context['code']}. Ingrésalo abajo para continuar.")
         return res
 
 
@@ -101,10 +97,13 @@ class GoogleAdapter(DefaultSocialAccountAdapter):
         return True
 
     def on_authentication_error(self, request, provider, error=None, exception=None, extra_context=None):
-        evento('google_error_autenticacion', request, error=str(error or exception or 'desconocido'))
+        import logging
+        detalle = repr(exception) if exception is not None else str(error or 'desconocido')
+        logging.getLogger('ecoparce').warning('Google OAuth error (%s): %s', error, detalle)
+        evento('google_error_autenticacion', request, error=str(error or 'desconocido'), detalle=detalle[:180])
         messages.error(
             request,
-            'No se pudo completar el ingreso con Google. Verifica que tu correo esté autorizado y vuelve a intentarlo.',
+            'No se pudo completar el ingreso con Google. Verifica que tu correo esté autorizado en Google Cloud y vuelve a intentarlo.',
         )
         raise ImmediateHttpResponse(redirect('account_login'))
 

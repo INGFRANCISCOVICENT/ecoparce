@@ -120,9 +120,9 @@ main:focus{outline:none}
 
 /* contraste WCAG AAA para textos directos sobre el fondo verde luminoso oscuro */
 main.wrap > h1,main.wrap > h2,main.wrap > .row h1,main.wrap > section.center > h1,main.wrap > div > h2{color:#F3FBF6}
-main.wrap > p,main.wrap > .mut,main.wrap > .crumb,main.wrap > .src,main.wrap > section.center > p.mut,main.wrap > .row > span{color:#BFE0CC}
-main.wrap > .crumb a,main.wrap > p a,main.wrap > .src a{color:#6EE7B7}
-main.wrap > .crumb a:hover,main.wrap > p a:hover,main.wrap > .src a:hover{color:#A7F3D0}
+main.wrap > p,main.wrap > p.mut,main.wrap > .mut,main.wrap > .crumb,main.wrap > .src,main.wrap > section.center p,main.wrap > section.center p.mut,main.wrap > .row > span{color:#DCF3E5}
+main.wrap > .crumb a,main.wrap > p a,main.wrap > .src a,main.wrap > section.center a{color:#6EE7B7}
+main.wrap > .crumb a:hover,main.wrap > p a:hover,main.wrap > .src a:hover,main.wrap > section.center a:hover{color:#A7F3D0}
 main.wrap > .prose p{color:#E8F6EE}
 main.wrap > ul.ok li,main.wrap > ul.no li{color:#EDF8F1;border-bottom-color:rgba(74,222,128,.18)}
 main.wrap > section.center .puntaje{color:#4ADE80}

@@ -60,7 +60,6 @@
         </div>
         {% if user.es_admin_sistema %}
         <div class="row" style="margin-top:12px;gap:14px;flex-wrap:wrap">
-          <a class="portada-link-claro small" href="{% url 'cuentas:auditoria' %}">Ver historial de auditoría →</a>
           <a class="portada-link-claro small" href="{% url 'cuentas:usuarios' %}">Aprobar solicitudes de admin →</a>
         </div>
         {% endif %}
