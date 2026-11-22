@@ -524,40 +524,40 @@ html[data-contraste="alto"] :focus-visible{outline:4px solid #000;outline-offset
   min-height:calc(100vh - 64px);
   display:flex;align-items:center;
   background:radial-gradient(circle at 18% 12%,#123C29 0%,#081912 52%,#040B08 100%);
-  color:#F8FAFC;padding:118px 18px 34px;
+  color:#F8FAFC;padding:172px 18px 34px;
   border-bottom:1px solid rgba(34,197,94,.26);
 }
-@media (min-width:900px){.portada-ciudad{padding:146px 36px 44px}}
+@media (min-width:900px){.portada-ciudad{padding:212px 36px 44px}}
 .portada-cielo{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 
-/* pista aérea superior a todo lo ancho: Escarlata cruza aleteando y planeando */
+/* pista aérea superior a todo lo ancho: Escarlata grande y realista cruzando el cielo */
 .vuelo-techo{
-  position:absolute;top:8px;left:0;right:0;height:150px;
+  position:absolute;top:0;left:0;right:0;height:225px;
   pointer-events:none;z-index:3;overflow:hidden;
 }
 .escarlata-trayectoria{
-  position:absolute;top:14px;left:0;will-change:transform;
-  animation:cruzar-cielo 15s linear infinite;
+  position:absolute;top:8px;left:0;will-change:transform;
+  animation:cruzar-cielo 16s linear infinite;
 }
 .escarlata-aleteo{
-  position:relative;display:flex;align-items:center;perspective:700px;
-  animation:ondular-vuelo 2.8s ease-in-out infinite;
+  position:relative;display:flex;align-items:center;perspective:800px;
+  animation:ondular-vuelo 3s ease-in-out infinite;
 }
 .escarlata-ave{
-  position:relative;z-index:2;width:clamp(155px,18vw,245px);height:auto;
-  filter:drop-shadow(0 16px 26px rgba(0,0,0,.55)) drop-shadow(0 0 22px rgba(34,197,94,.32));
-  transform-origin:52% 48%;
-  animation:aleteo-real 1.55s ease-in-out infinite;
+  position:relative;z-index:2;width:clamp(240px,28vw,390px);height:auto;
+  filter:drop-shadow(0 22px 34px rgba(0,0,0,.62)) drop-shadow(0 0 28px rgba(34,197,94,.28)) contrast(1.04) saturate(1.06);
+  transform-origin:50% 48%;
+  animation:aleteo-real 1.6s ease-in-out infinite;
   user-select:none;
 }
 .ala-estela-real{
-  position:absolute;right:74%;top:44%;width:clamp(120px,18vw,240px);height:26px;border-radius:999px;
-  background:linear-gradient(90deg,transparent,rgba(34,197,94,.35),rgba(250,204,21,.55),rgba(239,68,68,.42));
-  filter:blur(10px);transform:rotate(-5deg);animation:estela 1.55s ease-in-out infinite;
+  position:absolute;right:72%;top:46%;width:clamp(160px,24vw,340px);height:36px;border-radius:999px;
+  background:linear-gradient(90deg,transparent,rgba(34,197,94,.36),rgba(250,204,21,.52),rgba(239,68,68,.40));
+  filter:blur(13px);transform:rotate(-5deg);animation:estela 1.6s ease-in-out infinite;
 }
 @keyframes cruzar-cielo{
-  0%{transform:translateX(-280px)}
-  100%{transform:translateX(calc(100vw + 280px))}
+  0%{transform:translateX(-420px)}
+  100%{transform:translateX(calc(100vw + 420px))}
 }
 @keyframes ondular-vuelo{
   0%,100%{transform:translateY(14px) rotate(-4deg)}
