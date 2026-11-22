@@ -152,6 +152,8 @@ main:focus{outline:none}
 .search button:active{transform:scale(.97)}
 
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid.g3{grid-template-columns:1fr}
+@media (min-width:680px){.grid.g3{grid-template-columns:repeat(3,1fr)}}
 @media (min-width:640px){.grid.g4{grid-template-columns:repeat(4,1fr)}}
 
 .bag{
@@ -518,65 +520,21 @@ html[data-contraste="alto"] .kpi,
 html[data-contraste="alto"] .insignia{border-width:2px}
 html[data-contraste="alto"] :focus-visible{outline:4px solid #000;outline-offset:2px}
 
-/* ---------- portada a pantalla completa + Escarlata real volando ---------- */
+/* ---------- portada a pantalla completa + Escarlata real volando a la derecha ---------- */
 .portada-ciudad{
   position:relative;overflow:hidden;width:100%;
   min-height:calc(100vh - 64px);
   display:flex;align-items:center;
   background:radial-gradient(circle at 18% 12%,#123C29 0%,#081912 52%,#040B08 100%);
-  color:#F8FAFC;padding:172px 18px 34px;
+  color:#F8FAFC;padding:32px 18px 36px;
   border-bottom:1px solid rgba(34,197,94,.26);
 }
-@media (min-width:900px){.portada-ciudad{padding:212px 36px 44px}}
+@media (min-width:900px){.portada-ciudad{padding:44px 36px 46px}}
 .portada-cielo{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 
-/* pista aérea superior a todo lo ancho: Escarlata grande y realista cruzando el cielo */
-.vuelo-techo{
-  position:absolute;top:0;left:0;right:0;height:225px;
-  pointer-events:none;z-index:3;overflow:hidden;
-}
-.escarlata-trayectoria{
-  position:absolute;top:8px;left:0;will-change:transform;
-  animation:cruzar-cielo 16s linear infinite;
-}
-.escarlata-aleteo{
-  position:relative;display:flex;align-items:center;perspective:800px;
-  animation:ondular-vuelo 3s ease-in-out infinite;
-}
-.escarlata-ave{
-  position:relative;z-index:2;width:clamp(240px,28vw,390px);height:auto;
-  filter:drop-shadow(0 22px 34px rgba(0,0,0,.62)) drop-shadow(0 0 28px rgba(34,197,94,.28)) contrast(1.04) saturate(1.06);
-  transform-origin:50% 48%;
-  animation:aleteo-real 1.6s ease-in-out infinite;
-  user-select:none;
-}
-.ala-estela-real{
-  position:absolute;right:72%;top:46%;width:clamp(160px,24vw,340px);height:36px;border-radius:999px;
-  background:linear-gradient(90deg,transparent,rgba(34,197,94,.36),rgba(250,204,21,.52),rgba(239,68,68,.40));
-  filter:blur(13px);transform:rotate(-5deg);animation:estela 1.6s ease-in-out infinite;
-}
-@keyframes cruzar-cielo{
-  0%{transform:translateX(-420px)}
-  100%{transform:translateX(calc(100vw + 420px))}
-}
-@keyframes ondular-vuelo{
-  0%,100%{transform:translateY(14px) rotate(-4deg)}
-  35%{transform:translateY(-12px) rotate(3deg)}
-  70%{transform:translateY(6px) rotate(-2deg)}
-}
-@keyframes aleteo-real{
-  0%{transform:perspective(650px) rotateX(0deg) scaleY(1) scaleX(1)}
-  18%{transform:perspective(650px) rotateX(34deg) scaleY(.74) scaleX(1.04) translateY(-5px)}
-  36%{transform:perspective(650px) rotateX(-16deg) scaleY(1.07) scaleX(.97) translateY(3px)}
-  54%{transform:perspective(650px) rotateX(28deg) scaleY(.80) scaleX(1.03) translateY(-4px)}
-  72%{transform:perspective(650px) rotateX(-8deg) scaleY(1.03) scaleX(.99) translateY(1px)}
-  100%{transform:perspective(650px) rotateX(0deg) scaleY(1) scaleX(1)}
-}
-@keyframes estela{0%,100%{opacity:.45;transform:rotate(-5deg) scaleX(.85)}50%{opacity:.95;transform:rotate(-5deg) scaleX(1.15)}}
-
 .portada-inner{position:relative;z-index:2;width:100%;max-width:1160px;margin:0 auto}
-.portada-grid{display:grid;grid-template-columns:1fr;gap:20px;align-items:end;margin-bottom:22px}
-@media (min-width:920px){.portada-grid{grid-template-columns:1.25fr .85fr;gap:32px;margin-bottom:26px}}
+.portada-grid{display:grid;grid-template-columns:1fr;gap:24px;align-items:center;margin-bottom:28px}
+@media (min-width:920px){.portada-grid{grid-template-columns:1.05fr 1fr;gap:36px;margin-bottom:34px}}
 .portada-top-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
 .portada-badge{
   display:inline-flex;align-items:center;gap:8px;padding:6px 13px;border-radius:999px;
@@ -589,7 +547,45 @@ html[data-contraste="alto"] :focus-visible{outline:4px solid #000;outline-offset
 }
 @keyframes pulso{0%{box-shadow:0 0 0 0 rgba(34,197,94,.7)}70%{box-shadow:0 0 0 9px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
 
-.portada-col-vuelo{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-end}
+.portada-col-vuelo{display:flex;flex-direction:column;align-items:center;gap:16px}
+.escarlata-derecha-escena{
+  position:relative;width:100%;max-width:500px;min-height:230px;
+  display:flex;align-items:center;justify-content:center;perspective:850px;
+  animation:ondular-vuelo 4.2s ease-in-out infinite;
+}
+.escarlata-ave{
+  position:relative;z-index:2;width:clamp(260px,34vw,440px);height:auto;
+  filter:drop-shadow(0 22px 34px rgba(0,0,0,.62)) drop-shadow(0 0 28px rgba(34,197,94,.28)) contrast(1.04) saturate(1.06);
+  transform-origin:50% 48%;
+  animation:aleteo-real 2.1s ease-in-out infinite;
+  user-select:none;
+}
+.ala-estela-real{
+  position:absolute;left:-2%;bottom:24%;width:72%;height:38px;border-radius:999px;
+  background:linear-gradient(90deg,transparent,rgba(34,197,94,.34),rgba(250,204,21,.48),rgba(239,68,68,.36));
+  filter:blur(15px);transform:rotate(-7deg);animation:estela 2.1s ease-in-out infinite;
+}
+@keyframes ondular-vuelo{
+  0%,100%{transform:translate(0,8px) rotate(-3deg)}
+  50%{transform:translate(10px,-16px) rotate(2.5deg)}
+}
+@keyframes aleteo-real{
+  0%{transform:perspective(750px) rotateX(0deg) scaleY(1) scaleX(1)}
+  20%{transform:perspective(750px) rotateX(26deg) scaleY(.82) scaleX(1.03) translateY(-4px)}
+  42%{transform:perspective(750px) rotateX(-12deg) scaleY(1.05) scaleX(.98) translateY(2px)}
+  64%{transform:perspective(750px) rotateX(20deg) scaleY(.88) scaleX(1.02) translateY(-3px)}
+  100%{transform:perspective(750px) rotateX(0deg) scaleY(1) scaleX(1)}
+}
+@keyframes estela{0%,100%{opacity:.45;transform:rotate(-7deg) scaleX(.88)}50%{opacity:.9;transform:rotate(-7deg) scaleX(1.12)}}
+
+.portada-dock-fila{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.impacto-card{display:flex;flex-direction:column;gap:4px}
+.impacto-num{font-family:Baloo,Nunito,sans-serif;font-size:32px;font-weight:800;line-height:1.1;color:var(--gd);margin-top:6px;font-variant-numeric:tabular-nums}
+.paso-card{display:flex;flex-direction:column;gap:4px}
+.paso-num{
+  width:32px;height:32px;border-radius:10px;background:var(--gl);color:var(--gd);
+  display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;margin-bottom:4px;
+}
 
 /* decodificador interactivo de etiquetas y símbolos de reciclaje */
 .simbolos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 14px}
