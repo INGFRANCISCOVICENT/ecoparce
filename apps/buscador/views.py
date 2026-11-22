@@ -4,14 +4,13 @@ from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from django.views.decorators.http import require_POST
 
 from apps.contenidos.models import EstadoContenido, Residuo
 from apps.core.seguridad import limitar
 from apps.core.texto import normalizar
 
 from .forms import SugerenciaForm
-from .models import Busqueda, Sugerencia
+from .models import Busqueda, EstadoSugerencia, Sugerencia
 
 
 def buscar_residuos(termino):
@@ -38,17 +37,39 @@ def buscar(request):
     })
 
 
-@require_POST
 def sugerir(request):
-    """RF-13: el visitante propone un residuo que no encontró. Límite por sesión y campo trampa contra robots."""
+    """RF-13: centro de sugerencias ciudadano (estilo CiudadReporta) y recepción desde el buscador."""
+    if request.method == 'GET':
+        recientes = Sugerencia.objects.filter(
+            estado__in=[EstadoSugerencia.ATENDIDA, EstadoSugerencia.PENDIENTE]
+        )[:8]
+        mias = request.user.sugerencias.all()[:10] if request.user.is_authenticated else []
+        return render(request, 'buscador/sugerencias.html', {
+            'form': SugerenciaForm(),
+            'recientes': recientes,
+            'mias': mias,
+            'total_atendidas': Sugerencia.objects.filter(estado=EstadoSugerencia.ATENDIDA).count(),
+        })
+
+    desde_pagina = request.POST.get('origen') == 'pagina'
+    destino_ok = 'buscador:sugerir' if desde_pagina else 'buscador:buscar'
     form = SugerenciaForm(request.POST)
     ahora = time.time()
     envios = [t for t in request.session.get('sugerencias', []) if ahora - t < 3600]
     # Doble límite: por sesión y por huella temporal de red (no se guarda la IP, RN-08)
     if len(envios) >= settings.SUGERENCIAS_MAX_POR_HORA or not limitar(request, 'sugerencia', settings.SUGERENCIAS_MAX_POR_HORA * 2, 3600):
         messages.error(request, 'Ya recibimos varias sugerencias tuyas. Inténtalo más tarde.')
-        return redirect('buscador:buscar')
+        return redirect(destino_ok)
     if not form.is_valid():
+        if desde_pagina:
+            recientes = Sugerencia.objects.filter(
+                estado__in=[EstadoSugerencia.ATENDIDA, EstadoSugerencia.PENDIENTE]
+            )[:8]
+            mias = request.user.sugerencias.all()[:10] if request.user.is_authenticated else []
+            return render(request, 'buscador/sugerencias.html', {
+                'form': form, 'recientes': recientes, 'mias': mias,
+                'total_atendidas': Sugerencia.objects.filter(estado=EstadoSugerencia.ATENDIDA).count(),
+            }, status=400)
         termino = request.POST.get('termino', '')
         resultados = buscar_residuos(termino)
         return render(request, 'buscador/buscar.html', {'q': termino, 'principal': None, 'otros': resultados[:5],
@@ -59,7 +80,7 @@ def sugerir(request):
     envios.append(ahora)
     request.session['sugerencias'] = envios
     messages.success(request, '¡Gracias, parce! Revisaremos tu sugerencia y la agregaremos pronto.')
-    return redirect('buscador:buscar')
+    return redirect(destino_ok)
 
 
 def escanear(request):

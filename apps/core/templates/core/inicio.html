@@ -30,9 +30,29 @@
 <h2>Aprende jugando</h2>
 <a class="card row" href="{% url 'trivia:inicio' %}">
   <span class="ic" style="background:var(--yl)">{% icono 'game' 26 '#7A5A00' %}</span>
-  <span><strong>Trivia de Escarlata</strong><br><span class="small mut">5 preguntas · 2 minutos</span></span>
+  <span><strong>Trivia de Escarlata por niveles</strong><br><span class="small mut">3 niveles · gana insignias según tus puntos</span></span>
   <span class="ml">{% icono 'arrow' 22 '#1E7A46' %}</span>
 </a>
+
+<h2>Participa y comparte</h2>
+<div class="lista">
+  <a class="card row" href="{% url 'buscador:sugerir' %}">
+    <span class="ic" style="background:var(--bl)">{% icono 'msg' 24 '#1F4FA3' %}</span>
+    <span><strong>Sugerencias ciudadanas</strong><br><span class="small mut">Propón un residuo nuevo, reporta un punto o sugiere una mejora</span></span>
+    <span class="ml">{% icono 'arrow' 22 '#1E7A46' %}</span>
+  </a>
+  <section class="card">
+    <div class="row">
+      <span class="ic" style="background:var(--gl)">{% icono 'share' 22 '#14532D' %}</span>
+      <div><strong>Comparte EcoParce con alguien más</strong><div class="small mut">Envía el enlace de la app para que más personas aprendan a reciclar bien.</div></div>
+    </div>
+    <div class="grid" style="margin-top:12px">
+      <button class="btn o sm" type="button" data-compartir data-url="{{ SITE_URL }}/" data-titulo="EcoParce · Aprende a reciclar bien en Colombia">{% icono 'share' 18 '#1E7A46' %}Compartir enlace</button>
+      <a class="btn o sm" href="https://wa.me/?text={{ '¡Aprende a separar residuos en Colombia con EcoParce! '|urlencode }}{{ SITE_URL|urlencode }}/" target="_blank" rel="noopener noreferrer">{% icono 'whatsapp' 18 '#1E7A46' %}WhatsApp</a>
+    </div>
+    <p id="aviso-copiado" class="aviso ok" role="status" aria-live="polite" hidden style="margin:10px 0 0">Enlace de EcoParce copiado. ¡Compártelo donde quieras!</p>
+  </section>
+</div>
 {% if manejo %}
 <h2>Manejo de basuras</h2>
 <div class="lista">

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}{% load static eco %}
+{% block titulo %}Sugerencias y reportes{% endblock %}
+{% block contenido %}
+<div class="crumb"><a href="{% url 'core:inicio' %}">Inicio</a> › Sugerencias</div>
+<h1>Sugerencias ciudadanas</h1>
+<p class="mut">¿Falta un residuo en el buscador, cambió el horario de un punto posconsumo o tienes una idea para mejorar EcoParce? Cuéntanos y el equipo la revisa.</p>
+
+<section class="card" style="margin-top:12px">
+  <form method="post" action="{% url 'buscador:sugerir' %}" novalidate>{% csrf_token %}
+    <input type="hidden" name="origen" value="pagina">
+    {% include 'includes/campo.html' with campo=form.termino %}
+    {% include 'includes/campo.html' with campo=form.comentario %}
+    <div class="oculto" aria-hidden="true">{{ form.sitio_web }}</div>
+    <p class="xs mut" style="margin:8px 0 12px">{% if user.is_authenticated %}Quedará asociada a tu cuenta para que sigas su estado en «Mi cuenta».{% else %}Es anónima: no pedimos tu nombre ni correo. Si quieres seguir su estado, <a href="{% url 'account_login' %}?next={% url 'buscador:sugerir' %}">inicia sesión</a>.{% endif %}</p>
+    <button class="btn p full" type="submit">{% icono 'send' 20 '#fff' %}Enviar sugerencia</button>
+  </form>
+</section>
+
+{% if mias %}
+<h2>Tus sugerencias enviadas</h2>
+<div class="card">
+  <table>
+    <thead><tr><th>Sugerencia</th><th class="right">Estado</th></tr></thead>
+    <tbody>
+      {% for s in mias %}
+      <tr>
+        <td><strong>{{ s.termino }}</strong><div class="xs mut">{{ s.fecha_hora|date:"j M Y" }}</div></td>
+        <td class="right"><span class="st {{ s.estado|clase_estado }}">{{ s.get_estado_display }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% if recientes %}
+<h2>Aportes recientes de la comunidad</h2>
+<p class="xs mut" style="margin-top:-4px">Registro transparente y anónimo ({{ total_atendidas }} atendida{{ total_atendidas|pluralize }} por el equipo editorial).</p>
+<div class="card">
+  <table>
+    <thead><tr><th>Residuo o aporte</th><th class="right">Estado</th></tr></thead>
+    <tbody>
+      {% for s in recientes %}
+      <tr>
+        <td><strong>{{ s.termino }}</strong>{% if s.comentario %}<div class="xs mut">{{ s.comentario|truncatechars:90 }}</div>{% endif %}</td>
+        <td class="right"><span class="st {{ s.estado|clase_estado }}">{{ s.get_estado_display }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

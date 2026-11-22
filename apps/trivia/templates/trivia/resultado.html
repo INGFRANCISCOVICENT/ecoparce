@@ -44,5 +44,7 @@
   <button class="btn {% if siguiente_nivel %}o{% else %}p{% endif %} full" type="submit">{% icono 'refresh' 20 %}Volver a jugar Nivel {{ partida.nivel }}</button>
 </form>
 <a class="btn o full" style="margin-top:10px" href="{% url 'trivia:inicio' %}">{% icono 'game' 20 '#1E7A46' %}Ver todos los niveles e insignias</a>
+<button class="btn o full" style="margin-top:10px" type="button" data-compartir data-url="{{ SITE_URL }}{% url 'trivia:inicio' %}" data-titulo="Saqué {{ partida.puntaje }}/{{ partida.total_preguntas }} en el Nivel {{ partida.nivel }} de la Trivia EcoParce">{% icono 'share' 20 '#1E7A46' %}Compartir mi resultado y la app</button>
+<p id="aviso-copiado" class="aviso ok" role="status" aria-live="polite" hidden style="margin-top:10px">Enlace copiado. ¡Reta a un amigo a superar tu puntaje!</p>
 <a class="btn o full" style="margin-top:10px" href="{% url 'core:inicio' %}">{% icono 'home' 20 '#1E7A46' %}Volver al inicio</a>
 {% endblock %}

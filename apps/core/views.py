@@ -86,6 +86,7 @@ def sitemap_xml(request):
         ('/escanear/', 'monthly', '0.8'),
         ('/puntos/', 'weekly', '0.9'),
         ('/trivia/', 'weekly', '0.8'),
+        ('/sugerencias/', 'weekly', '0.7'),
         ('/privacidad/', 'yearly', '0.3'),
         ('/terminos/', 'yearly', '0.3'),
         ('/licencias/', 'yearly', '0.3'),

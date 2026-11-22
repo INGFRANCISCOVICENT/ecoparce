@@ -2,6 +2,11 @@
 
 Este proyecto sigue el [Versionado Semántico (SemVer 2.0.0)](https://semver.org/lang/es/) y control de versiones en Git.
 
+## [1.3.1] - 2026-11-21
+### Agregado
+- **Centro de Sugerencias Ciudadanas (`/sugerencias/`)** estilo CiudadReporta: página dedicada para proponer residuos nuevos, reportar puntos o sugerir mejoras, con tablero transparente de aportes recientes (anónimo, RN-08) y seguimiento de estado (`Pendiente` / `Atendida` / `Descartada`) en «Mi cuenta».
+- **Compartir la app EcoParce**: botones para compartir el enlace de la aplicación (hoja nativa del dispositivo / copiar enlace + WhatsApp) en la pantalla de inicio (`/`) y en los resultados de la trivia (`/trivia/resultado/`).
+
 ## [1.3.0] - 2026-11-21
 ### Agregado
 - **Trivia con dificultad progresiva e insignias estrictamente por puntos**:

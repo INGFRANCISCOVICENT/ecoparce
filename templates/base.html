@@ -36,6 +36,7 @@
     <a class="{% activo '/escanear/' %}" {% aria_actual '/escanear/' %} href="{% url 'buscador:escanear' %}">Escanear</a>
     <a class="{% activo '/puntos/' %}" {% aria_actual '/puntos/' %} href="{% url 'contenidos:puntos' %}">Puntos</a>
     <a class="{% activo '/trivia/' %}" {% aria_actual '/trivia/' %} href="{% url 'trivia:inicio' %}">Trivia</a>
+    <a class="{% activo '/sugerencias/' %}" {% aria_actual '/sugerencias/' %} href="{% url 'buscador:sugerir' %}">Sugerencias</a>
   </nav>
   {% if user.is_authenticated %}
   <a class="cuenta" href="{% if user.es_personal %}{% url 'estadisticas:resumen' %}{% else %}{% url 'cuentas:mi_cuenta' %}{% endif %}" aria-label="Mi cuenta">{% icono 'users' 18 %}<span>{{ user.nombre.split.0|truncatechars:12 }}</span></a>

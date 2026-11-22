@@ -52,3 +52,13 @@ class BuscadorTests(TestCase):
         self.assertRedirects(r, '/panel/contenidos/residuos/nuevo/?nombre=esponja')
         s.refresh_from_db()
         self.assertEqual((s.estado, s.atendida_por), ('ATENDIDA', sistema))
+
+    def test_centro_sugerencias_get_y_post(self):
+        r = self.client.get('/sugerencias/')
+        self.assertEqual(r.status_code, 200)
+        self.assertContains(r, 'Sugerencias ciudadanas')
+        r_post = self.client.post('/sugerencias/', {
+            'origen': 'pagina', 'termino': 'cápsula de café', 'comentario': '¿Se recicla?'
+        })
+        self.assertRedirects(r_post, '/sugerencias/')
+        self.assertTrue(Sugerencia.objects.filter(termino='cápsula de café').exists())
