@@ -284,6 +284,31 @@ class PanelSeguroTests(TestCase):
         self.assertFalse(Usuario.objects.create_user('z@e.co', 'Z').es_personal)
         self.assertEqual(Usuario.objects.create_superuser('s@e.co', 'S', P.CLAVE).rol, Rol.SISTEMA)
 
+    def test_solicitud_y_aprobacion_de_administrador(self):
+        from .models import EstadoSolicitudAdmin, SolicitudAdmin
+        visitante = Usuario.objects.create_user('nuevo_admin@ejemplo.co', 'Sofía Torres', P.CLAVE)
+        P.consentir(visitante)
+        self.client.force_login(visitante)
+        # Inicio personalizado para usuario registrado
+        r_home = self.client.get('/')
+        self.assertContains(r_home, '¡Hola,')
+        self.assertContains(r_home, 'Medallas 3D')
+        # Enviar solicitud para ser administrador
+        r_sol = self.client.post('/cuenta/solicitar-admin/', {'motivo': 'Quiero apoyar revisando guías de reciclaje.'})
+        self.assertRedirects(r_sol, '/cuenta/')
+        sol = SolicitudAdmin.objects.get(usuario=visitante)
+        self.assertEqual(sol.estado, EstadoSolicitudAdmin.PENDIENTE)
+        # El administrador del sistema la aprueba desde /panel/usuarios/
+        otro = self.client_class()
+        P.entrar_panel(otro, self.sistema)
+        r_ap = otro.post(f'/panel/usuarios/solicitud/{sol.pk}/', {'accion': 'aprobar_contenido'})
+        self.assertRedirects(r_ap, '/panel/usuarios/')
+        visitante.refresh_from_db()
+        sol.refresh_from_db()
+        self.assertEqual(visitante.rol, Rol.CONTENIDO)
+        self.assertEqual(sol.estado, EstadoSolicitudAdmin.APROBADA)
+        self.assertTrue(RegistroAuditoria.objects.filter(usuario=self.sistema, detalle__icontains='Aprobó solicitud').exists())
+
 
 class DatosPersonalesTests(TestCase):
     def setUp(self):

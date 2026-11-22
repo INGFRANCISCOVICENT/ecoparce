@@ -101,3 +101,26 @@ class Consentimiento(models.Model):
 
     def __str__(self):
         return f'{self.usuario} · {self.version}'
+
+
+class EstadoSolicitudAdmin(models.TextChoices):
+    PENDIENTE = 'PENDIENTE', 'Pendiente'
+    APROBADA = 'APROBADA', 'Aprobada'
+    RECHAZADA = 'RECHAZADA', 'Rechazada'
+
+
+class SolicitudAdmin(models.Model):
+    """Solicitud de un usuario registrado para ser aprobado como administrador por el admin del sistema."""
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='solicitudes_admin')
+    motivo = models.CharField('motivo', max_length=300)
+    estado = models.CharField('estado', max_length=12, choices=EstadoSolicitudAdmin.choices, default=EstadoSolicitudAdmin.PENDIENTE)
+    creada_en = models.DateTimeField(auto_now_add=True)
+    resuelta_por = models.ForeignKey(Usuario, null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
+    resuelta_en = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'solicitud_admin'
+        ordering = ['-creada_en']
+
+    def __str__(self):
+        return f'{self.usuario} ({self.get_estado_display()})'

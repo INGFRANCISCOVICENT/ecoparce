@@ -30,4 +30,7 @@ def sitio(request):
         datos['PEND_REVISION'] = (Guia.objects.filter(estado=en_rev).exclude(autor=usuario).count()
                                   + Residuo.objects.filter(estado=en_rev).exclude(autor=usuario).count())
         datos['PEND_SUGERENCIAS'] = Sugerencia.objects.filter(estado=EstadoSugerencia.PENDIENTE).count()
+        if usuario.es_admin_sistema():
+            from apps.cuentas.models import EstadoSolicitudAdmin, SolicitudAdmin
+            datos['PEND_SOLICITUDES'] = SolicitudAdmin.objects.filter(estado=EstadoSolicitudAdmin.PENDIENTE).count()
     return datos

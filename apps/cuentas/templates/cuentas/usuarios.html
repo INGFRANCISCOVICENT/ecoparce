@@ -3,6 +3,34 @@
 {% block contenido %}
 <div class="filtros"><span class="mut small">Solo el administrador del sistema autoriza administradores, asigna roles y desactiva cuentas (RF-15). Hay {{ visitantes }} visitante{{ visitantes|pluralize }} con cuenta.</span>
 <a class="btn p sm ml" href="{% url 'cuentas:usuario_crear' %}">{% icono 'plus' 18 '#fff' %}Nuevo administrador</a></div>
+
+{% if solicitudes %}
+<section class="card tabla" style="margin-bottom:16px;border-color:#F0DC94;background:linear-gradient(180deg,#FFFDF4 0%,#FFFFFF 100%)">
+  <div class="row" style="padding:6px 10px 10px;justify-content:space-between;flex-wrap:wrap">
+    <strong>Solicitudes pendientes para ser administrador ({{ solicitudes|length }})</strong>
+    <span class="st s-rev">Requiere tu aprobación</span>
+  </div>
+  <table>
+    <tr><th>Usuario</th><th>Correo</th><th>Motivo</th><th>Fecha</th><th class="right">Decisión</th></tr>
+    {% for s in solicitudes %}
+    <tr>
+      <td><strong>{{ s.usuario.nombre }}</strong></td>
+      <td>{{ s.usuario.correo }}</td>
+      <td class="small">{{ s.motivo }}</td>
+      <td class="small mut">{{ s.creada_en|date:"j M Y, H:i" }}</td>
+      <td class="right" style="white-space:nowrap">
+        <form method="post" action="{% url 'cuentas:resolver_solicitud' s.pk %}" style="display:inline-flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">{% csrf_token %}
+          <button class="btn p sm" type="submit" name="accion" value="aprobar_contenido">Aprobar Contenido</button>
+          <button class="btn o sm" type="submit" name="accion" value="aprobar_sistema">Aprobar Sistema</button>
+          <button class="btn r sm" type="submit" name="accion" value="rechazar">Rechazar</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</section>
+{% endif %}
+
 <section class="card tabla"><table>
 <tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Google</th><th>2FA</th><th>Estado</th><th>Último acceso</th><th></th></tr>
 {% for u in usuarios %}

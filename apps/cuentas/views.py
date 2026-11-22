@@ -23,7 +23,7 @@ from apps.core.permisos import sistema_requerido
 from apps.core.seguridad import evento
 
 from .forms import AdministradorForm, AutorizacionForm, EliminarCuentaForm, UsuarioEditarForm
-from .models import Consentimiento, Rol, Usuario
+from .models import Consentimiento, EstadoSolicitudAdmin, Rol, SolicitudAdmin, Usuario
 from .sesiones import cerrar_sesiones
 
 FRESCURA_SEGUNDOS = 15 * 60
@@ -124,7 +124,29 @@ def mi_cuenta(request):
         'insignias': insignias,
         'insignias_obtenidas': sum(1 for i in insignias if i['obtenida']),
         'progreso_trivia': progreso_niveles(usuario=u),
+        'solicitud_pendiente': u.solicitudes_admin.filter(estado=EstadoSolicitudAdmin.PENDIENTE).first(),
     })
+
+
+@require_POST
+@login_required
+def solicitar_admin(request):
+    """Permite a un visitante registrado solicitar aprobación para ser administrador."""
+    u = request.user
+    if u.es_personal:
+        messages.info(request, 'Tu cuenta ya tiene permisos de administrador.')
+        return redirect('cuentas:mi_cuenta')
+    if u.solicitudes_admin.filter(estado=EstadoSolicitudAdmin.PENDIENTE).exists():
+        messages.info(request, 'Ya tienes una solicitud pendiente de revisión por el administrador del sistema.')
+        return redirect('cuentas:mi_cuenta')
+    motivo = (request.POST.get('motivo') or '').strip()[:300]
+    if len(motivo) < 8:
+        messages.error(request, 'Cuéntanos brevemente por qué deseas ser administrador (mínimo 8 caracteres).')
+        return redirect('cuentas:mi_cuenta')
+    SolicitudAdmin.objects.create(usuario=u, motivo=motivo)
+    evento('solicitud_admin_creada', request, usuario=u)
+    messages.success(request, 'Enviamos tu solicitud. El administrador del sistema (fjnv1305@gmail.com) la revisará en el panel.')
+    return redirect('cuentas:mi_cuenta')
 
 
 @login_required
@@ -189,7 +211,37 @@ def usuarios(request):
         'usuarios': Usuario.objects.filter(rol__in=[Rol.CONTENIDO, Rol.SISTEMA]).prefetch_related('socialaccount_set'),
         'con_mfa': set(Authenticator.objects.filter(type=Authenticator.Type.TOTP).values_list('user_id', flat=True)),
         'visitantes': Usuario.objects.filter(rol=Rol.VISITANTE).count(),
+        'solicitudes': SolicitudAdmin.objects.filter(estado=EstadoSolicitudAdmin.PENDIENTE).select_related('usuario'),
     })
+
+
+@require_POST
+@sistema_requerido
+def resolver_solicitud(request, pk):
+    """Aprueba (como Admin de contenido o del sistema) o rechaza una solicitud de administrador."""
+    sol = get_object_or_404(SolicitudAdmin.objects.select_related('usuario'), pk=pk, estado=EstadoSolicitudAdmin.PENDIENTE)
+    accion = request.POST.get('accion', '')
+    u = sol.usuario
+    if accion in ('aprobar_contenido', 'aprobar_sistema'):
+        nuevo_rol = Rol.SISTEMA if accion == 'aprobar_sistema' else Rol.CONTENIDO
+        u.rol = nuevo_rol
+        u.is_active = True
+        u.save(update_fields=['rol', 'is_active'])
+        sol.estado = EstadoSolicitudAdmin.APROBADA
+        sol.resuelta_por = request.user
+        sol.resuelta_en = timezone.now()
+        sol.save(update_fields=['estado', 'resuelta_por', 'resuelta_en'])
+        cerrar_sesiones(u)
+        RegistroAuditoria.registrar(request.user, Accion.EDITAR, u, f'Aprobó solicitud de {u.correo} como {u.get_rol_display()}')
+        messages.success(request, f'Aprobaste a {u.nombre} ({u.correo}) como {u.get_rol_display()}.')
+    elif accion == 'rechazar':
+        sol.estado = EstadoSolicitudAdmin.RECHAZADA
+        sol.resuelta_por = request.user
+        sol.resuelta_en = timezone.now()
+        sol.save(update_fields=['estado', 'resuelta_por', 'resuelta_en'])
+        RegistroAuditoria.registrar(request.user, Accion.EDITAR, u, f'Rechazó solicitud de administrador de {u.correo}')
+        messages.info(request, f'Rechazaste la solicitud de {u.nombre}.')
+    return redirect('cuentas:usuarios')
 
 
 @sistema_requerido

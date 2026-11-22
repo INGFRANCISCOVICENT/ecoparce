@@ -34,23 +34,46 @@
     <div class="portada-grid">
       <div class="portada-col-texto">
         <div class="portada-top-row">
-          <span class="portada-badge"><span class="pulso-verde"></span>BOGOTÁ · RED ECOLÓGICA · RES. 2184</span>
+          <span class="portada-badge"><span class="pulso-verde"></span>{% if user.is_authenticated %}SESIÓN ACTIVA · {{ user.get_rol_display|upper }}{% else %}BOGOTÁ · RED ECOLÓGICA · RES. 2184{% endif %}</span>
           <span class="ai-etiqueta" title="Ilustración realista de Escarlata asistida con IA">Ilustración IA</span>
         </div>
 
+        {% if user.is_authenticated %}
+        <h1 class="portada-titulo">¡Hola, <span class="portada-grad">{{ user.nombre.split.0 }}</span>!</h1>
+        <p class="portada-sub">Tu progreso ecológico se guarda automáticamente. Sigue sumando puntos, desbloquea medallas 3D y aporta a tu comunidad.</p>
+
+        <div class="mi-resumen-grid" aria-label="Tu resumen personal">
+          <div class="mi-stat"><strong>{{ mi_puntos }}</strong><span>Puntos</span></div>
+          <div class="mi-stat"><strong>{{ mi_insignias }}/{{ total_insignias }}</strong><span>Medallas 3D</span></div>
+          <div class="mi-stat"><strong>Nivel {{ mi_nivel }}</strong><span>Trivia</span></div>
+          <div class="mi-stat"><strong>{{ mi_sugerencias }}</strong><span>Sugerencias</span></div>
+        </div>
+
+        <div class="portada-ctas">
+          <a class="btn-cta-grad" href="{% url 'trivia:inicio' %}">Continuar Trivia →</a>
+          <a class="btn-cta-glass" href="{% url 'cuentas:mi_cuenta' %}">Mi cuenta y medallas</a>
+          {% if user.es_personal %}
+          <a class="btn-cta-admin" href="{% url 'estadisticas:resumen' %}">{% icono 'shield' 16 '#FDE047' %}Panel Admin</a>
+          {% else %}
+          <a class="btn-cta-sin-cuenta" href="{% url 'buscador:sugerir' %}">Dar sugerencia</a>
+          {% endif %}
+        </div>
+        {% if user.es_admin_sistema %}
+        <div class="row" style="margin-top:12px;gap:14px;flex-wrap:wrap">
+          <a class="portada-link-claro small" href="{% url 'cuentas:auditoria' %}">Ver historial de auditoría →</a>
+          <a class="portada-link-claro small" href="{% url 'cuentas:usuarios' %}">Aprobar solicitudes de admin →</a>
+        </div>
+        {% endif %}
+        {% else %}
         <h1 class="portada-titulo">Vuela limpio,<br><span class="portada-grad">separa bien.</span></h1>
         <p class="portada-sub">Aprende en segundos en qué bolsa va cada residuo, escanea empaques y ubica puntos posconsumo en vivo.</p>
 
         <div class="portada-ctas">
-          {% if user.is_authenticated %}
-          <a class="btn-cta-grad" href="{% url 'trivia:inicio' %}">Jugar Trivia →</a>
-          <a class="btn-cta-glass" href="{% url 'cuentas:mi_cuenta' %}">Mi cuenta</a>
-          {% else %}
           <a class="btn-cta-grad" href="{% url 'account_signup' %}">Crear cuenta gratis →</a>
           <a class="btn-cta-glass" href="{% url 'account_login' %}">Iniciar sesión</a>
-          {% endif %}
           <a class="btn-cta-sin-cuenta" href="#contenido">Explorar sin cuenta ↓</a>
         </div>
+        {% endif %}
       </div>
 
       <!-- Escarlata grande y realista volando en el lado derecho -->

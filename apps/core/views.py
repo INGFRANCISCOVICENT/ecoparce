@@ -7,11 +7,25 @@ def inicio(request):
     contenedores = {c.codigo: c for c in Contenedor.objects.all()}
     guias = {g.contenedor_id: g for g in Guia.publicadas.filter(tipo=TipoGuia.SEPARACION, contenedor__isnull=False)}
     bolsas = [(c, guias.get(c.pk)) for c in contenedores.values() if c.es_bolsa]
-    return render(request, 'core/inicio.html', {
+    contexto = {
         'bolsas': bolsas,
         'posconsumo': contenedores.get(Contenedor.POSCONSUMO),
         'manejo': Guia.publicadas.filter(tipo=TipoGuia.MANEJO)[:3],
-    })
+    }
+    if request.user.is_authenticated:
+        from apps.trivia.models import obtener_insignias, progreso_niveles
+        prog = progreso_niveles(usuario=request.user)
+        insignias = obtener_insignias(usuario=request.user)
+        nivel_max = max(nv for nv, ok in prog['desbloqueados'].items() if ok)
+        contexto.update({
+            'mi_puntos': prog['puntos_totales'],
+            'mi_partidas': prog['partidas_totales'],
+            'mi_nivel': nivel_max,
+            'mi_insignias': sum(1 for i in insignias if i['obtenida']),
+            'total_insignias': len(insignias),
+            'mi_sugerencias': request.user.sugerencias.count(),
+        })
+    return render(request, 'core/inicio.html', contexto)
 
 
 def privacidad(request):

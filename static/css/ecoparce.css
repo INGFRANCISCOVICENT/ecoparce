@@ -712,6 +712,20 @@ html[data-contraste="alto"] :focus-visible{outline:4px solid #000;outline-offset
   border:1px dashed rgba(125,211,252,.45);transition:background var(--tr),color var(--tr);
 }
 .btn-cta-sin-cuenta:hover{color:#fff;background:rgba(56,189,248,.16)}
+.btn-cta-admin{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:48px;padding:0 16px;
+  border-radius:14px;font-weight:800;font-size:14px;color:#FDE047;text-decoration:none;
+  background:rgba(250,204,21,.12);border:1px solid rgba(250,204,21,.48);transition:background var(--tr),color var(--tr);
+}
+.btn-cta-admin:hover{color:#fff;background:rgba(250,204,21,.24)}
+.mi-resumen-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 18px}
+@media (max-width:520px){.mi-resumen-grid{grid-template-columns:repeat(2,1fr)}}
+.mi-stat{
+  background:rgba(15,38,28,.75);border:1px solid rgba(74,222,128,.28);border-radius:14px;
+  padding:10px 12px;display:flex;flex-direction:column;gap:2px;
+}
+.mi-stat strong{font-family:Baloo,Nunito,sans-serif;font-size:20px;line-height:1.1;color:#4ADE80;font-variant-numeric:tabular-nums}
+.mi-stat span{font-size:12px;color:#CBD5E1;font-weight:700}
 
 /* ---------- modos de trivia, racha y medallas reales en 3D ---------- */
 .modo-card{display:flex;flex-direction:column;justify-content:space-between}

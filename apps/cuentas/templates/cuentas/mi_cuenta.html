@@ -54,6 +54,29 @@
   {% else %}<a class="card row" href="{% url 'account_set_password' %}">{% icono 'lock' 24 '#1E7A46' %}<span><strong>Crear una contraseña</strong><br><span class="small mut">Para entrar también sin Google</span></span><span class="ml">{% icono 'arrow' 22 '#1E7A46' %}</span></a>{% endif %}
 </div>
 
+{% if not user.es_personal %}
+<h2>Rol de administrador</h2>
+<section class="card">
+  {% if solicitud_pendiente %}
+  <div class="row">
+    <span class="ic" style="background:var(--yl)">{% icono 'clock' 22 '#7A5A00' %}</span>
+    <div>
+      <strong>Solicitud en revisión</strong>
+      <div class="small mut">Enviada el {{ solicitud_pendiente.creada_en|date:"j M Y, H:i" }}. El administrador del sistema revisará tu solicitud y podrá aprobarla desde el panel.</div>
+    </div>
+  </div>
+  {% else %}
+  <strong>¿Quieres colaborar como administrador de EcoParce?</strong>
+  <p class="small mut" style="margin-top:4px">Si haces parte del equipo o institución, envía una solicitud para que el administrador del sistema la apruebe.</p>
+  <form method="post" action="{% url 'cuentas:solicitar_admin' %}" style="margin-top:10px">{% csrf_token %}
+    <label for="id_motivo">¿Por qué deseas ser administrador?</label>
+    <textarea id="id_motivo" name="motivo" maxlength="300" required placeholder="Ej. Soy integrante del equipo EcoParce y quiero apoyar revisando guías y preguntas de trivia."></textarea>
+    <button class="btn o full" style="margin-top:10px" type="submit">{% icono 'shield' 18 '#1E7A46' %}Enviar solicitud de administrador</button>
+  </form>
+  {% endif %}
+</section>
+{% endif %}
+
 <h2>Mis datos y cancelación</h2>
 <p class="small mut">Según la Ley 1581 de 2012 puedes conocer, descargar y suprimir tus datos cuando quieras.{% if consentimiento %} Aceptaste los Términos y la Política de Privacidad el <strong>{{ consentimiento.aceptado_en|date:"j M Y, H:i" }}</strong> (versión {{ consentimiento.version }}).{% endif %}</p>
 <a class="btn o full" href="{% url 'cuentas:exportar' %}">{% icono 'down' 20 '#1E7A46' %}Descargar mis datos (JSON)</a>

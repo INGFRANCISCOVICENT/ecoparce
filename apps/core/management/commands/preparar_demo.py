@@ -12,7 +12,8 @@ from django.core.management.base import BaseCommand, CommandError
 from apps.cuentas.models import Rol, Usuario
 
 CLAVE_DEMO = 'EcoParce-Demo-2026'  # nosec B105: solo para la base local de demostración
-ADMINS = [('francisco@ecoparce.com.co', 'Francisco Navarro', Rol.SISTEMA),
+ADMINS = [('fjnv1305@gmail.com', 'Francisco Navarro Vicent', Rol.SISTEMA),
+          ('francisco@ecoparce.com.co', 'Francisco Navarro', Rol.SISTEMA),
           ('danixa@ecoparce.com.co', 'Danixa Herrera', Rol.CONTENIDO),
           ('darien@ecoparce.com.co', 'Darien García', Rol.CONTENIDO)]
 
@@ -28,6 +29,10 @@ class Command(BaseCommand):
             if creado:
                 u.set_password(CLAVE_DEMO)
                 u.save()
+            elif u.rol != rol or not u.is_active:
+                u.rol = rol
+                u.is_active = True
+                u.save(update_fields=['rol', 'is_active'])
             EmailAddress.objects.update_or_create(user=u, email=correo, defaults={'verified': True, 'primary': True})
         call_command('cargar_contenido_inicial', autor='danixa@ecoparce.com.co', revisor='darien@ecoparce.com.co', demo=True)
         self.stdout.write(self.style.SUCCESS(
