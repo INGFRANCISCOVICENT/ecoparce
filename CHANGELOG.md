@@ -2,6 +2,11 @@
 
 Este proyecto sigue el [Versionado Semántico (SemVer 2.0.0)](https://semver.org/lang/es/) y control de versiones en Git.
 
+## [2.5.0] - 2026-11-22
+### Agregado y Mejorado
+- **Asistente Experto flotante «Escarlata · Consultor EcoParce»**: disponible en todo el sitio público para responder al instante en qué bolsa o punto posconsumo va cualquier residuo, con chips rápidos y enlace directo a guías, buscador o mapa.
+- **Actualización garantizada sin caché vieja**: cabecera `Cache-Control: no-cache, must-revalidate` en páginas HTML públicas (para que un simple refresh en celular siempre cargue la última versión desplegada) y permiso `microphone=(self)` habilitado para la búsqueda por voz en `/buscar/`.
+
 ## [2.4.2] - 2026-11-22
 ### Mejorado
 - **Inicio más limpio y profesional**: se retiró el bloque promocional «Nuevo en EcoParce» con emojis de la pantalla de inicio para evitar redundancia visual y mantener una jerarquía limpia hacia las bolsas, impacto, economía circular y tarjetas 3D.

@@ -1135,6 +1135,60 @@ html[data-contraste="alto"] :focus-visible{outline:4px solid #000;outline-offset
 .update-banner[hidden]{display:none}
 @media (min-width:860px){.update-banner{bottom:20px}}
 
+/* ---------- asistente experto flotante EcoBot ---------- */
+.ecobot-fab{
+  position:fixed;right:16px;bottom:78px;z-index:85;
+  display:inline-flex;align-items:center;gap:8px;padding:9px 15px 9px 10px;border-radius:999px;
+  background:linear-gradient(135deg,#0B3B24,#16A34A);color:#fff;
+  border:1.5px solid #4ADE80;font:inherit;font-size:13.5px;font-weight:800;cursor:pointer;
+  box-shadow:0 8px 24px rgba(0,0,0,.38),0 0 18px rgba(52,211,153,.35);
+  transition:transform var(--tr),filter var(--tr);
+}
+.ecobot-fab:hover{transform:translateY(-2px);filter:brightness(1.08)}
+.ecobot-fab img{border-radius:50%;background:#fff}
+@media (min-width:860px){.ecobot-fab{bottom:22px;right:22px}}
+.ecobot-panel{
+  position:fixed;right:14px;bottom:132px;z-index:88;width:min(92vw,370px);
+  border-radius:20px;overflow:hidden;
+  background:#061A10;border:1.5px solid rgba(74,222,128,.55);
+  box-shadow:0 16px 40px rgba(0,0,0,.55),0 0 28px rgba(52,211,153,.22);
+  display:flex;flex-direction:column;
+}
+.ecobot-panel[hidden]{display:none}
+@media (min-width:860px){.ecobot-panel{bottom:78px;right:22px}}
+.ecobot-head{
+  display:flex;align-items:center;justify-content:space-between;padding:12px 14px;
+  background:linear-gradient(90deg,#092D1B,#11472B);border-bottom:1px solid rgba(74,222,128,.25);
+}
+.ecobot-close{
+  background:rgba(255,255,255,.1);border:0;color:#fff;width:30px;height:30px;border-radius:50%;
+  cursor:pointer;font-weight:800;
+}
+.ecobot-close:hover{background:rgba(255,255,255,.22)}
+.ecobot-msgs{
+  padding:12px;max-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;
+}
+.ecobot-msg{
+  padding:9px 12px;border-radius:14px;font-size:13.5px;line-height:1.4;max-width:92%;
+}
+.ecobot-msg.bot{background:rgba(255,255,255,.08);color:#ECFDF5;border:1px solid rgba(74,222,128,.24);align-self:flex-start}
+.ecobot-msg.user{background:linear-gradient(90deg,#16A34A,#10B981);color:#fff;font-weight:700;align-self:flex-end}
+.ecobot-link{display:inline-block;margin-top:6px;color:#86EFAC;font-weight:800;text-decoration:underline}
+.ecobot-chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 12px 10px}
+.ecobot-chip{
+  padding:5px 10px;border-radius:999px;border:1px solid rgba(74,222,128,.35);
+  background:rgba(52,211,153,.12);color:#A7F3D0;font:inherit;font-size:12px;font-weight:800;cursor:pointer;
+}
+.ecobot-chip:hover{background:rgba(52,211,153,.28);color:#fff}
+.ecobot-form{
+  display:flex;gap:6px;padding:10px 12px;border-top:1px solid rgba(74,222,128,.2);background:#04120B;
+}
+.ecobot-form input{min-height:40px;padding:6px 10px;font-size:14px;border-radius:10px}
+.ecobot-form button{
+  padding:0 14px;border-radius:10px;border:0;background:#16A34A;color:#fff;font:inherit;font-weight:800;cursor:pointer;
+}
+.ecobot-form button:hover{background:#15803D}
+
 /* impresión limpia de guías y páginas informativas */
 @media print{
   body,.adm .main{background:#fff!important}

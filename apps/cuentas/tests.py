@@ -466,11 +466,14 @@ class EncabezadosTests(TestCase):
         self.assertEqual(r_ver.json()['version'], ver)
         self.assertIn('no-store', r_ver['Cache-Control'])
 
-        # 2. Pie de página incluye la marca, el banner de actualización y sin etiqueta «Ilustración IA»
+        # 2. Pie de página incluye la marca, el banner de actualización, EcoBot y Cache-Control sin caché vieja
         r_home = self.client.get('/')
         self.assertContains(r_home, 'Francisco Navarro, Danixa Herrera y Darien García')
         self.assertContains(r_home, 'banner-actualizacion')
+        self.assertContains(r_home, 'ecobot-fab')
         self.assertNotContains(r_home, 'Ilustración IA')
+        self.assertIn('no-cache', r_home['Cache-Control'])
+        self.assertIn('microphone=(self)', r_home['Permissions-Policy'])
 
         # 3. /panel/versiones/ exige administrador y muestra el historial de versiones
         self.assertEqual(self.client.get('/panel/versiones/').status_code, 302)

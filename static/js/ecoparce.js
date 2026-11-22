@@ -377,4 +377,117 @@
     });
     setInterval(revisarVersion, 120000);
   }
+
+  // Asistente Experto Flotante «Escarlata · Consultor EcoParce» (100 % local y CSP-safe).
+  var botFab = document.getElementById('ecobot-fab');
+  var botPanel = document.getElementById('ecobot-panel');
+  var botCerrar = document.getElementById('ecobot-cerrar');
+  var botMsgs = document.getElementById('ecobot-msgs');
+  var botForm = document.getElementById('ecobot-form');
+  var botInput = document.getElementById('ecobot-input');
+  if (botFab && botPanel && botMsgs && botForm && botInput) {
+    var BASE_ECO = [
+      { keys: ['pizza', 'grasa', 'servilleta', 'higienico', 'panal', 'colilla', 'icopor', 'aluminio sucio', 'papel carbon', 'tapabocas'],
+        bolsa: 'Bolsa Negra (No aprovechables)',
+        tip: 'Los residuos con grasa, higiene personal o contaminados no se pueden reciclar. Ciérralos bien en la bolsa negra.',
+        link: '/guias/' },
+      { keys: ['vidrio roto', 'espejo', 'ceramica', 'loza'],
+        bolsa: 'Bolsa Negra (envuelto y marcado)',
+        tip: 'Nunca pongas vidrio roto suelto en la bolsa blanca: envuélvelo en cartón o periódico marcado «Vidrio roto» y deposítalo en bolsa negra para proteger a los recicladores.',
+        link: '/guias/' },
+      { keys: ['pet', 'botella', 'plastico', 'lata', 'aluminio', 'carton', 'papel', 'cuaderno', 'vidrio', 'tetrapak', 'tetra', 'caja de leche', 'tapa', 'metal', 'frasco'],
+        bolsa: 'Bolsa Blanca (Aprovechables)',
+        tip: 'Vacíalo, enjuágalo rápido si tenía líquidos, déjalo escurrir/secar y aplástalo para ahorrar espacio.',
+        link: '/escanear/' },
+      { keys: ['cascara', 'fruta', 'verdura', 'comida', 'cafe', 'cuncho', 'huevo', 'organico', 'hoja', 'poda', 'compost'],
+        bolsa: 'Bolsa Verde (Orgánicos aprovechables)',
+        tip: 'Separa restos vegetales crudos, cáscaras y cuncho de café sin bolsas plásticas mezcladas para aprovecharlos como abono.',
+        link: '/guias/' },
+      { keys: ['aceite', 'pila', 'bateria', 'bombillo', 'led', 'medicamento', 'medicina', 'jarabe', 'celular', 'cargador', 'cable', 'raee', 'electronico', 'llanta', 'pintura', 'computador'],
+        bolsa: 'Punto Posconsumo (Residuo especial)',
+        tip: 'Jamás va en las bolsas comunes ni al desagüe. Guárdalo aparte (aceite frío en botella cerrada; pilas en frasco seco) y llévalo a un punto autorizado.',
+        link: '/puntos/' },
+      { keys: ['2184', 'resolucion', 'norma', 'colores', 'bolsa blanca', 'bolsa negra', 'bolsa verde'],
+        bolsa: 'Resolución 2184 de 2019 (Colombia)',
+        tip: 'Código unificado nacional: Blanca (aprovechables limpios y secos), Negra (no aprovechables) y Verde (orgánicos aprovechables). Los peligrosos van a Posconsumo.',
+        link: '/guias/' }
+    ];
+
+    var normBot = function (s) {
+      return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+    };
+
+    var agregarMsg = function (texto, tipo, extraLink, extraLabel) {
+      var div = document.createElement('div');
+      div.className = 'ecobot-msg ' + tipo;
+      div.textContent = texto;
+      if (extraLink) {
+        var br = document.createElement('br');
+        var a = document.createElement('a');
+        a.href = extraLink;
+        a.className = 'ecobot-link';
+        a.textContent = extraLabel || 'Ver más en EcoParce →';
+        div.appendChild(br);
+        div.appendChild(a);
+      }
+      botMsgs.appendChild(div);
+      botMsgs.scrollTop = botMsgs.scrollHeight;
+    };
+
+    var responder = function (consulta) {
+      var q = consulta.trim();
+      if (!q) return;
+      agregarMsg(q, 'user');
+      var qn = normBot(q);
+      var match = null;
+      for (var i = 0; i < BASE_ECO.length; i++) {
+        for (var j = 0; j < BASE_ECO[i].keys.length; j++) {
+          if (qn.indexOf(BASE_ECO[i].keys[j]) !== -1) {
+            match = BASE_ECO[i];
+            break;
+          }
+        }
+        if (match) break;
+      }
+      if (match) {
+        agregarMsg(
+          match.bolsa + ': ' + match.tip,
+          'bot',
+          match.link,
+          match.link === '/puntos/' ? 'Abrir mapa de puntos Posconsumo →' : 'Ver guía oficial →'
+        );
+      } else {
+        agregarMsg(
+          'Puedo buscar «' + q + '» directamente en la base completa de residuos de EcoParce para darte la instrucción exacta.',
+          'bot',
+          '/buscar/?q=' + encodeURIComponent(q),
+          'Buscar «' + q + '» en el buscador →'
+        );
+      }
+    };
+
+    var toggleBot = function (abrir) {
+      var estado = typeof abrir === 'boolean' ? abrir : botPanel.hidden;
+      botPanel.hidden = !estado;
+      botFab.setAttribute('aria-expanded', String(estado));
+      if (estado) botInput.focus();
+    };
+
+    botFab.addEventListener('click', function () { toggleBot(); });
+    if (botCerrar) botCerrar.addEventListener('click', function () { toggleBot(false); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !botPanel.hidden) toggleBot(false);
+    });
+    botPanel.querySelectorAll('[data-ecobot-q]').forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        responder(chip.getAttribute('data-ecobot-q') || '');
+      });
+    });
+    botForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var val = botInput.value;
+      botInput.value = '';
+      responder(val);
+    });
+  }
 })();

@@ -11,8 +11,10 @@ class CabecerasSeguridadMiddleware:
     def __call__(self, request):
         respuesta = self.get_response(request)
         respuesta.setdefault('Content-Security-Policy', self.CSP)
-        respuesta.setdefault('Permissions-Policy', 'camera=(self), microphone=(), geolocation=(self), interest-cohort=()')
+        respuesta.setdefault('Permissions-Policy', 'camera=(self), microphone=(self), geolocation=(self), interest-cohort=()')
         respuesta.setdefault('Cross-Origin-Resource-Policy', 'same-origin')
         if request.path.startswith(('/panel/', '/cuenta/', '/accounts/')):
             respuesta['Cache-Control'] = 'no-store'
+        elif 'text/html' in (respuesta.get('Content-Type') or ''):
+            respuesta.setdefault('Cache-Control', 'no-cache, must-revalidate')
         return respuesta
