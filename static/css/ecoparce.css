@@ -591,6 +591,39 @@ html[data-contraste="alto"] :focus-visible{outline:4px solid #000;outline-offset
   display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;margin-bottom:4px;
 }
 
+/* calculadora interactiva de impacto ambiental */
+.calc-eco{padding:20px 22px;border:1.5px solid #A9D4BA;background:linear-gradient(180deg,#FFFFFF 0%,#F3FBF6 100%);box-shadow:var(--sh-sm)}
+.calc-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.calc-rango{
+  display:inline-flex;align-items:center;padding:6px 14px;border-radius:999px;
+  background:linear-gradient(90deg,var(--g),#10B981);color:#fff;font-weight:800;font-size:13.5px;
+  box-shadow:0 4px 12px rgba(30,122,70,.24);
+}
+.calc-grid{display:grid;grid-template-columns:1fr;gap:18px;align-items:center}
+@media (min-width:760px){.calc-grid{grid-template-columns:1.15fr 1fr;gap:24px}}
+.calc-controles{display:flex;flex-direction:column;gap:14px}
+.calc-ctrl label{font-size:14px;font-weight:700;color:var(--ink)}
+.calc-ctrl strong{font-size:16px;color:var(--gd);font-variant-numeric:tabular-nums}
+.eco-range{width:100%;accent-color:var(--g);height:6px;cursor:pointer;margin-top:6px}
+.calc-resultados{display:grid;grid-template-columns:1fr;gap:10px}
+.calc-kpi{
+  background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:var(--sh-xs);
+}
+.calc-kpi small{font-size:13.5px;font-weight:700;color:var(--mut)}
+.calc-kpi div{font-family:Baloo,Nunito,sans-serif;font-size:24px;font-weight:800;color:var(--gd);font-variant-numeric:tabular-nums}
+
+/* línea de tiempo de degradación */
+.degradacion-lista{display:flex;flex-direction:column;gap:12px;padding:18px 20px}
+.deg-bar{height:10px;background:#E2ECE6;border-radius:999px;overflow:hidden;margin-top:6px}
+.deg-bar i{display:block;height:100%;border-radius:999px}
+
+/* preguntas frecuentes (acordeón nativo accesible) */
+.faq-item summary{cursor:pointer;font-weight:800;font-size:15.5px;color:var(--ink);list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary::after{content:"+";font-size:20px;font-weight:800;color:var(--g);flex:none;transition:transform var(--tr)}
+.faq-item[open] summary::after{content:"−";color:var(--gd)}
+
 /* decodificador interactivo de etiquetas y símbolos de reciclaje */
 .simbolos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 14px}
 @media (min-width:580px){.simbolos-grid{grid-template-columns:repeat(6,1fr)}}

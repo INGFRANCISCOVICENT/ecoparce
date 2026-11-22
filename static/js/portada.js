@@ -120,4 +120,49 @@
       }
     });
   }
+
+  // 4. Calculadora interactiva de impacto ambiental anual en el hogar
+  var slPet = document.getElementById('sl-pet');
+  var slLatas = document.getElementById('sl-latas');
+  var slCarton = document.getElementById('sl-carton');
+  var slAceite = document.getElementById('sl-aceite');
+  if (slPet && slLatas && slCarton && slAceite) {
+    var actualizarCalc = function () {
+      var pet = parseInt(slPet.value, 10) || 0;
+      var latas = parseInt(slLatas.value, 10) || 0;
+      var carton = parseInt(slCarton.value, 10) || 0;
+      var aceite = parseInt(slAceite.value, 10) || 0;
+
+      document.getElementById('val-pet').textContent = pet;
+      document.getElementById('val-latas').textContent = latas;
+      document.getElementById('val-carton').textContent = carton;
+      document.getElementById('val-aceite').textContent = aceite;
+
+      // Factores educativos anuales aproximados:
+      // PET: ~0.08 kg CO2 y 3 h LED por botella; Aluminio: ~0.13 kg CO2 y 3 h LED por lata;
+      // Cartón: ~0.22 kg CO2 por caja; Aceite usado: 1.000 L agua protegida por litro/mes.
+      var co2 = Math.round((pet * 0.08 + latas * 0.13 + carton * 0.22) * 52);
+      var agua = aceite * 12 * 1000;
+      var horasLed = (pet * 3 + latas * 3) * 52;
+
+      document.getElementById('res-co2').textContent = co2.toLocaleString('es-CO') + ' kg';
+      document.getElementById('res-agua').textContent = agua.toLocaleString('es-CO') + ' L';
+      document.getElementById('res-energia').textContent = horasLed.toLocaleString('es-CO') + ' h LED';
+
+      var nivel = document.getElementById('calc-nivel');
+      if (nivel) {
+        if (co2 >= 120 || agua >= 24000) {
+          nivel.textContent = 'Hogar Campeón Ambiental';
+        } else if (co2 >= 40 || agua >= 12000) {
+          nivel.textContent = 'Hogar Guardián';
+        } else {
+          nivel.textContent = 'Hogar Semilla';
+        }
+      }
+    };
+    [slPet, slLatas, slCarton, slAceite].forEach(function (el) {
+      el.addEventListener('input', actualizarCalc);
+    });
+    actualizarCalc();
+  }
 })();

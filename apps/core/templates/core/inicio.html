@@ -145,6 +145,78 @@
   </article>
 </div>
 
+<!-- Calculadora interactiva de impacto ambiental en casa -->
+<section class="card calc-eco" style="margin-top:26px" aria-labelledby="tit-calc">
+  <div class="calc-head">
+    <div>
+      <span class="st s-pub">Herramienta interactiva</span>
+      <h2 id="tit-calc" style="margin:6px 0 4px">Calcula tu impacto ambiental anual</h2>
+      <p class="small mut" style="margin:0">Mueve los controles según lo que separas en casa y descubre cuánto ayudas al planeta en un año.</p>
+    </div>
+    <span class="calc-rango" id="calc-nivel">Hogar Guardián</span>
+  </div>
+  <div class="calc-grid">
+    <div class="calc-controles">
+      <div class="calc-ctrl">
+        <div class="row" style="justify-content:space-between"><label for="sl-pet" style="margin:0">Botellas PET / semana</label><strong id="val-pet">6</strong></div>
+        <input id="sl-pet" type="range" min="0" max="30" value="6" class="eco-range">
+      </div>
+      <div class="calc-ctrl">
+        <div class="row" style="justify-content:space-between"><label for="sl-latas" style="margin:0">Latas de aluminio / semana</label><strong id="val-latas">4</strong></div>
+        <input id="sl-latas" type="range" min="0" max="20" value="4" class="eco-range">
+      </div>
+      <div class="calc-ctrl">
+        <div class="row" style="justify-content:space-between"><label for="sl-carton" style="margin:0">Cajas de cartón / semana</label><strong id="val-carton">3</strong></div>
+        <input id="sl-carton" type="range" min="0" max="15" value="3" class="eco-range">
+      </div>
+      <div class="calc-ctrl">
+        <div class="row" style="justify-content:space-between"><label for="sl-aceite" style="margin:0">Litros de aceite en botella / mes</label><strong id="val-aceite">1</strong></div>
+        <input id="sl-aceite" type="range" min="0" max="5" value="1" class="eco-range">
+      </div>
+    </div>
+    <div class="calc-resultados" aria-live="polite">
+      <div class="calc-kpi">
+        <small>CO₂ evitado al año</small>
+        <div id="res-co2">61 kg</div>
+      </div>
+      <div class="calc-kpi">
+        <small>Agua protegida al año</small>
+        <div id="res-agua">12.000 L</div>
+      </div>
+      <div class="calc-kpi">
+        <small>Energía ahorrada al año</small>
+        <div id="res-energia">1.560 h LED</div>
+      </div>
+      <p class="xs mut" style="margin:6px 0 0">Estimación educativa basada en factores estándar de aprovechamiento (PET, aluminio, cartón y aceite usado).</p>
+    </div>
+  </div>
+</section>
+
+<!-- Línea de tiempo de degradación -->
+<h2>¿Cuánto tarda en degradarse si NO lo reciclas?</h2>
+<section class="card degradacion-lista">
+  <div class="deg-item">
+    <div class="row" style="justify-content:space-between"><strong>Cáscara de fruta (Bolsa Verde)</strong><span class="tag">2 – 6 meses</span></div>
+    <div class="deg-bar"><i style="width:10%;background:#2E7D32"></i></div>
+  </div>
+  <div class="deg-item">
+    <div class="row" style="justify-content:space-between"><strong>Colilla de cigarrillo (Bolsa Negra)</strong><span class="tag">~10 años</span></div>
+    <div class="deg-bar"><i style="width:24%;background:#64748B"></i></div>
+  </div>
+  <div class="deg-item">
+    <div class="row" style="justify-content:space-between"><strong>Lata de aluminio (Bolsa Blanca)</strong><span class="tag">~200 años</span></div>
+    <div class="deg-bar"><i style="width:52%;background:#1F4FA3"></i></div>
+  </div>
+  <div class="deg-item">
+    <div class="row" style="justify-content:space-between"><strong>Botella plástica PET (Bolsa Blanca)</strong><span class="tag">~450 años</span></div>
+    <div class="deg-bar"><i style="width:76%;background:#D97706"></i></div>
+  </div>
+  <div class="deg-item">
+    <div class="row" style="justify-content:space-between"><strong>Botella de vidrio (Bolsa Blanca)</strong><span class="tag">+4.000 años (¡pero es 100 % reciclable!)</span></div>
+    <div class="deg-bar"><i style="width:100%;background:#C81E1E"></i></div>
+  </div>
+</section>
+
 <h2>Cómo usar EcoParce en 3 pasos</h2>
 <div class="grid g3">
   <div class="card paso-card">
@@ -162,6 +234,30 @@
     <strong>Juega y gana medallas 3D</strong>
     <p class="small mut" style="margin:4px 0 0">Supera los 3 niveles de la trivia, desmiente mitos y colecciona tus insignias ecológicas.</p>
   </div>
+</div>
+
+<h2>Preguntas frecuentes sobre reciclaje en Colombia</h2>
+<div class="lista faq-lista">
+  <details class="card faq-item">
+    <summary>¿Debo lavar con jabón los envases antes de ponerlos en la bolsa blanca?</summary>
+    <p class="small mut" style="margin:8px 0 0">No hace falta gastar agua ni jabón de más: basta con vaciar bien el contenido, dar un enjuague rápido si tenía líquidos o lácteos y dejar escurrir para que no ensucie el papel ni el cartón.</p>
+  </details>
+  <details class="card faq-item">
+    <summary>¿Las cajas de leche o jugo (Tetra Pak) sí se reciclan en Colombia?</summary>
+    <p class="small mut" style="margin:8px 0 0">Sí. En Colombia los envases multicapa van en la <strong>bolsa blanca</strong>: vacíalos, enjuágalos, abre las esquinas, aplástalos y déjalos secos.</p>
+  </details>
+  <details class="card faq-item">
+    <summary>¿Qué pasa si meto una servilleta usada o cartón con grasa en la bolsa blanca?</summary>
+    <p class="small mut" style="margin:8px 0 0">La grasa y los restos de comida dañan las fibras del papel y cartón limpio, haciendo que el reciclador pierda material aprovechable. Todo papel o cartón con grasa va en la <strong>bolsa negra</strong>.</p>
+  </details>
+  <details class="card faq-item">
+    <summary>¿Dónde llevo pilas, bombillos, aceite usado o medicamentos vencidos?</summary>
+    <p class="small mut" style="margin:8px 0 0">Nunca van en las bolsas comunes. Guárdalos aparte y consulta los <a href="{% url 'contenidos:puntos' %}">puntos oficiales posconsumo en el mapa</a>.</p>
+  </details>
+  <details class="card faq-item">
+    <summary>¿Necesito crear una cuenta para usar EcoParce?</summary>
+    <p class="small mut" style="margin:8px 0 0">No. Todas las guías, el buscador, el escáner, el mapa y la trivia funcionan <strong>sin cuenta y 100 % gratis</strong>. Crear cuenta es opcional para guardar tus medallas 3D y progreso.</p>
+  </details>
 </div>
 
 <h2>Participa y comparte</h2>
