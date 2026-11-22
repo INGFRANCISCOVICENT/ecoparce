@@ -2,6 +2,11 @@
 
 Este proyecto sigue el [Versionado Semántico (SemVer 2.0.0)](https://semver.org/lang/es/) y control de versiones en Git.
 
+## [2.6.0] - 2026-11-22
+### Seguridad, Arquitectura y Chat Profesional
+- **Asistente EcoBot conectado en tiempo real a la base oficial (`/asistente/consultar/`)**: consulta el catálogo real de residuos y guías con rate-limiting (45 req/min), tarjetas estructuradas por color de bolsa, pasos de preparación, chips relacionados, botón «Limpiar», memoria de sesión (`sessionStorage`) y renderizado DOM 100 % seguro contra XSS.
+- **Endurecimiento de producción y despliegue**: nuevo healthcheck real de base de datos (`/health/`) configurado en `render.yaml`, `conn_health_checks=True` para PostgreSQL en Render, límite de payload POST (`2.5 MB`) y auditoría completa de seguridad y calidad aprobada.
+
 ## [2.5.0] - 2026-11-22
 ### Agregado y Mejorado
 - **Asistente Experto flotante «Escarlata · Consultor EcoParce»**: disponible en todo el sitio público para responder al instante en qué bolsa o punto posconsumo va cualquier residuo, con chips rápidos y enlace directo a guías, buscador o mapa.

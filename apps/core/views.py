@@ -49,6 +49,21 @@ def version_json(request):
     return resp
 
 
+def health(request):
+    """Healthcheck de producción: verifica conectividad real a la base de datos."""
+    from django.db import connection
+    from django.http import JsonResponse
+    from apps.core.context_processors import app_version
+    try:
+        with connection.cursor() as cur:
+            cur.execute('SELECT 1')
+        resp = JsonResponse({'status': 'ok', 'version': app_version()})
+    except Exception:
+        resp = JsonResponse({'status': 'error'}, status=503)
+    resp['Cache-Control'] = 'no-store'
+    return resp
+
+
 def _parsear_changelog():
     """Lee CHANGELOG.md y devuelve una lista estructurada por versión para el panel admin."""
     import re

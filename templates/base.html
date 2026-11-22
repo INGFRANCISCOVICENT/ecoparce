@@ -67,29 +67,36 @@
   <img src="{% static 'img/logo-96.png' %}" alt="" width="28" height="28">
   <span>Asistente Eco</span>
 </button>
-<section id="ecobot-panel" class="ecobot-panel" role="dialog" aria-label="Asistente experto EcoParce" hidden>
+<section id="ecobot-panel" class="ecobot-panel" role="dialog" aria-label="Asistente experto EcoParce" data-api="{% url 'buscador:asistente_consultar' %}" hidden>
   <header class="ecobot-head">
     <div class="row" style="gap:8px">
-      <img src="{% static 'img/logo-96.png' %}" alt="" width="34" height="34" style="border-radius:50%;background:#fff">
+      <div class="ecobot-avatar-wrap">
+        <img src="{% static 'img/logo-96.png' %}" alt="" width="36" height="36">
+        <span class="ecobot-online" aria-hidden="true"></span>
+      </div>
       <div>
-        <strong style="display:block;font-size:15px;color:#fff">Escarlata · Consultor Experto</strong>
-        <span class="xs" style="color:#A7F3D0">Resolución 2184 · Respuesta inmediata</span>
+        <strong style="display:block;font-size:15px;color:#fff">Escarlata · Consultor Eco</strong>
+        <span class="xs" style="color:#A7F3D0">Conectado a la base oficial · Res. 2184</span>
       </div>
     </div>
-    <button type="button" id="ecobot-cerrar" class="ecobot-close" aria-label="Cerrar asistente">✕</button>
+    <div class="row" style="gap:6px">
+      <button type="button" id="ecobot-limpiar" class="ecobot-clear" title="Limpiar conversación" aria-label="Limpiar conversación">Limpiar</button>
+      <button type="button" id="ecobot-cerrar" class="ecobot-close" aria-label="Cerrar asistente">✕</button>
+    </div>
   </header>
   <div id="ecobot-msgs" class="ecobot-msgs" aria-live="polite">
-    <div class="ecobot-msg bot">¡Hola! Escribe cualquier residuo o duda (ej. <strong>aceite</strong>, <strong>tetrapak</strong>, <strong>vidrio roto</strong>, <strong>pilas</strong>) y te digo al instante en qué bolsa o punto va.</div>
+    <div class="ecobot-msg bot">¡Hola! Soy <strong>Escarlata</strong>. Escribe cualquier residuo (ej. <strong>caja de pizza</strong>, <strong>aceite</strong>, <strong>tetrapak</strong>, <strong>vidrio roto</strong>) y te indico la bolsa exacta y cómo prepararlo.</div>
   </div>
   <div class="ecobot-chips" role="group" aria-label="Consultas rápidas">
-    <button type="button" class="ecobot-chip" data-ecobot-q="caja de pizza">Caja de pizza</button>
-    <button type="button" class="ecobot-chip" data-ecobot-q="aceite usado">Aceite usado</button>
+    <button type="button" class="ecobot-chip" data-ecobot-q="botella">Botella PET</button>
+    <button type="button" class="ecobot-chip" data-ecobot-q="aceite">Aceite usado</button>
     <button type="button" class="ecobot-chip" data-ecobot-q="tetrapak">Tetra Pak</button>
     <button type="button" class="ecobot-chip" data-ecobot-q="pilas">Pilas</button>
+    <button type="button" class="ecobot-chip" data-ecobot-q="resolucion 2184">Res. 2184</button>
   </div>
   <form id="ecobot-form" class="ecobot-form" autocomplete="off">
     <label class="sr" for="ecobot-input">Escribe un residuo o pregunta</label>
-    <input id="ecobot-input" type="text" placeholder="¿Dónde va...? (ej. bombillo, icopor)" maxlength="90" required>
+    <input id="ecobot-input" type="text" placeholder="¿Qué vas a botar? (ej. bombillo, icopor)" maxlength="100" required>
     <button type="submit">Enviar</button>
   </form>
 </section>

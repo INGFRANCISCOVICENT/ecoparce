@@ -484,3 +484,32 @@ class EncabezadosTests(TestCase):
         self.assertContains(r_panel, f'v{ver}')
         self.assertContains(r_panel, 'Control de versiones')
         self.assertContains(r_panel, 'Francisco Navarro, Danixa Herrera y Darien García')
+
+    def test_healthcheck_y_api_asistente_ecobot(self):
+        from apps.core.context_processors import app_version
+
+        # 1. Healthcheck de producción verifica BD y responde sin caché
+        r_hp = self.client.get('/health/')
+        self.assertEqual(r_hp.status_code, 200)
+        self.assertEqual(r_hp.json()['status'], 'ok')
+        self.assertEqual(r_hp.json()['version'], app_version())
+        self.assertIn('no-store', r_hp['Cache-Control'])
+
+        # 2. API EcoBot consulta residuos reales publicados y normas Res. 2184
+        _, autor, revisor = P.usuarios()
+        P.residuo('Botella PET transparente', autor, revisor, codigo='BLANCA')
+        r_bot = self.client.get('/asistente/consultar/', {'q': 'botella'})
+        self.assertEqual(r_bot.status_code, 200)
+        datos = r_bot.json()
+        self.assertTrue(datos['encontrado'])
+        self.assertEqual(datos['codigo'], 'BLANCA')
+        self.assertIn('no-store', r_bot['Cache-Control'])
+
+        r_norm = self.client.get('/asistente/consultar/', {'q': 'resolucion 2184'})
+        self.assertEqual(r_norm.status_code, 200)
+        self.assertTrue(r_norm.json()['encontrado'])
+
+        # 3. Término inexistente devuelve sugerencia segura sin romper
+        r_no = self.client.get('/asistente/consultar/', {'q': '<script>alert(1)</script>'})
+        self.assertEqual(r_no.status_code, 200)
+        self.assertFalse(r_no.json()['encontrado'])

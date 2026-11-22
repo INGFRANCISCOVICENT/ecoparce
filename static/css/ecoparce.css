@@ -1160,20 +1160,48 @@ html[data-contraste="alto"] :focus-visible{outline:4px solid #000;outline-offset
   display:flex;align-items:center;justify-content:space-between;padding:12px 14px;
   background:linear-gradient(90deg,#092D1B,#11472B);border-bottom:1px solid rgba(74,222,128,.25);
 }
+.ecobot-avatar-wrap{position:relative;width:36px;height:36px;flex:none}
+.ecobot-avatar-wrap img{border-radius:50%;background:#fff;display:block}
+.ecobot-online{
+  position:absolute;right:0;bottom:0;width:10px;height:10px;border-radius:50%;
+  background:#22C55E;border:2px solid #092D1B;
+}
+.ecobot-clear{
+  padding:4px 9px;border-radius:8px;border:1px solid rgba(167,243,208,.3);
+  background:rgba(255,255,255,.08);color:#D1FAE5;font:inherit;font-size:11.5px;font-weight:800;cursor:pointer;
+}
+.ecobot-clear:hover{background:rgba(255,255,255,.18);color:#fff}
 .ecobot-close{
   background:rgba(255,255,255,.1);border:0;color:#fff;width:30px;height:30px;border-radius:50%;
   cursor:pointer;font-weight:800;
 }
 .ecobot-close:hover{background:rgba(255,255,255,.22)}
 .ecobot-msgs{
-  padding:12px;max-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;
+  padding:12px;max-height:290px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;
 }
 .ecobot-msg{
-  padding:9px 12px;border-radius:14px;font-size:13.5px;line-height:1.4;max-width:92%;
+  padding:10px 12px;border-radius:14px;font-size:13.5px;line-height:1.42;max-width:94%;
 }
 .ecobot-msg.bot{background:rgba(255,255,255,.08);color:#ECFDF5;border:1px solid rgba(74,222,128,.24);align-self:flex-start}
 .ecobot-msg.user{background:linear-gradient(90deg,#16A34A,#10B981);color:#fff;font-weight:700;align-self:flex-end}
-.ecobot-link{display:inline-block;margin-top:6px;color:#86EFAC;font-weight:800;text-decoration:underline}
+.ecobot-typing{font-style:italic;color:#A7F3D0;opacity:.85}
+.ecobot-bolsa-badge{
+  display:inline-block;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:800;margin-bottom:5px;
+}
+.ecobot-bolsa-badge.bolsa-blanca{background:#F8FAFC;color:#0F172A}
+.ecobot-bolsa-badge.bolsa-negra{background:#334155;color:#F8FAFC;border:1px solid #64748B}
+.ecobot-bolsa-badge.bolsa-verde{background:#16A34A;color:#fff}
+.ecobot-bolsa-badge.bolsa-posconsumo{background:#DC2626;color:#fff}
+.ecobot-res-tit{display:block;font-size:14.5px;color:#fff;margin-bottom:4px}
+.ecobot-pasos{list-style:none;margin:4px 0 6px;padding:0;display:flex;flex-direction:column;gap:3px;font-size:12.5px;color:#D1FAE5}
+.ecobot-acciones{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ecobot-link-btn{
+  display:inline-block;padding:5px 10px;border-radius:8px;font-size:12px;font-weight:800;
+  text-decoration:none;background:#16A34A;color:#fff;
+}
+.ecobot-link-btn.sec{background:rgba(255,255,255,.1);color:#A7F3D0;border:1px solid rgba(74,222,128,.35)}
+.ecobot-link-btn:hover{filter:brightness(1.1);color:#fff}
+.ecobot-rel{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;padding-top:7px;border-top:1px solid rgba(255,255,255,.1)}
 .ecobot-chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 12px 10px}
 .ecobot-chip{
   padding:5px 10px;border-radius:999px;border:1px solid rgba(74,222,128,.35);

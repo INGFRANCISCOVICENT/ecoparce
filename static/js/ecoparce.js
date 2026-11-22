@@ -378,93 +378,170 @@
     setInterval(revisarVersion, 120000);
   }
 
-  // Asistente Experto Flotante «Escarlata · Consultor EcoParce» (100 % local y CSP-safe).
+  // Asistente Experto Flotante «Escarlata · Consultor Eco» conectado a /asistente/consultar/ (CSP & XSS safe).
   var botFab = document.getElementById('ecobot-fab');
   var botPanel = document.getElementById('ecobot-panel');
   var botCerrar = document.getElementById('ecobot-cerrar');
+  var botLimpiar = document.getElementById('ecobot-limpiar');
   var botMsgs = document.getElementById('ecobot-msgs');
   var botForm = document.getElementById('ecobot-form');
   var botInput = document.getElementById('ecobot-input');
   if (botFab && botPanel && botMsgs && botForm && botInput) {
-    var BASE_ECO = [
-      { keys: ['pizza', 'grasa', 'servilleta', 'higienico', 'panal', 'colilla', 'icopor', 'aluminio sucio', 'papel carbon', 'tapabocas'],
-        bolsa: 'Bolsa Negra (No aprovechables)',
-        tip: 'Los residuos con grasa, higiene personal o contaminados no se pueden reciclar. Ciérralos bien en la bolsa negra.',
-        link: '/guias/' },
-      { keys: ['vidrio roto', 'espejo', 'ceramica', 'loza'],
-        bolsa: 'Bolsa Negra (envuelto y marcado)',
-        tip: 'Nunca pongas vidrio roto suelto en la bolsa blanca: envuélvelo en cartón o periódico marcado «Vidrio roto» y deposítalo en bolsa negra para proteger a los recicladores.',
-        link: '/guias/' },
-      { keys: ['pet', 'botella', 'plastico', 'lata', 'aluminio', 'carton', 'papel', 'cuaderno', 'vidrio', 'tetrapak', 'tetra', 'caja de leche', 'tapa', 'metal', 'frasco'],
-        bolsa: 'Bolsa Blanca (Aprovechables)',
-        tip: 'Vacíalo, enjuágalo rápido si tenía líquidos, déjalo escurrir/secar y aplástalo para ahorrar espacio.',
-        link: '/escanear/' },
-      { keys: ['cascara', 'fruta', 'verdura', 'comida', 'cafe', 'cuncho', 'huevo', 'organico', 'hoja', 'poda', 'compost'],
-        bolsa: 'Bolsa Verde (Orgánicos aprovechables)',
-        tip: 'Separa restos vegetales crudos, cáscaras y cuncho de café sin bolsas plásticas mezcladas para aprovecharlos como abono.',
-        link: '/guias/' },
-      { keys: ['aceite', 'pila', 'bateria', 'bombillo', 'led', 'medicamento', 'medicina', 'jarabe', 'celular', 'cargador', 'cable', 'raee', 'electronico', 'llanta', 'pintura', 'computador'],
-        bolsa: 'Punto Posconsumo (Residuo especial)',
-        tip: 'Jamás va en las bolsas comunes ni al desagüe. Guárdalo aparte (aceite frío en botella cerrada; pilas en frasco seco) y llévalo a un punto autorizado.',
-        link: '/puntos/' },
-      { keys: ['2184', 'resolucion', 'norma', 'colores', 'bolsa blanca', 'bolsa negra', 'bolsa verde'],
-        bolsa: 'Resolución 2184 de 2019 (Colombia)',
-        tip: 'Código unificado nacional: Blanca (aprovechables limpios y secos), Negra (no aprovechables) y Verde (orgánicos aprovechables). Los peligrosos van a Posconsumo.',
-        link: '/guias/' }
-    ];
+    var apiBase = botPanel.getAttribute('data-api') || '/asistente/consultar/';
+    var HIST_KEY = 'ecoparce_ecobot_hist';
+    var bienvenidaHtml = botMsgs.innerHTML;
 
-    var normBot = function (s) {
-      return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+    var leerHist = function () {
+      try { return JSON.parse(sessionStorage.getItem(HIST_KEY) || '[]'); }
+      catch (_) { return []; }
+    };
+    var guardarHist = function (items) {
+      try { sessionStorage.setItem(HIST_KEY, JSON.stringify(items.slice(-16))); } catch (_) {}
     };
 
-    var agregarMsg = function (texto, tipo, extraLink, extraLabel) {
+    var crearBurbujaUsuario = function (texto) {
       var div = document.createElement('div');
-      div.className = 'ecobot-msg ' + tipo;
+      div.className = 'ecobot-msg user';
       div.textContent = texto;
-      if (extraLink) {
-        var br = document.createElement('br');
-        var a = document.createElement('a');
-        a.href = extraLink;
-        a.className = 'ecobot-link';
-        a.textContent = extraLabel || 'Ver más en EcoParce →';
-        div.appendChild(br);
-        div.appendChild(a);
-      }
       botMsgs.appendChild(div);
       botMsgs.scrollTop = botMsgs.scrollHeight;
     };
 
-    var responder = function (consulta) {
-      var q = consulta.trim();
-      if (!q) return;
-      agregarMsg(q, 'user');
-      var qn = normBot(q);
-      var match = null;
-      for (var i = 0; i < BASE_ECO.length; i++) {
-        for (var j = 0; j < BASE_ECO[i].keys.length; j++) {
-          if (qn.indexOf(BASE_ECO[i].keys[j]) !== -1) {
-            match = BASE_ECO[i];
-            break;
-          }
+    var crearBurbujaResultado = function (data) {
+      var div = document.createElement('div');
+      div.className = 'ecobot-msg bot';
+
+      if (data.error) {
+        div.textContent = data.error;
+        botMsgs.appendChild(div);
+        botMsgs.scrollTop = botMsgs.scrollHeight;
+        return;
+      }
+
+      if (data.encontrado) {
+        var badge = document.createElement('span');
+        badge.className = 'ecobot-bolsa-badge bolsa-' + String(data.codigo || 'VERDE').toLowerCase();
+        badge.textContent = data.contenedor || 'Separación';
+        div.appendChild(badge);
+
+        var tit = document.createElement('strong');
+        tit.className = 'ecobot-res-tit';
+        tit.textContent = data.residuo || '';
+        div.appendChild(tit);
+
+        if (Array.isArray(data.pasos) && data.pasos.length) {
+          var ul = document.createElement('ul');
+          ul.className = 'ecobot-pasos';
+          data.pasos.forEach(function (p) {
+            var li = document.createElement('li');
+            li.textContent = '✓ ' + p;
+            ul.appendChild(li);
+          });
+          div.appendChild(ul);
         }
-        if (match) break;
-      }
-      if (match) {
-        agregarMsg(
-          match.bolsa + ': ' + match.tip,
-          'bot',
-          match.link,
-          match.link === '/puntos/' ? 'Abrir mapa de puntos Posconsumo →' : 'Ver guía oficial →'
-        );
+
+        var acciones = document.createElement('div');
+        acciones.className = 'ecobot-acciones';
+        if (data.puntos_url) {
+          var aP = document.createElement('a');
+          aP.href = data.puntos_url;
+          aP.className = 'ecobot-link-btn';
+          aP.textContent = 'Ver puntos cercanos →';
+          acciones.appendChild(aP);
+        }
+        if (data.guia_url) {
+          var aG = document.createElement('a');
+          aG.href = data.guia_url;
+          aG.className = 'ecobot-link-btn sec';
+          aG.textContent = data.guia_titulo || 'Ver guía oficial →';
+          acciones.appendChild(aG);
+        }
+        if (acciones.childNodes.length) div.appendChild(acciones);
+
+        if (Array.isArray(data.relacionados) && data.relacionados.length) {
+          var rel = document.createElement('div');
+          rel.className = 'ecobot-rel';
+          data.relacionados.forEach(function (nombre) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'ecobot-chip';
+            b.textContent = nombre;
+            b.addEventListener('click', function () { consultar(nombre); });
+            rel.appendChild(b);
+          });
+          div.appendChild(rel);
+        }
       } else {
-        agregarMsg(
-          'Puedo buscar «' + q + '» directamente en la base completa de residuos de EcoParce para darte la instrucción exacta.',
-          'bot',
-          '/buscar/?q=' + encodeURIComponent(q),
-          'Buscar «' + q + '» en el buscador →'
-        );
+        var p = document.createElement('div');
+        p.textContent = data.mensaje || 'No encontré ese residuo todavía.';
+        div.appendChild(p);
+        var acc = document.createElement('div');
+        acc.className = 'ecobot-acciones';
+        if (data.buscar_url) {
+          var aB = document.createElement('a');
+          aB.href = data.buscar_url;
+          aB.className = 'ecobot-link-btn';
+          aB.textContent = 'Abrir en el buscador →';
+          acc.appendChild(aB);
+        }
+        if (data.sugerir_url) {
+          var aS = document.createElement('a');
+          aS.href = data.sugerir_url;
+          aS.className = 'ecobot-link-btn sec';
+          aS.textContent = 'Sugerir este residuo →';
+          acc.appendChild(aS);
+        }
+        div.appendChild(acc);
       }
+
+      botMsgs.appendChild(div);
+      botMsgs.scrollTop = botMsgs.scrollHeight;
     };
+
+    var consultar = function (consulta) {
+      var q = (consulta || '').trim().slice(0, 100);
+      if (!q) return;
+      crearBurbujaUsuario(q);
+
+      var typing = document.createElement('div');
+      typing.className = 'ecobot-msg bot ecobot-typing';
+      typing.textContent = 'Escarlata está consultando…';
+      botMsgs.appendChild(typing);
+      botMsgs.scrollTop = botMsgs.scrollHeight;
+
+      fetch(apiBase + '?q=' + encodeURIComponent(q), {
+        credentials: 'same-origin',
+        headers: { 'Accept': 'application/json' },
+        cache: 'no-store'
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          typing.remove();
+          crearBurbujaResultado(data);
+          var hist = leerHist();
+          hist.push({ q: q, d: data });
+          guardarHist(hist);
+        })
+        .catch(function () {
+          typing.remove();
+          crearBurbujaResultado({
+            encontrado: false,
+            mensaje: 'No pude conectar en este momento. Puedes consultarlo directo en el buscador.',
+            buscar_url: '/buscar/?q=' + encodeURIComponent(q)
+          });
+        });
+    };
+
+    // Restaurar conversación activa de la sesión
+    var previo = leerHist();
+    if (previo.length) {
+      previo.forEach(function (item) {
+        if (item && item.q && item.d) {
+          crearBurbujaUsuario(item.q);
+          crearBurbujaResultado(item.d);
+        }
+      });
+    }
 
     var toggleBot = function (abrir) {
       var estado = typeof abrir === 'boolean' ? abrir : botPanel.hidden;
@@ -475,19 +552,26 @@
 
     botFab.addEventListener('click', function () { toggleBot(); });
     if (botCerrar) botCerrar.addEventListener('click', function () { toggleBot(false); });
+    if (botLimpiar) {
+      botLimpiar.addEventListener('click', function () {
+        try { sessionStorage.removeItem(HIST_KEY); } catch (_) {}
+        botMsgs.innerHTML = bienvenidaHtml;
+        botInput.focus();
+      });
+    }
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && !botPanel.hidden) toggleBot(false);
     });
     botPanel.querySelectorAll('[data-ecobot-q]').forEach(function (chip) {
       chip.addEventListener('click', function () {
-        responder(chip.getAttribute('data-ecobot-q') || '');
+        consultar(chip.getAttribute('data-ecobot-q') || '');
       });
     });
     botForm.addEventListener('submit', function (e) {
       e.preventDefault();
       var val = botInput.value;
       botInput.value = '';
-      responder(val);
+      consultar(val);
     });
   }
 })();

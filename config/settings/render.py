@@ -32,7 +32,12 @@ SITE_URL = env('SITE_URL', f'https://{RENDER_HOST}' if RENDER_HOST else 'https:/
 DATABASE_URL = env('DATABASE_URL', '').strip()
 if DATABASE_URL:
     DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=300, ssl_require=True),
+        'default': dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=300,
+            conn_health_checks=True,
+            ssl_require=True,
+        ),
     }
 else:
     DATABASES = {'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': BASE_DIR / 'db.sqlite3'}}
@@ -55,6 +60,13 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = False
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+X_FRAME_OPTIONS = 'DENY'
+DATA_UPLOAD_MAX_MEMORY_SIZE = 2_621_440  # 2.5 MB máximo por petición POST
 SESSION_COOKIE_NAME = '__Host-sessionid'
 CSRF_COOKIE_NAME = '__Host-csrftoken'
 

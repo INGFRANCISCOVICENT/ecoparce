@@ -10,6 +10,7 @@ urlpatterns = [
     path('terminos/', views.terminos, name='terminos'),
     path('licencias/', views.licencias, name='licencias'),
     path('version.json', views.version_json, name='version_json'),
+    path('health/', views.health, name='health'),
     path('panel/versiones/', views.panel_versiones, name='panel_versiones'),
     path('robots.txt', views.robots_txt, name='robots'),
     path('sitemap.xml', views.sitemap_xml, name='sitemap'),
