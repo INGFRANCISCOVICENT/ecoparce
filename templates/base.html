@@ -44,6 +44,7 @@
   <a class="cuenta" href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}">{% icono 'users' 18 %}<span>Ingresar</span></a>
   {% endif %}
 </header>
+{% block portada %}{% endblock %}
 <main id="contenido" class="wrap" tabindex="-1">
 {% for m in messages %}<div class="aviso {% if m.tags == 'error' %}error{% elif m.tags == 'warning' or m.tags == 'info' %}info{% else %}ok{% endif %}" role="{% if m.tags == 'error' %}alert{% else %}status{% endif %}">{% icono 'info' 20 %}<span>{{ m }}</span><button class="aviso-cerrar" type="button" aria-label="Cerrar aviso" data-cerrar-aviso>{% icono 'x' 16 %}</button></div>{% endfor %}
 {% block contenido %}{% endblock %}
