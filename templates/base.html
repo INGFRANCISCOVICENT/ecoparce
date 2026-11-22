@@ -39,7 +39,10 @@
     <a class="{% activo '/sugerencias/' %}" {% aria_actual '/sugerencias/' %} href="{% url 'buscador:sugerir' %}">Sugerencias</a>
   </nav>
   {% if user.is_authenticated %}
-  <a class="cuenta" href="{% if user.es_personal %}{% url 'estadisticas:resumen' %}{% else %}{% url 'cuentas:mi_cuenta' %}{% endif %}" aria-label="Mi cuenta">{% icono 'users' 18 %}<span>{{ user.nombre.split.0|truncatechars:12 }}</span></a>
+  <div class="top-sesion">
+    <a class="cuenta" href="{% if user.es_personal %}{% url 'estadisticas:resumen' %}{% else %}{% url 'cuentas:mi_cuenta' %}{% endif %}" aria-label="Mi cuenta">{% icono 'users' 18 %}<span>{{ user.nombre.split.0|truncatechars:12 }}</span></a>
+    <form method="post" action="{% url 'account_logout' %}" data-cerrar-sesion>{% csrf_token %}<button class="btn-salir" type="submit" aria-label="Cerrar sesión">{% icono 'logout' 16 %}<span>Salir</span></button></form>
+  </div>
   {% else %}
   <a class="cuenta" href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}">{% icono 'users' 18 %}<span>Ingresar</span></a>
   {% endif %}

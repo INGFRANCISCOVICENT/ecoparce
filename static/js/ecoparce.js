@@ -117,6 +117,15 @@
     actualizar();
   }
 
+  // Limpieza de estado local al cerrar sesión (el servidor destruye la sesión por POST + CSRF).
+  document.querySelectorAll('form[data-cerrar-sesion]').forEach(function (f) {
+    f.addEventListener('submit', function () {
+      try { sessionStorage.clear(); } catch (e) { /* ignorar */ }
+      var b = f.querySelector('button[type=submit]');
+      if (b) { b.setAttribute('aria-busy', 'true'); }
+    });
+  });
+
   // Evitar doble envío y restaurar botones si el usuario vuelve con el botón «Atrás» (bfcache).
   document.querySelectorAll('form').forEach(function (f) {
     f.addEventListener('submit', function (e) {

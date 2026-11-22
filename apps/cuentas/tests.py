@@ -309,6 +309,29 @@ class PanelSeguroTests(TestCase):
         self.assertEqual(sol.estado, EstadoSolicitudAdmin.APROBADA)
         self.assertTrue(RegistroAuditoria.objects.filter(usuario=self.sistema, detalle__icontains='Aprobó solicitud').exists())
 
+    def test_flujo_e2e_login_navegacion_logout_y_proteccion_rutas(self):
+        v = Usuario.objects.create_user('e2e@ejemplo.co', 'Camila E2E', P.CLAVE)
+        EmailAddress.objects.create(user=v, email=v.correo, verified=True, primary=True)
+        P.consentir(v)
+        # 1. Inicio de sesión real
+        r_login = self.client.post('/accounts/login/', {'login': v.correo, 'password': P.CLAVE})
+        self.assertEqual(r_login.status_code, 302)
+        self.assertEqual(self.client.session.get('_auth_user_id'), str(v.pk))
+        # 2. Navegación interna y visibilidad del botón de cerrar sesión
+        for ruta in ['/', '/cuenta/', '/guias/', '/escanear/', '/trivia/', '/sugerencias/']:
+            r = self.client.get(ruta)
+            self.assertEqual(r.status_code, 200)
+            self.assertContains(r, 'data-cerrar-sesion')
+        # 3. Cierre de sesión destruye sesión y redirige a /accounts/login/
+        r_out = self.client.post('/accounts/logout/')
+        self.assertRedirects(r_out, '/accounts/login/')
+        self.assertNotIn('_auth_user_id', self.client.session)
+        # 4. No puede volver a rutas privadas sin autenticarse nuevamente
+        r_priv = self.client.get('/cuenta/')
+        self.assertEqual(r_priv.status_code, 302)
+        self.assertIn('/accounts/login/', r_priv['Location'])
+        self.assertEqual(r_priv['Cache-Control'], 'no-store')
+
 
 class DatosPersonalesTests(TestCase):
     def setUp(self):

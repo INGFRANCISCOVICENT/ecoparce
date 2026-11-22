@@ -49,7 +49,8 @@ class CuentaAdapter(DefaultAccountAdapter):
         return _destino(request, request.user)
 
     def get_logout_redirect_url(self, request):
-        return '/'
+        messages.info(request, 'Cerraste sesión de forma segura.')
+        return reverse('account_login')
 
     def is_reauthentication_required(self, *, app, **kwargs):
         """Un ingreso completo de hace menos de 5 minutos cuenta como identidad confirmada.
@@ -67,13 +68,45 @@ class CuentaAdapter(DefaultAccountAdapter):
         return super().is_reauthentication_required(app=app, **kwargs)
 
     def send_mail(self, template_prefix, email, context):
-        evento('correo_enviado', plantilla=template_prefix.rsplit('/', 1)[-1])
-        return super().send_mail(template_prefix, email, context)
+        import logging
+
+        from allauth.core import context as allauth_ctx
+        from django.conf import settings
+        plantilla = template_prefix.rsplit('/', 1)[-1]
+        evento('correo_enviado', plantilla=plantilla)
+        try:
+            res = super().send_mail(template_prefix, email, context)
+        except Exception as exc:  # pragma: no cover
+            logging.getLogger('ecoparce').error('Error enviando correo (%s): %s', plantilla, exc)
+            req = getattr(allauth_ctx, 'request', None)
+            if req is not None:
+                messages.error(req, 'No pudimos enviar el correo de verificación ahora mismo. Revisa la configuración SMTP o inténtalo de nuevo.')
+            return None
+        # En desarrollo local sin SMTP real, mostrar el código en pantalla para evitar bloqueos silenciosos.
+        if (settings.DEBUG
+                and settings.EMAIL_BACKEND == 'django.core.mail.backends.console.EmailBackend'
+                and context.get('code')):
+            req = getattr(allauth_ctx, 'request', None)
+            if req is not None:
+                messages.info(
+                    req,
+                    f"Modo local sin SMTP configurado: tu código es {context['code']}. "
+                    'Para recibirlo en tu correo real, configura SMTP_HOST y SMTP_PASSWORD en .env.',
+                )
+        return res
 
 
 class GoogleAdapter(DefaultSocialAccountAdapter):
     def is_open_for_signup(self, request, sociallogin):
         return True
+
+    def on_authentication_error(self, request, provider, error=None, exception=None, extra_context=None):
+        evento('google_error_autenticacion', request, error=str(error or exception or 'desconocido'))
+        messages.error(
+            request,
+            'No se pudo completar el ingreso con Google. Verifica que tu correo esté autorizado y vuelve a intentarlo.',
+        )
+        raise ImmediateHttpResponse(redirect('account_login'))
 
     def pre_social_login(self, request, sociallogin):
         datos = sociallogin.account.extra_data or {}

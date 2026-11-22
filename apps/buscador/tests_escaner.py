@@ -69,5 +69,7 @@ class EscanerTests(TestCase):
         self.assertContains(self.client.get('/escanear/'), 'Abrir cámara')
 
     def test_google_sin_configurar_no_manda_a_google(self):
-        r = self.client.post('/accounts/google/login/')
+        from django.test import override_settings
+        with override_settings(SOCIALACCOUNT_PROVIDERS={'google': {'APPS': [{'client_id': '', 'secret': '', 'key': ''}]}}):
+            r = self.client.post('/accounts/google/login/')
         self.assertRedirects(r, '/accounts/login/')
