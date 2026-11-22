@@ -2,41 +2,43 @@
 {% block titulo %}Inicio{% endblock %}
 {% block contenido %}
 <section class="portada-ciudad" aria-label="Portada interactiva de EcoParce">
-  <!-- Fondo isométrico de ciudad ecológica -->
-  <svg class="portada-iso" viewBox="0 0 800 520" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
+  <!-- Fondo de cielo ecológico con corrientes de viento y hojas luminosas (sin edificios) -->
+  <svg class="portada-cielo" viewBox="0 0 800 520" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
     <defs>
-      <linearGradient id="ecoGrad1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#22C55E" stop-opacity=".34"/><stop offset="100%" stop-color="#0B2419" stop-opacity=".05"/></linearGradient>
-      <linearGradient id="ecoGrad2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#38BDF8" stop-opacity=".30"/><stop offset="100%" stop-color="#0B2419" stop-opacity=".04"/></linearGradient>
-      <linearGradient id="ecoGrad3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#F59E0B" stop-opacity=".28"/><stop offset="100%" stop-color="#0B2419" stop-opacity=".04"/></linearGradient>
-      <linearGradient id="ecoGrad4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#EF4444" stop-opacity=".26"/><stop offset="100%" stop-color="#0B2419" stop-opacity=".04"/></linearGradient>
+      <radialGradient id="haloSol" cx="78%" cy="24%" r="48%">
+        <stop offset="0%" stop-color="#22C55E" stop-opacity=".32"/>
+        <stop offset="55%" stop-color="#0EA5E9" stop-opacity=".12"/>
+        <stop offset="100%" stop-color="#050C0A" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="rutaViento" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#22C55E" stop-opacity="0"/>
+        <stop offset="45%" stop-color="#4ADE80" stop-opacity=".55"/>
+        <stop offset="80%" stop-color="#FACC15" stop-opacity=".65"/>
+        <stop offset="100%" stop-color="#EF4444" stop-opacity="0"/>
+      </linearGradient>
     </defs>
-    <!-- Torres isométricas -->
-    <g stroke-width="1.2" fill="none">
-      <polygon points="80,290 140,258 200,290 140,322" fill="url(#ecoGrad1)" stroke="#22C55E" stroke-opacity=".55"/>
-      <polygon points="80,290 140,322 140,460 80,428" fill="url(#ecoGrad1)" stroke="#22C55E" stroke-opacity=".4"/>
-      <polygon points="200,290 140,322 140,460 200,428" fill="#0A2117" fill-opacity=".6" stroke="#22C55E" stroke-opacity=".35"/>
-
-      <polygon points="240,330 300,298 360,330 300,362" fill="url(#ecoGrad4)" stroke="#EF4444" stroke-opacity=".55"/>
-      <polygon points="240,330 300,362 300,480 240,448" fill="url(#ecoGrad4)" stroke="#EF4444" stroke-opacity=".4"/>
-      <polygon points="360,330 300,362 300,480 360,448" fill="#180F12" fill-opacity=".5" stroke="#EF4444" stroke-opacity=".35"/>
-
-      <polygon points="440,220 510,184 580,220 510,256" fill="url(#ecoGrad2)" stroke="#38BDF8" stroke-opacity=".55"/>
-      <polygon points="440,220 510,256 510,440 440,404" fill="url(#ecoGrad2)" stroke="#38BDF8" stroke-opacity=".38"/>
-      <polygon points="580,220 510,256 510,440 580,404" fill="#091C26" fill-opacity=".55" stroke="#38BDF8" stroke-opacity=".32"/>
-
-      <polygon points="590,340 650,308 710,340 650,372" fill="url(#ecoGrad3)" stroke="#F59E0B" stroke-opacity=".6"/>
-      <polygon points="590,340 650,372 650,490 590,458" fill="url(#ecoGrad3)" stroke="#F59E0B" stroke-opacity=".4"/>
-      <polygon points="710,340 650,372 650,490 710,458" fill="#1C180B" fill-opacity=".5" stroke="#F59E0B" stroke-opacity=".35"/>
-
-      <!-- Nodos / faros ecológicos -->
-      <line x1="140" y1="290" x2="140" y2="235" stroke="#22C55E" stroke-opacity=".6"/>
-      <circle cx="140" cy="235" r="4" fill="#22C55E"/><circle cx="140" cy="235" r="11" fill="#22C55E" fill-opacity=".2"/>
-      <line x1="300" y1="330" x2="300" y2="275" stroke="#EF4444" stroke-opacity=".6"/>
-      <circle cx="300" cy="275" r="4" fill="#EF4444"/><circle cx="300" cy="275" r="11" fill="#EF4444" fill-opacity=".2"/>
-      <line x1="510" y1="220" x2="510" y2="162" stroke="#38BDF8" stroke-opacity=".6"/>
-      <circle cx="510" cy="162" r="4" fill="#38BDF8"/><circle cx="510" cy="162" r="11" fill="#38BDF8" fill-opacity=".2"/>
+    <rect width="800" height="520" fill="url(#haloSol)"/>
+    <!-- Corrientes de aire y trayectoria de vuelo de Escarlata -->
+    <path d="M-20,250 C140,180 280,290 450,195 C610,105 710,175 830,130" fill="none" stroke="url(#rutaViento)" stroke-width="2.5" stroke-dasharray="8 8"/>
+    <path d="M-20,310 C170,250 320,350 510,255 C650,185 730,225 830,190" fill="none" stroke="#38BDF8" stroke-opacity=".22" stroke-width="1.5"/>
+    <!-- Hojas y destellos ecológicos flotantes -->
+    <g fill="#4ADE80" fill-opacity=".22">
+      <path d="M120,390 C120,362 142,348 168,348 C168,376 146,390 120,390 Z"/>
+      <path d="M620,360 C620,336 640,324 662,324 C662,348 642,360 620,360 Z"/>
+      <path d="M460,120 C460,102 475,92 492,92 C492,110 477,120 460,120 Z"/>
+    </g>
+    <g fill="#FDE047" fill-opacity=".45">
+      <circle cx="195" cy="215" r="3"/><circle cx="340" cy="250" r="2.5"/><circle cx="520" cy="175" r="3.5"/><circle cx="675" cy="145" r="2.5"/><circle cx="720" cy="280" r="3"/>
     </g>
   </svg>
+
+  <!-- Escarlata volando como protagonista por la portada -->
+  <div class="escarlata-cielo-pista" aria-hidden="true">
+    <div class="escarlata-cielo-vuelo">
+      <span class="ala-estela"></span>
+      <img src="{% static 'img/logo-256.png' %}" alt="" width="112" height="112">
+    </div>
+  </div>
 
   <div class="portada-contenido">
     <div class="portada-top-row">
@@ -44,20 +46,20 @@
       <span class="ai-etiqueta" title="Ilustración de Escarlata asistida con IA">Escarlata · Ilustración IA</span>
     </div>
 
-    <!-- Escarlata volando y dejando mensajes de sensibilización -->
+    <h1 class="portada-titulo">Vuela limpio,<br><span class="portada-grad">separa bien.</span></h1>
+    <p class="portada-sub">Sigue el vuelo de Escarlata: identifica en segundos en qué bolsa va cada residuo, escanea empaques, ubica puntos posconsumo en vivo y domina la trivia ecológica.</p>
+
+    <!-- Mensajes de sensibilización ambiental que deja Escarlata a su paso -->
     <div class="vuelo-escena" aria-live="polite">
       <div class="escarlata-volando">
         <span class="estela-vuelo" aria-hidden="true"></span>
-        <img src="{% static 'img/logo-256.png' %}" alt="Escarlata, guacamaya roja de EcoParce volando con mensajes de reciclaje (ilustración asistida con IA)" width="62" height="62">
+        <img src="{% static 'img/logo-256.png' %}" alt="Escarlata, guacamaya roja de EcoParce volando con mensajes de reciclaje (ilustración asistida con IA)" width="58" height="58">
       </div>
       <div class="vuelo-mensaje">
-        <span class="vuelo-label">Escarlata dice al volar:</span>
+        <span class="vuelo-label">Escarlata deja este mensaje al volar:</span>
         <p id="escarlata-mensaje">Cada botella PET limpia que separas ahorra energía para encender un bombillo LED por 3 horas.</p>
       </div>
     </div>
-
-    <h1 class="portada-titulo">Transforma tu ciudad,<br><span class="portada-grad">separando bien.</span></h1>
-    <p class="portada-sub">Identifica en segundos en qué bolsa va cada residuo, escanea empaques, ubica puntos posconsumo en vivo y domina la trivia ecológica.</p>
 
     <!-- Píldoras interactivas de las 4 rutas de separación -->
     <div class="portada-pills" role="group" aria-label="Categorías de separación">
