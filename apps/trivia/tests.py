@@ -152,3 +152,31 @@ class TriviaTests(TestCase):
         r_res = self.client.get('/trivia/resultado/')
         self.assertContains(r_res, '¡FELICIDADES, PASASTE DE NIVEL!')
         self.assertContains(r_res, 'medalla-3d')
+
+    def test_video_interactivo_arcade_reto_y_certificado(self):
+        from apps.cuentas.models import Usuario
+
+        # Visitante anónimo ve el video interactivo, el simulador arcade y el reto diario,
+        # pero el certificado personalizado le invita a registrarse.
+        r_anon = self.client.get('/trivia/')
+        self.assertEqual(r_anon.status_code, 200)
+        self.assertContains(r_anon, 'eco-video-player')
+        self.assertContains(r_anon, 'eco-video-canvas')
+        self.assertContains(r_anon, 'eco-arcade')
+        self.assertContains(r_anon, 'reto-diario-btn')
+        self.assertContains(r_anon, 'trivia_video.js')
+        self.assertNotContains(r_anon, 'data-generar-certificado')
+        self.assertIn("script-src 'self'", r_anon['Content-Security-Policy'])
+
+        # Usuario autenticado desbloquea el botón de Certificado Digital PNG
+        visitante = Usuario.objects.create_user('cert@ejemplo.co', 'Sofía', P.CLAVE)
+        P.consentir(visitante)
+        self.client.force_login(visitante)
+        r_auth = self.client.get('/trivia/')
+        self.assertContains(r_auth, 'data-generar-certificado')
+        self.assertContains(r_auth, 'Sofía')
+
+        # Búsqueda por voz progresiva disponible en /buscar/
+        r_busc = self.client.get('/buscar/')
+        self.assertEqual(r_busc.status_code, 200)
+        self.assertContains(r_busc, 'btn-voz-buscar')

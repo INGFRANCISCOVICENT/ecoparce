@@ -4,6 +4,7 @@
 <form class="search" style="margin-top:0" action="{% url 'buscador:buscar' %}" method="get" role="search">
   {% icono 'search' 24 '#1E7A46' %}<label class="sr" for="q">¿Qué vas a botar?</label>
   <input id="q" name="q" type="search" value="{{ q }}" placeholder="¿Qué vas a botar?" maxlength="100" autocomplete="off" {% if not q %}autofocus{% endif %} required>
+  <button type="button" id="btn-voz-buscar" class="btn-voz" title="Buscar por voz" aria-label="Buscar por voz" hidden>🎙️</button>
   <button type="submit">Buscar</button>
 </form>
 {% if principal %}

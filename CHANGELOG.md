@@ -2,6 +2,14 @@
 
 Este proyecto sigue el [Versionado Semántico (SemVer 2.0.0)](https://semver.org/lang/es/) y control de versiones en Git.
 
+## [2.2.0] - 2026-11-22
+### Agregado
+- **Video educativo interactivo en `/trivia/`**: reproductor cinematográfico HTML5 Canvas 100 % local y compatible con CSP estricta, con Escarlata animada, 4 capítulos (Blanca, Negra, Verde y Posconsumo), subtítulos sincronizados, narración opcional en voz en español (`es-CO`) y **4 pausas interactivas con retos en vivo** dentro del video.
+- **Simulador Arcade «Atrapa y Separa 30 s»** en `/trivia/`: mini-juego contrarreloj con multiplicador de combo (hasta x4), récord personal guardado en el navegador, atajos de teclado (`1`-`4`) y retroalimentación educativa instantánea.
+- **Reto Diario Ecológico con racha**: misión práctica diaria que rota automáticamente cada día calendario con seguimiento de racha consecutiva.
+- **Certificado Digital Ambiental descargable (PNG HD)** para usuarios registrados en `/trivia/` y `/trivia/resultado/`, personalizado con nombre, rango, puntaje y medallas 3D.
+- **Búsqueda por voz progresiva (`🎙️`)** en `/buscar/` (Web Speech API `es-CO`).
+
 ## [1.4.0] - 2026-11-21
 ### Agregado
 - **Portada interactiva estilo ciudad ecológica (inspirada en CiudadReporta)**:

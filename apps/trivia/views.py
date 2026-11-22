@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
@@ -12,6 +14,27 @@ from .models import (
 
 MENSAJES = [(5, '¡Vuelas alto, parce!'), (4, '¡Vuelas alto, parce!'), (3, '¡Muy bien, vas volando!'),
             (2, '¡Buen intento, sigue practicando!'), (0, '¡A repasar juntos, parce!')]
+
+RETOS_DIARIOS = [
+    {'titulo': 'Enjuaga y seca un envase hoy', 'detalle': 'Antes de llevar una botella PET o caja de leche a la bolsa blanca, enjuágala con poca agua y déjala escurrir.', 'bolsa': 'Bolsa Blanca'},
+    {'titulo': 'Caza de pilas en casa', 'detalle': 'Revisa controles y cajones; guarda las pilas gastadas en un frasco seco para llevarlas a un punto Posconsumo.', 'bolsa': 'Posconsumo'},
+    {'titulo': 'Aceite de cocina a la botella', 'detalle': 'Nunca viertas aceite usado al lavaplatos: déjalo enfriar y guárdalo en una botella plástica bien tapada.', 'bolsa': 'Posconsumo'},
+    {'titulo': 'Aplasta el cartón y las botellas', 'detalle': 'Compacta cajas limpias y botellas PET secas para reducir espacio y facilitar el trabajo del reciclador.', 'bolsa': 'Bolsa Blanca'},
+    {'titulo': 'Separa las cáscaras de hoy', 'detalle': 'Guarda cáscaras de frutas, verduras y cuncho de café en tu recipiente de orgánicos (bolsa verde).', 'bolsa': 'Bolsa Verde'},
+    {'titulo': 'Revisa la caja de pizza', 'detalle': 'Si la tapa está limpia y sin grasa, recíclala en blanca; la parte manchada de grasa va en bolsa negra.', 'bolsa': 'Blanca / Negra'},
+    {'titulo': 'Un vidrio seguro para todos', 'detalle': 'Si se rompe un vaso o frasco, envuélvelo en cartón o periódico marcado antes de botarlo en bolsa negra.', 'bolsa': 'Bolsa Negra'},
+    {'titulo': 'Medicamentos vencidos al Punto Azul', 'detalle': 'Revisa tu botiquín y separa los medicamentos vencidos con sus empaques para llevarlos a un Punto Azul.', 'bolsa': 'Posconsumo'},
+    {'titulo': 'Escanea 2 empaques de tu cocina', 'detalle': 'Usa el Escáner de EcoParce para identificar el número de resina (1 al 7) de dos productos de tu alacena.', 'bolsa': 'Escáner EcoParce'},
+    {'titulo': 'Bolsa reutilizable lista', 'detalle': 'Deja una bolsa de tela cerca de la puerta o en tu morral para evitar bolsas plásticas de un solo uso hoy.', 'bolsa': 'Reducción'},
+    {'titulo': 'Comparte un dato ambiental', 'detalle': 'Cuéntale a un familiar o amigo la diferencia entre la bolsa blanca, la negra y la verde en Colombia.', 'bolsa': 'Comunidad'},
+    {'titulo': 'Cables y cargadores dañados aparte', 'detalle': 'Guarda audífonos, cables o celulares viejos en una caja seca para entregarlos como RAEE.', 'bolsa': 'Posconsumo'},
+]
+
+
+def _reto_del_dia():
+    hoy = date.today()
+    reto = RETOS_DIARIOS[hoy.toordinal() % len(RETOS_DIARIOS)]
+    return {**reto, 'fecha': hoy.isoformat()}
 
 
 def _partida(request):
@@ -59,6 +82,7 @@ def inicio(request):
         'ranking': _ranking_top() if usuario else [],
         'insignias': insignias,
         'total_obtenidas': sum(1 for i in insignias if i['obtenida']),
+        'reto_diario': _reto_del_dia(),
     })
 
 
@@ -146,6 +170,7 @@ def resultado(request):
         siguiente_nivel = info_nivel(partida.nivel + 1)
     mensaje = next(m for minimo, m in MENSAJES if puntaje >= minimo)
     falladas = partida.respuestas.filter(es_correcta=False).select_related('pregunta')
+    insignias = obtener_insignias(usuario=usuario, sesion=request.session)
     return render(request, 'trivia/resultado.html', {
         'partida': partida,
         'mensaje': mensaje,
@@ -154,4 +179,7 @@ def resultado(request):
         'paso_de_nivel': paso_de_nivel,
         'nuevas_insignias': nuevas_insignias,
         'siguiente_nivel': siguiente_nivel,
+        'rango': _rango_jugador(progreso['puntos_totales']),
+        'puntos_totales': progreso['puntos_totales'],
+        'total_obtenidas': sum(1 for i in insignias if i['obtenida']),
     })

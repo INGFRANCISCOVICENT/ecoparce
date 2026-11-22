@@ -146,4 +146,35 @@
       });
     }
   });
+
+  // Búsqueda por voz progresiva en /buscar/ (Web Speech API en español Colombia).
+  var btnVoz = document.getElementById('btn-voz-buscar');
+  var campoQ = document.getElementById('q');
+  var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (btnVoz && campoQ && SpeechRec) {
+    btnVoz.hidden = false;
+    btnVoz.addEventListener('click', function () {
+      var rec = new SpeechRec();
+      rec.lang = 'es-CO';
+      rec.interimResults = false;
+      rec.maxAlternatives = 1;
+      btnVoz.classList.add('escuchando');
+      btnVoz.setAttribute('aria-label', 'Escuchando...');
+      rec.onresult = function (ev) {
+        var texto = ev.results && ev.results[0] && ev.results[0][0] ? ev.results[0][0].transcript : '';
+        if (texto) {
+          campoQ.value = texto.replace(/\.$/, '').trim();
+          if (campoQ.form) { campoQ.form.submit(); }
+        }
+      };
+      rec.onend = function () {
+        btnVoz.classList.remove('escuchando');
+        btnVoz.setAttribute('aria-label', 'Buscar por voz');
+      };
+      rec.onerror = function () {
+        btnVoz.classList.remove('escuchando');
+      };
+      try { rec.start(); } catch (_) {}
+    });
+  }
 })();

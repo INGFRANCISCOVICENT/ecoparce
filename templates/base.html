@@ -77,5 +77,6 @@
   <a class="{% activo '/trivia/' %}" {% aria_actual '/trivia/' %} href="{% url 'trivia:inicio' %}">{% icono 'game' 24 %}<span>Trivia</span></a>
 </nav>
 <script src="{% static 'js/ecoparce.js' %}" defer></script>
+{% block scripts %}{% endblock %}
 </body>
 </html>

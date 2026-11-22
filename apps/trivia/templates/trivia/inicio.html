@@ -24,6 +24,107 @@
   <div class="prog" style="margin-top:10px" role="progressbar" aria-label="Progreso de rango" aria-valuenow="{{ rango.pct }}" aria-valuemin="0" aria-valuemax="100"><i style="width:{{ rango.pct }}%"></i></div>
 </section>
 
+<!-- Video Educativo Interactivo de Escarlata (60 s con pausas de reto) -->
+<section class="video-cinema" id="eco-video-player" data-escarlata="{% static 'img/escarlata-volando.png' %}" aria-label="Video educativo interactivo sobre separación en la fuente">
+  <div class="video-head">
+    <div>
+      <span class="video-badge">VIDEO INTERACTIVO · 60 s</span>
+      <h2 style="margin:6px 0 2px;color:#fff;font-size:20px">Aprende con Escarlata antes de jugar</h2>
+      <p class="xs" style="margin:0;color:#CBE8D7">Con narración en español, subtítulos y 4 pausas interactivas en pantalla.</p>
+    </div>
+    <span class="video-cp-badge" id="ev-cp-score">Retos del video: 0/4</span>
+  </div>
+  <div class="video-stage">
+    <canvas id="eco-video-canvas" class="video-canvas" width="960" height="540" aria-label="Animación educativa de las bolsas blanca, negra, verde y puntos posconsumo"></canvas>
+    <button type="button" id="ev-play-big" class="video-overlay-play" aria-label="Reproducir video interactivo">▶ Ver video interactivo</button>
+    <div id="ev-caption" class="video-captions" aria-live="polite" hidden></div>
+    <div id="ev-checkpoint" class="video-checkpoint" role="dialog" aria-label="Pregunta interactiva del video" hidden>
+      <div class="ev-cp-card">
+        <span class="video-badge">PAUSA INTERACTIVA</span>
+        <h3 id="ev-cp-title" style="margin:8px 0 12px;color:#fff;font-size:18px"></h3>
+        <div id="ev-cp-opts" class="ev-cp-opts"></div>
+        <p id="ev-cp-feedback" class="ev-cp-feedback" hidden></p>
+        <button type="button" id="ev-cp-continue" class="btn p sm full" style="margin-top:10px" hidden>Continuar video →</button>
+      </div>
+    </div>
+  </div>
+  <div class="video-progress" id="ev-progress-wrap" role="slider" aria-label="Línea de tiempo del video" aria-valuemin="0" aria-valuemax="60" aria-valuenow="0" tabindex="0">
+    <div class="video-progress-fill" id="ev-progress-fill"></div>
+    <span class="video-marker" style="left:24%" title="Reto 1"></span>
+    <span class="video-marker" style="left:49%" title="Reto 2"></span>
+    <span class="video-marker" style="left:74%" title="Reto 3"></span>
+    <span class="video-marker" style="left:97%" title="Reto 4"></span>
+  </div>
+  <div class="video-controls">
+    <button type="button" class="ev-btn" id="ev-play">▶ Reproducir</button>
+    <button type="button" class="ev-btn" id="ev-restart" title="Reiniciar video">↻</button>
+    <span class="ev-time" id="ev-time">0:00 / 1:00</span>
+    <button type="button" class="ev-btn" id="ev-voice" aria-pressed="true">🔊 Voz: ON</button>
+    <button type="button" class="ev-btn activo" id="ev-cc" aria-pressed="true">CC</button>
+  </div>
+  <div class="video-chapters" role="group" aria-label="Capítulos del video">
+    <button type="button" class="ev-cap activo" data-ev-cap="0">1. Blanca</button>
+    <button type="button" class="ev-cap" data-ev-cap="1">2. Negra</button>
+    <button type="button" class="ev-cap" data-ev-cap="2">3. Verde</button>
+    <button type="button" class="ev-cap" data-ev-cap="3">4. Posconsumo</button>
+  </div>
+</section>
+
+<!-- Reto Diario Ecológico + Certificado Ambiental Descargable -->
+<div class="grid" style="margin-top:14px">
+  <section class="card reto-diario-card">
+    <div class="row" style="justify-content:space-between;gap:6px;flex-wrap:wrap">
+      <span class="st s-pub">Reto diario · {{ reto_diario.bolsa }}</span>
+      <span class="racha-pill" id="reto-diario-racha">🔥 Racha: 0 días</span>
+    </div>
+    <strong style="display:block;margin-top:8px;font-size:16px">{{ reto_diario.titulo }}</strong>
+    <p class="xs mut" style="margin:4px 0 12px">{{ reto_diario.detalle }}</p>
+    <button type="button" class="btn p sm full" id="reto-diario-btn" data-fecha="{{ reto_diario.fecha }}">¡Cumplí el reto de hoy!</button>
+    <p id="reto-diario-estado" class="xs" style="color:var(--gd);font-weight:800;margin:8px 0 0" hidden>¡Excelente hábito! Vuelve mañana para aumentar tu racha.</p>
+  </section>
+
+  <section class="card cert-card">
+    <div class="row" style="justify-content:space-between;gap:6px;flex-wrap:wrap">
+      <span class="st s-rev">Certificado digital HD</span>
+      <span class="tag">PNG descargable</span>
+    </div>
+    <strong style="display:block;margin-top:8px;font-size:16px">Diploma de Guardián Ambiental</strong>
+    {% if user.is_authenticated %}
+    <p class="xs mut" style="margin:4px 0 12px">Genera y descarga tu certificado personalizado con tu rango <strong>{{ rango.nombre }}</strong>, tus <strong>{{ puntos_totales }} pts</strong> y tus medallas 3D.</p>
+    <button type="button" class="btn o sm full" data-generar-certificado data-nombre="{{ user.nombre|default:user.correo }}" data-rango="{{ rango.nombre }}" data-puntos="{{ puntos_totales }}" data-medallas="{{ total_obtenidas }}" data-logo="{% static 'img/logo-256.png' %}">Descargar mi Certificado (PNG)</button>
+    {% else %}
+    <p class="xs mut" style="margin:4px 0 12px">Crea tu cuenta gratis para generar y descargar tu diploma oficial con tu nombre, puntaje y medallas 3D.</p>
+    <a class="btn o sm full" href="{% url 'account_signup' %}?next={% url 'trivia:inicio' %}">{% icono 'lock' 16 %}Regístrate para descargar diploma</a>
+    {% endif %}
+  </section>
+</div>
+
+<!-- Simulador Arcade «Atrapa y Separa 30 s» -->
+<section class="card arcade-box" id="eco-arcade" style="margin-top:14px" aria-label="Simulador rápido Atrapa y Separa">
+  <div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <div>
+      <span class="st s-pub">Simulador rápido · 30 s</span>
+      <h2 style="margin:6px 0 2px;font-size:19px">Atrapa y Separa en vivo</h2>
+      <p class="xs mut" style="margin:0">Clasifica cada residuo antes de que se acabe el tiempo y multiplica tu combo hasta x4.</p>
+    </div>
+    <button type="button" class="btn p sm" id="arc-start">▶ Iniciar 30 s</button>
+  </div>
+  <div class="arcade-stats">
+    <div class="arc-stat"><span>Puntos</span><strong id="arc-score">0</strong></div>
+    <div class="arc-stat"><span>Combo</span><strong id="arc-combo">x1</strong></div>
+    <div class="arc-stat"><span>Tiempo</span><strong id="arc-timer">30 s</strong></div>
+    <div class="arc-stat"><span>Récord</span><strong id="arc-best">0</strong></div>
+  </div>
+  <div class="arcade-item" id="arc-item" aria-live="polite">Pulsa «Iniciar 30 s» para comenzar</div>
+  <p class="arcade-tip" id="arc-tip">Usa los botones o las teclas 1, 2, 3 y 4 en tu computador.</p>
+  <div class="arcade-bins">
+    <button type="button" class="arcade-bin bin-blanca" data-arc-bin="BLANCA"><span>1</span><strong>Blanca</strong><small>Aprovechables</small></button>
+    <button type="button" class="arcade-bin bin-negra" data-arc-bin="NEGRA"><span>2</span><strong>Negra</strong><small>No aprovechables</small></button>
+    <button type="button" class="arcade-bin bin-verde" data-arc-bin="VERDE"><span>3</span><strong>Verde</strong><small>Orgánicos</small></button>
+    <button type="button" class="arcade-bin bin-pos" data-arc-bin="POSCONSUMO"><span>4</span><strong>Posconsumo</strong><small>Especiales</small></button>
+  </div>
+</section>
+
 {% if partida and not partida.terminada and partida.respondidas %}
 <a class="btn p full" style="margin-top:14px;margin-bottom:14px" href="{% url 'trivia:jugar' %}">{% icono 'game' 20 '#fff' %}Seguir mi partida · {{ partida.get_modo_display }} ({{ partida.respondidas }}/{{ partida.total_preguntas }})</a>
 {% endif %}
@@ -151,3 +252,4 @@
   {% endfor %}
 </div>
 {% endblock %}
+{% block scripts %}<script src="{% static 'js/trivia_video.js' %}" defer></script>{% endblock %}

@@ -70,7 +70,11 @@
   <button class="btn {% if siguiente_nivel %}o{% else %}p{% endif %} full" type="submit">{% icono 'refresh' 20 %}Volver a jugar</button>
 </form>
 <a class="btn o full" style="margin-top:10px" href="{% url 'trivia:inicio' %}">{% icono 'game' 20 '#1E7A46' %}Ver todos los modos, niveles y medallas</a>
+{% if user.is_authenticated %}
+<button class="btn o full" style="margin-top:10px" type="button" data-generar-certificado data-nombre="{{ user.nombre|default:user.correo }}" data-rango="{{ rango.nombre }}" data-puntos="{{ puntos_totales }}" data-medallas="{{ total_obtenidas }}" data-logo="{% static 'img/logo-256.png' %}">{% icono 'star' 20 '#7A5A00' %}Descargar mi Certificado Ambiental (PNG)</button>
+{% endif %}
 <button class="btn o full" style="margin-top:10px" type="button" data-compartir data-url="{{ SITE_URL }}{% url 'trivia:inicio' %}" data-titulo="Saqué {{ partida.puntaje }}/{{ partida.total_preguntas }} en la Trivia EcoParce">{% icono 'share' 20 '#1E7A46' %}Compartir mi resultado y la app</button>
 <p id="aviso-copiado" class="aviso ok" role="status" aria-live="polite" hidden style="margin-top:10px">Enlace copiado. ¡Reta a un amigo a superar tu puntaje!</p>
 <a class="btn o full" style="margin-top:10px" href="{% url 'core:inicio' %}">{% icono 'home' 20 '#1E7A46' %}Volver al inicio</a>
 {% endblock %}
+{% block scripts %}<script src="{% static 'js/trivia_video.js' %}" defer></script>{% endblock %}
