@@ -40,6 +40,56 @@ def licencias(request):
     return render(request, 'core/licencias.html')
 
 
+def version_json(request):
+    """Devuelve la versión activa en servidor sin caché para avisar actualizaciones en móvil/PC."""
+    from django.http import JsonResponse
+    from apps.core.context_processors import app_version
+    resp = JsonResponse({'version': app_version()})
+    resp['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    return resp
+
+
+def _parsear_changelog():
+    """Lee CHANGELOG.md y devuelve una lista estructurada por versión para el panel admin."""
+    import re
+    from django.conf import settings
+    ruta = settings.BASE_DIR / 'CHANGELOG.md'
+    if not ruta.exists():
+        return []
+    versiones = []
+    actual = None
+    categoria = ''
+    for linea in ruta.read_text(encoding='utf-8').splitlines():
+        m_ver = re.match(r'^##\s+\[([^\]]+)\]\s*-\s*(.+)$', linea.strip())
+        if m_ver:
+            actual = {'version': m_ver.group(1), 'fecha': m_ver.group(2).strip(), 'cambios': []}
+            versiones.append(actual)
+            categoria = ''
+            continue
+        if actual is None:
+            continue
+        m_cat = re.match(r'^###\s+(.+)$', linea.strip())
+        if m_cat:
+            categoria = m_cat.group(1).strip()
+            continue
+        m_item = re.match(r'^\s*-\s+(.+)$', linea)
+        if m_item:
+            texto = re.sub(r'\*\*([^*]+)\*\*', r'\1', m_item.group(1).strip())
+            actual['cambios'].append({'categoria': categoria or 'Cambio', 'texto': texto})
+    return versiones
+
+
+from apps.core.permisos import panel_requerido  # noqa: E402
+
+
+@panel_requerido
+def panel_versiones(request):
+    """Control de versiones visible para administradores en /panel/versiones/."""
+    return render(request, 'panel/versiones.html', {
+        'versiones': _parsear_changelog(),
+    })
+
+
 def error_404(request, exception=None):
     return render(request, 'core/404.html', status=404)
 

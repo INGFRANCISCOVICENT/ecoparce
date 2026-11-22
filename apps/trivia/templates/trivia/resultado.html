@@ -77,4 +77,4 @@
 <p id="aviso-copiado" class="aviso ok" role="status" aria-live="polite" hidden style="margin-top:10px">Enlace copiado. ¡Reta a un amigo a superar tu puntaje!</p>
 <a class="btn o full" style="margin-top:10px" href="{% url 'core:inicio' %}">{% icono 'home' 20 '#1E7A46' %}Volver al inicio</a>
 {% endblock %}
-{% block scripts %}<script src="{% static 'js/trivia_video.js' %}" defer></script>{% endblock %}
+{% block scripts %}<script src="{% static 'js/trivia_video.js' %}?v={{ APP_VERSION }}" defer></script>{% endblock %}

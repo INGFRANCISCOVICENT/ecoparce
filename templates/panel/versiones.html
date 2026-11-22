@@ -1,0 +1,36 @@
+{% extends 'panel/base.html' %}{% load eco %}
+{% block titulo %}Control de versiones{% endblock %}
+{% block encabezado %}Control de versiones · EcoParce{% endblock %}
+{% block contenido %}
+<section class="card" style="margin-bottom:16px">
+  <div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:10px">
+    <div>
+      <span class="st s-pub">Versión activa en producción: v{{ APP_VERSION }}</span>
+      <h2 style="margin:8px 0 4px;font-size:20px">Historial completo de lanzamientos</h2>
+      <p class="small mut" style="margin:0">Marca y autoría: <strong>Francisco Navarro, Danixa Herrera y Darien García</strong> · Registro basado en Versionado Semántico (SemVer 2.0.0).</p>
+    </div>
+    <span class="tag">{{ versiones|length }} versiones registradas</span>
+  </div>
+</section>
+
+<div class="lista">
+  {% for v in versiones %}
+  <article class="card">
+    <div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+      <div class="row" style="gap:8px;flex-wrap:wrap">
+        <strong style="font-size:18px">v{{ v.version }}</strong>
+        {% if v.version == APP_VERSION %}<span class="st s-pub">Actual</span>{% endif %}
+      </div>
+      <span class="tag">{{ v.fecha }}</span>
+    </div>
+    <ul class="ok" style="margin:0">
+      {% for c in v.cambios %}
+      <li>{% icono 'check' 16 '#1E7A46' 3 %}<span><strong>[{{ c.categoria }}]</strong> {{ c.texto }}</span></li>
+      {% endfor %}
+    </ul>
+  </article>
+  {% empty %}
+  <div class="aviso info">{% icono 'info' 20 %}<span>No se encontraron registros en CHANGELOG.md.</span></div>
+  {% endfor %}
+</div>
+{% endblock %}

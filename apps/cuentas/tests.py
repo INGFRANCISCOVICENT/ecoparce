@@ -455,3 +455,28 @@ class EncabezadosTests(TestCase):
         self.assertTrue(u.password.startswith('argon2$'))
         self.assertNotIn(fuerte, u.password)
         self.assertTrue(u.check_password(fuerte))
+
+    def test_version_json_control_versiones_y_marca(self):
+        from apps.core.context_processors import app_version
+        ver = app_version()
+
+        # 1. Endpoint /version.json sin caché devuelve la versión activa
+        r_ver = self.client.get('/version.json')
+        self.assertEqual(r_ver.status_code, 200)
+        self.assertEqual(r_ver.json()['version'], ver)
+        self.assertIn('no-store', r_ver['Cache-Control'])
+
+        # 2. Pie de página incluye la marca y el banner de actualización
+        r_home = self.client.get('/')
+        self.assertContains(r_home, 'Francisco Navarro, Danixa Herrera y Darien García')
+        self.assertContains(r_home, 'banner-actualizacion')
+
+        # 3. /panel/versiones/ exige administrador y muestra el historial de versiones
+        self.assertEqual(self.client.get('/panel/versiones/').status_code, 302)
+        _, autor, _ = P.usuarios()
+        P.entrar_panel(self.client, autor)
+        r_panel = self.client.get('/panel/versiones/')
+        self.assertEqual(r_panel.status_code, 200)
+        self.assertContains(r_panel, f'v{ver}')
+        self.assertContains(r_panel, 'Control de versiones')
+        self.assertContains(r_panel, 'Francisco Navarro, Danixa Herrera y Darien García')

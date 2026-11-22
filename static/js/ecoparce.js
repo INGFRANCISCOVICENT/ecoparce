@@ -336,4 +336,45 @@
     if (pw2) pw2.addEventListener('input', evaluarCoincidencia);
     evaluarClave();
   }
+
+  // Detector automático de nueva versión publicada (/version.json) con botón «Actualizar ahora».
+  var metaVer = document.querySelector('meta[name="app-version"]');
+  var bannerUpd = document.getElementById('banner-actualizacion');
+  var txtVerUpd = document.getElementById('update-ver-txt');
+  var btnUpd = document.getElementById('btn-actualizar-app');
+  if (metaVer && bannerUpd) {
+    var verLocal = (metaVer.getAttribute('content') || '').trim();
+    var revisarVersion = function () {
+      fetch('/version.json?t=' + Date.now(), { cache: 'no-store', credentials: 'same-origin' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) {
+          if (d && d.version && d.version !== verLocal) {
+            if (txtVerUpd) txtVerUpd.textContent = 'v' + d.version;
+            bannerUpd.hidden = false;
+          }
+        })
+        .catch(function () {});
+    };
+    if (btnUpd) {
+      btnUpd.addEventListener('click', function () {
+        var recargar = function () {
+          var url = new URL(window.location.href);
+          url.searchParams.set('v', String(Date.now()));
+          window.location.replace(url.toString());
+        };
+        if (window.caches && caches.keys) {
+          caches.keys().then(function (keys) {
+            return Promise.all(keys.map(function (k) { return caches.delete(k); }));
+          }).finally(recargar);
+        } else {
+          recargar();
+        }
+      });
+    }
+    setTimeout(revisarVersion, 4000);
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'visible') revisarVersion();
+    });
+    setInterval(revisarVersion, 120000);
+  }
 })();

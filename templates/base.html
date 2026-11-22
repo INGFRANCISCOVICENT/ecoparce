@@ -7,6 +7,7 @@
 <meta name="description" content="{% block descripcion %}Aprende a separar en la fuente con el código de colores de Colombia: bolsa blanca, negra y verde, y dónde llevar los residuos especiales.{% endblock %}">
 <meta name="theme-color" content="#1E7A46">
 <meta name="color-scheme" content="light">
+<meta name="app-version" content="{{ APP_VERSION }}">
 <link rel="canonical" href="{{ SITE_URL }}{{ request.path }}">
 <link rel="manifest" href="{% static 'manifest.webmanifest' %}">
 <link rel="icon" href="{% static 'img/favicon-32.png' %}" sizes="32x32" type="image/png">
@@ -20,7 +21,7 @@
 <meta property="og:description" content="Aprende a separar en la fuente con el código de colores de Colombia: bolsa blanca, negra y verde, y dónde llevar los residuos especiales.">
 <meta property="og:image" content="{{ SITE_URL }}{% static 'img/logo-256.png' %}">
 {% endblock %}
-<link rel="stylesheet" href="{% static 'css/ecoparce.css' %}">
+<link rel="stylesheet" href="{% static 'css/ecoparce.css' %}?v={{ APP_VERSION }}">
 </head>
 <body>
 <a class="saltar" href="#contenido">Ir al contenido</a>
@@ -53,10 +54,14 @@
 {% block contenido %}{% endblock %}
 </main>
 <footer class="pie">
-  <p>EcoParce v{{ APP_VERSION }} · Sistema de reciclaje y manejo de residuos · {{ ANIO }}<br>
+  <p><strong>EcoParce v{{ APP_VERSION }}</strong> · Marca de <strong>Francisco Navarro, Danixa Herrera y Darien García</strong> · {{ ANIO }}<br>
   Basado en la Resolución 2184 de 2019 (MinAmbiente). · <a href="{% url 'core:privacidad' %}">Privacidad</a> · <a href="{% url 'core:terminos' %}">Términos</a> · <a href="{% url 'core:licencias' %}">Licencias</a><br>
   Soporte y derechos de autor: <a href="mailto:fjnv1305@gmail.com">fjnv1305@gmail.com</a> · <button type="button" class="link-btn" id="btn-preferencias-cookies">Preferencias de cookies</button> · <button type="button" class="link-btn" id="btn-contraste" aria-pressed="false">Alto contraste</button></p>
 </footer>
+<aside id="banner-actualizacion" class="update-banner" role="status" aria-live="polite" hidden>
+  <span>✨ ¡Hay una nueva versión de EcoParce disponible (<strong id="update-ver-txt"></strong>)!</span>
+  <button type="button" class="btn p sm" id="btn-actualizar-app">Actualizar ahora</button>
+</aside>
 <aside id="banner-cookies" class="cookies-banner" role="dialog" aria-label="Aviso de cookies" aria-live="polite" hidden>
   <div class="cookies-inner">
     <div>
@@ -76,7 +81,7 @@
   <a class="{% activo '/buscar/' '/puntos/' %}" {% aria_actual '/buscar/' '/puntos/' %} href="{% url 'buscador:buscar' %}">{% icono 'search' 24 %}<span>Buscar</span></a>
   <a class="{% activo '/trivia/' %}" {% aria_actual '/trivia/' %} href="{% url 'trivia:inicio' %}">{% icono 'game' 24 %}<span>Trivia</span></a>
 </nav>
-<script src="{% static 'js/ecoparce.js' %}" defer></script>
+<script src="{% static 'js/ecoparce.js' %}?v={{ APP_VERSION }}" defer></script>
 {% block scripts %}{% endblock %}
 </body>
 </html>

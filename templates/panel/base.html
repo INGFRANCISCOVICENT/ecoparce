@@ -8,7 +8,7 @@
 <meta name="color-scheme" content="light">
 <title>{% block titulo %}Panel{% endblock %} · Panel EcoParce</title>
 <link rel="icon" href="{% static 'img/favicon-32.png' %}" sizes="32x32" type="image/png">
-<link rel="stylesheet" href="{% static 'css/ecoparce.css' %}">
+<link rel="stylesheet" href="{% static 'css/ecoparce.css' %}?v={{ APP_VERSION }}">
 </head>
 <body>
 <a class="saltar" href="#contenido">Ir al contenido</a>
@@ -21,6 +21,7 @@
   <a class="nav {% activo '/panel/puntos/' %}" {% aria_actual '/panel/puntos/' %} href="{% url 'panel_contenidos:puntos' %}">{% icono 'pin' 20 %}Puntos de entrega</a>
   <a class="nav {% activo '/panel/trivia/' %}" {% aria_actual '/panel/trivia/' %} href="{% url 'panel_trivia:lista' %}">{% icono 'game' 20 %}Trivia</a>
   <a class="nav {% activo '/panel/sugerencias/' %}" {% aria_actual '/panel/sugerencias/' %} href="{% url 'panel_buscador:sugerencias' %}">{% icono 'msg' 20 %}Sugerencias{% if PEND_SUGERENCIAS %}<span class="cnt">{{ PEND_SUGERENCIAS }}</span>{% endif %}</a>
+  <a class="nav {% activo '/panel/versiones/' %}" {% aria_actual '/panel/versiones/' %} href="{% url 'core:panel_versiones' %}">{% icono 'file' 20 %}Control de versiones</a>
   {% if user.es_admin_sistema %}
   <div class="sep">Administrador del sistema</div>
   <a class="nav {% activo '/panel/qr/' %}" {% aria_actual '/panel/qr/' %} href="{% url 'panel_qr:lista' %}">{% icono 'qr' 20 %}Códigos QR</a>
@@ -40,6 +41,6 @@
   {% block contenido %}{% endblock %}
 </main>
 </div>
-<script src="{% static 'js/ecoparce.js' %}" defer></script>
+<script src="{% static 'js/ecoparce.js' %}?v={{ APP_VERSION }}" defer></script>
 </body>
 </html>

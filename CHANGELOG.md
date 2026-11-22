@@ -2,6 +2,12 @@
 
 Este proyecto sigue el [Versionado Semántico (SemVer 2.0.0)](https://semver.org/lang/es/) y control de versiones en Git.
 
+## [2.4.0] - 2026-11-22
+### Agregado
+- **Aviso automático de nueva versión y botón «Actualizar ahora»**: nuevo endpoint `/version.json` sin caché, versionado `?v=` en CSS/JS y banner emergente que detecta cuando hay una versión más reciente en el servidor para limpiar caché y recargar con un toque en celular o PC.
+- **Control de versiones en el panel de administrador (`/panel/versiones/`)**: vista exclusiva para administradores con el historial completo de cada lanzamiento y qué se implementó en cada versión.
+- **Identidad de marca oficial**: crédito de marca visible para **Francisco Navarro, Danixa Herrera y Darien García** en el pie de página y en el panel de versiones.
+
 ## [2.3.1] - 2026-11-22
 ### Seguridad y UX
 - **Política estricta de contraseñas seguras + Medidor visual en tiempo real (`/accounts/signup/`)**:
