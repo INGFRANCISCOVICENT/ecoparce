@@ -1233,6 +1233,22 @@ html[data-contraste="alto"] :focus-visible{outline:4px solid #000;outline-offset
 .auto-item:hover,.auto-item:focus{background:rgba(52,211,153,.2);outline:0}
 .auto-item .ecobot-bolsa-badge{margin-bottom:0;flex:none}
 
+/* ---------- generador de carteles y etiquetas imprimibles HD ---------- */
+.cartel-gen{
+  padding:20px;border-radius:22px;
+  background:radial-gradient(ellipse 75% 55% at 88% 12%,rgba(52,211,153,.22) 0%,transparent 65%),
+             linear-gradient(155deg,#04130B 0%,#082417 60%,#04120B 100%);
+  border:1.5px solid rgba(52,211,153,.42);
+  box-shadow:0 14px 34px rgba(0,0,0,.35),0 0 24px rgba(34,197,94,.16);
+}
+.cartel-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;align-items:center}
+@media (max-width:700px){.cartel-grid{grid-template-columns:1fr}}
+.cartel-preview-wrap{
+  background:rgba(255,255,255,.06);border:1px solid rgba(134,239,172,.3);border-radius:16px;padding:10px;
+  display:flex;align-items:center;justify-content:center;
+}
+.cartel-canvas{width:100%;max-width:300px;height:auto;border-radius:10px;display:block;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+
 /* impresión limpia de guías y páginas informativas */
 @media print{
   body,.adm .main{background:#fff!important}

@@ -1,4 +1,4 @@
-{% extends 'base.html' %}{% load eco %}
+{% extends 'base.html' %}{% load static eco %}
 {% block titulo %}Guías{% endblock %}
 {% block contenido %}
 <h1>Guías de reciclaje</h1>
@@ -63,4 +63,29 @@
   <span><strong>Residuos especiales y puntos de entrega</strong><br><span class="small mut">Pilas, aceite, medicamentos, electrónicos y bombillos</span></span>
   <span class="ml">{% icono 'arrow' 22 '#1E7A46' %}</span>
 </a>
+
+<!-- Generador interactivo de Carteles y Etiquetas HD para Canecas -->
+<section class="cartel-gen" id="eco-cartel-gen" data-logo="{% static 'img/logo-256.png' %}" aria-labelledby="tit-cartel" style="margin-top:22px">
+  <div class="cartel-grid">
+    <div>
+      <span class="video-badge">HERRAMIENTA IMPRIMIBLE HD</span>
+      <h2 id="tit-cartel" style="margin:6px 0 4px;color:#fff;font-size:21px">Crea etiquetas para tus canecas</h2>
+      <p class="small" style="margin:0 0 12px;color:#CBE8D7">Personaliza un cartel o etiqueta con el nombre de tu casa, colegio u oficina y descárgalo en alta resolución listo para imprimir y pegar.</p>
+      <label for="cartel-titulo" style="color:#E2FBE9;margin-top:6px">Nombre de tu espacio</label>
+      <input id="cartel-titulo" type="text" maxlength="32" value="Nuestro Hogar" placeholder="Ej. Familia Navarro, Salón 5B, Oficina">
+      <label for="cartel-tipo" style="color:#E2FBE9">Diseño a generar</label>
+      <select id="cartel-tipo">
+        <option value="COMPLETO">Cartel completo (3 Bolsas + Posconsumo)</option>
+        <option value="BLANCA">Etiqueta Bolsa Blanca (Aprovechables)</option>
+        <option value="NEGRA">Etiqueta Bolsa Negra (No aprovechables)</option>
+        <option value="VERDE">Etiqueta Bolsa Verde (Orgánicos)</option>
+      </select>
+      <button type="button" id="cartel-descargar" class="btn p full" style="margin-top:14px">{% icono 'down' 18 '#fff' %}Descargar PNG listo para imprimir</button>
+    </div>
+    <div class="cartel-preview-wrap">
+      <canvas id="cartel-canvas" class="cartel-canvas" width="900" height="1200" aria-label="Vista previa en vivo de la etiqueta imprimible para canecas"></canvas>
+    </div>
+  </div>
+</section>
 {% endblock %}
+{% block scripts %}<script src="{% static 'js/cartel.js' %}?v={{ APP_VERSION }}" defer></script>{% endblock %}

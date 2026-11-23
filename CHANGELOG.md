@@ -2,6 +2,10 @@
 
 Este proyecto sigue el [Versionado Semántico (SemVer 2.0.0)](https://semver.org/lang/es/) y control de versiones en Git.
 
+## [2.8.0] - 2026-11-23
+### Innovación
+- **Generador interactivo de Carteles y Etiquetas HD para Canecas (`/guias/`)**: permite personalizar en vivo con el nombre de tu hogar, colegio u oficina y descargar en PNG listo para imprimir el cartel completo de la Resolución 2184 o las etiquetas individuales de Bolsa Blanca, Bolsa Negra y Bolsa Verde (100 % local en Canvas HTML5 y compatible con CSP estricta).
+
 ## [2.7.0] - 2026-11-22
 ### Agregado y Seguridad
 - **Buscador con autocompletado instantáneo en vivo (`/buscar/autocompletar/`)**: al escribir desde 2 caracteres muestra en tiempo real los residuos coincidentes con su etiqueta de color de bolsa (`Blanca`, `Negra`, `Verde`, `Posconsumo`), con rate-limiting y renderizado DOM seguro.

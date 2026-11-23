@@ -191,3 +191,5 @@ class TriviaTests(TestCase):
         r_guias = self.client.get('/guias/')
         self.assertEqual(r_guias.status_code, 200)
         self.assertContains(r_guias, 'data-eco-check')
+        self.assertContains(r_guias, 'eco-cartel-gen')
+        self.assertContains(r_guias, 'cartel.js')
