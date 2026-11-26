@@ -6,6 +6,7 @@ from allauth.account.models import EmailAddress
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 
+from apps.core.rls import contexto_rls_sistema
 from apps.cuentas.models import Rol, Usuario
 
 
@@ -13,6 +14,10 @@ class Command(BaseCommand):
     help = 'Crea/actualiza el administrador principal y carga guías, residuos y trivia si están vacíos (idempotente).'
 
     def handle(self, *args, **options):
+        with contexto_rls_sistema():
+            self._ejecutar()
+
+    def _ejecutar(self):
         correo_principal = os.environ.get('ADMIN_PRINCIPAL_CORREO', 'fjnv1305@gmail.com').strip().lower()
         clave_inicial = os.environ.get('ADMIN_PRINCIPAL_CLAVE', '').strip()
 

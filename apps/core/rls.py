@@ -192,15 +192,18 @@ def aplicar_politicas_postgresql():
 class RLSContextMiddleware:
     """Middleware que sincroniza el usuario autenticado con el contexto RLS en cada petición."""
 
+    RUTAS_AUTH = ('/accounts/', '/api/v1/oauth/')
+
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
         usuario = getattr(request, 'user', None)
+        es_ruta_auth = request.path.startswith(self.RUTAS_AUTH)
         if usuario is not None and getattr(usuario, 'is_authenticated', False):
-            aplicar_contexto_db(user_id=usuario.pk, role=getattr(usuario, 'rol', 'VISITANTE'), bypass=False)
+            aplicar_contexto_db(user_id=usuario.pk, role=getattr(usuario, 'rol', 'VISITANTE'), bypass=es_ruta_auth)
         else:
-            aplicar_contexto_db(user_id='', role='ANON', bypass=False)
+            aplicar_contexto_db(user_id='', role='ANON', bypass=es_ruta_auth)
         try:
             return self.get_response(request)
         finally:

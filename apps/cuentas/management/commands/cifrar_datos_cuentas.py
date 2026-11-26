@@ -3,6 +3,7 @@ from django.core.management.base import BaseCommand
 from django.db import connection
 
 from apps.core.cifrado import cifrar_texto, esta_cifrado, indice_ciego
+from apps.core.rls import contexto_rls_sistema
 from apps.cuentas.models import SolicitudAdmin, Usuario
 
 
@@ -10,6 +11,10 @@ class Command(BaseCommand):
     help = 'Cifra en base de datos los registros heredados de cuentas y solicitudes de administrador.'
 
     def handle(self, *args, **options):
+        with contexto_rls_sistema():
+            self._cifrar()
+
+    def _cifrar(self):
         usuarios_actualizados = 0
         with connection.cursor() as cur:
             cur.execute('SELECT id, correo, nombre, correo_hash FROM usuario')

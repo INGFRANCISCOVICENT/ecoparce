@@ -8,7 +8,7 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
-from apps.core.rls import filtrar_por_rls
+from apps.core.rls import contexto_rls_sistema, filtrar_por_rls
 
 
 class PermisoApi(models.TextChoices):
@@ -66,10 +66,11 @@ class ApiKey(models.Model):
             return None
         prefijo = clave_plana[:12]
         candidato_hash = _hash_clave(clave_plana)
-        for llave in cls.objects.select_related('propietario').filter(prefijo=prefijo, activa=True):
-            if hmac.compare_digest(llave.clave_hash, candidato_hash) and llave.propietario.is_active:
-                cls.objects.filter(pk=llave.pk).update(ultimo_uso=timezone.now())
-                return llave
+        with contexto_rls_sistema():
+            for llave in cls.objects.select_related('propietario').filter(prefijo=prefijo, activa=True):
+                if hmac.compare_digest(llave.clave_hash, candidato_hash) and llave.propietario.is_active:
+                    cls.objects.filter(pk=llave.pk).update(ultimo_uso=timezone.now())
+                    return llave
         return None
 
     def permite_escritura(self):
