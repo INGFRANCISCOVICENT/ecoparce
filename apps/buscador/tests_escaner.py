@@ -57,7 +57,8 @@ class EscanerTests(TestCase):
         with mock.patch('apps.buscador.escaner._consultar', return_value=None) as m:
             self.assertFalse(self.client.get('/escanear/producto/0000000000000/').json()['encontrado'])
             self.client.get('/escanear/producto/0000000000000/')
-        self.assertEqual(m.call_count, 3, 'se consulta una vez en cada base y luego se usa la caché')
+        from apps.buscador.escaner import BASES
+        self.assertEqual(m.call_count, len(BASES), 'se consulta una vez en cada base y luego se usa la caché')
 
     def test_red_caida_responde_sin_error_500(self):
         with mock.patch('apps.buscador.escaner._consultar', side_effect=OSError('sin red')):
@@ -95,6 +96,22 @@ class EscanerTests(TestCase):
         # 3. Archivo corrupto rechazado con 400
         malo = SimpleUploadedFile('malo.jpg', b'no-es-una-imagen', content_type='image/jpeg')
         self.assertEqual(self.client.post('/escanear/foto/', {'foto': malo}).status_code, 400)
+
+    def test_upcitemdb_e_inferencia_inteligente_de_empaque(self):
+        fake_upc = {
+            'product_name_es': 'Papas Margarita Pollo 105g',
+            'brands': 'Margarita',
+            'packaging_tags': [],
+            'categories_tags': ['Snacks'],
+        }
+        with mock.patch('apps.buscador.escaner._consultar', return_value=None), \
+             mock.patch('apps.buscador.escaner._consultar_upcitemdb', return_value=fake_upc):
+            r = self.client.get('/escanear/producto/7702189000123/')
+        self.assertEqual(r.status_code, 200)
+        d = r.json()
+        self.assertTrue(d['encontrado'])
+        self.assertEqual(d['fuente'], 'UPCitemdb Global')
+        self.assertEqual(d['partes'][0]['codigo'], 'NEGRA')
 
     def test_google_sin_configurar_no_manda_a_google(self):
         from django.test import override_settings

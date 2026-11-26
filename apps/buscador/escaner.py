@@ -6,8 +6,10 @@ El navegador del visitante nunca habla con esos servicios: no se comparte su IP 
 """
 import json
 import logging
+import os
 import re
 import urllib.error
+import urllib.parse
 import urllib.request
 
 from django.conf import settings
@@ -21,7 +23,9 @@ BASES = [
     ('Open Food Facts', 'https://world.openfoodfacts.org'),
     ('Open Beauty Facts', 'https://world.openbeautyfacts.org'),
     ('Open Products Facts', 'https://world.openproductsfacts.org'),
+    ('Open Pet Food Facts', 'https://world.openpetfoodfacts.org'),
 ]
+URL_UPCITEMDB = 'https://api.upcitemdb.com/prod/trial/lookup?upc={codigo}'
 CAMPOS = 'product_name,product_name_es,brands,packagings,packaging_tags,packaging_materials_tags,categories_tags'
 CODIGO_VALIDO = re.compile(r'^\d{8,14}$')
 
@@ -95,23 +99,110 @@ def clasificar_material(texto):
     return None
 
 
+# Reglas de inferencia inteligente cuando una API externa devuelve nombre/categoría sin etiquetas de empaque.
+INFERENCIA_NOMBRE = [
+    (('pila', 'bateria', 'batería', 'duracell', 'energizer', 'battery'), Contenedor.POSCONSUMO, 'Producto', 'pilas o baterías',
+     'No va en ninguna bolsa: llévalo a un punto posconsumo de pilas.', 'Posconsumo · Pilas'),
+    (('bombill', 'led bulb', 'foco', 'fluorescente'), Contenedor.POSCONSUMO, 'Producto', 'bombillo',
+     'No va en ninguna bolsa: llévalo a un punto posconsumo de luminarias.', 'Posconsumo · Luminarias'),
+    (('medicament', 'tableta', 'jarabe', 'acetaminofen', 'ibuprofeno', 'capsula', 'cápsula'), Contenedor.POSCONSUMO, 'Producto', 'medicamento',
+     'Lleva medicamentos vencidos o sobrantes a un Punto Azul posconsumo.', 'Posconsumo · Punto Azul'),
+    (('papas', 'chips', 'doritos', 'cheetos', 'mecato', 'galleta', 'chocolatina', 'snack', 'detodito', 'tostacos', 'chocoramo', 'ponque', 'ponqué'),
+     Contenedor.NEGRA, 'Envoltura', 'empaque metalizado o laminado',
+     'Las envolturas metalizadas o laminadas de mecato no son aprovechables: van en la bolsa negra.', '7 · Laminado'),
+    (('lata', 'can ', 'cerveza', 'atun', 'atún', 'sardina', 'salchicha', 'energy drink', 'red bull', 'monster'),
+     Contenedor.BLANCA, 'Lata', 'aluminio o acero',
+     'Vacía, enjuaga y aplasta la lata antes de ponerla en la bolsa blanca.', 'ALU 41 · Aluminio'),
+    (('tetra', 'leche', 'jugo', 'nectar', 'néctar', 'crema de leche', 'avena', 'alqueria', 'alquería', 'alpina', 'colanta'),
+     Contenedor.BLANCA, 'Caja', 'multicapa (tipo tetrapak)',
+     'Vacíalo, enjuágalo, ábrelo o aplástalo y ponlo seco en la bolsa blanca.', 'C/PAP 84 · Multicapa'),
+    (('vidrio', 'glass', 'frasco', 'mermelada', 'compota', 'vino', 'aceite de oliva', 'salsa'),
+     Contenedor.BLANCA, 'Frasco', 'vidrio',
+     'Vacíalo y enjuágalo para la bolsa blanca. Si está roto, envuélvelo en papel y márcalo.', 'GL 70 · Vidrio'),
+    (('agua', 'gaseosa', 'cola', 'soda', 'refresco', 'botella', 'bottle', 'pet', 'shampoo', 'champu', 'champú', 'detergente', 'jabon', 'jabón', 'suavizante', 'yogur', 'yogurt', 'aceite'),
+     Contenedor.BLANCA, 'Botella', 'plástico (PET / HDPE)',
+     'Vacíalo, enjuágalo rápido, aplástalo y ponle la tapa para la bolsa blanca.', '1 · PET / 2 · HDPE'),
+    (('caja', 'cereal', 'carton', 'cartón', 'papel', 'cuaderno', 'pasta', 'arroz'),
+     Contenedor.BLANCA, 'Caja', 'papel o cartón',
+     'Desarma y aplasta la caja limpia y seca para la bolsa blanca (si tiene grasa, va en negra).', 'PAP 21 · Cartón/Papel'),
+]
+
+
 def _consultar(base, codigo):
+    """Consulta un código de barras en Open Food/Beauty/Products/Pet Facts API v2."""
     url = f'{base}/api/v2/product/{codigo}.json?fields={CAMPOS}'
     req = urllib.request.Request(url, headers={
-        'User-Agent': f'EcoParce/1.2 ({settings.SITE_URL}; {settings.CONTACTO_SEGURIDAD})', 'Accept': 'application/json'})
+        'User-Agent': f'EcoParce/2.9 ({settings.SITE_URL}; {settings.CONTACTO_SEGURIDAD})', 'Accept': 'application/json'})
     with urllib.request.urlopen(req, timeout=6) as r:  # nosec B310: bases fijas https, código validado (solo dígitos)
         datos = json.loads(r.read().decode('utf-8'))
     return datos.get('product') if datos.get('status') == 1 else None
 
 
+def _consultar_api_empresa(codigo):
+    """Conector configurable a API de catálogo empresarial (EMPRESA_PRODUCTOS_API_URL + EMPRESA_PRODUCTOS_API_KEY)."""
+    url_base = (os.environ.get('EMPRESA_PRODUCTOS_API_URL') or '').strip()
+    if not url_base or not url_base.startswith('https://'):
+        return None
+    url = url_base.replace('{codigo}', urllib.parse.quote(codigo)) if '{codigo}' in url_base else f"{url_base.rstrip('/')}/{codigo}"
+    headers = {'Accept': 'application/json', 'User-Agent': f'EcoParce/2.9 ({settings.SITE_URL})'}
+    api_key = (os.environ.get('EMPRESA_PRODUCTOS_API_KEY') or '').strip()
+    if api_key:
+        headers['Authorization'] = f'Bearer {api_key}'
+        headers['X-API-Key'] = api_key
+    req = urllib.request.Request(url, headers=headers)
+    with urllib.request.urlopen(req, timeout=6) as r:  # nosec B310: URL HTTPS configurada por administrador
+        data = json.loads(r.read().decode('utf-8'))
+    if not isinstance(data, dict):
+        return None
+    nombre = data.get('nombre') or data.get('product_name') or data.get('title')
+    if not nombre:
+        return None
+    return {
+        'product_name_es': str(nombre)[:120],
+        'brands': str(data.get('marca') or data.get('brand') or '')[:80],
+        'packaging_tags': data.get('packaging_tags') or ([data['material']] if data.get('material') else []),
+        'categories_tags': [str(data.get('categoria') or data.get('category') or '')],
+    }
+
+
+def _consultar_upcitemdb(codigo):
+    """Consulta la base global pública UPCitemdb para productos de supermercado y consumo masivo."""
+    url = URL_UPCITEMDB.format(codigo=codigo)
+    req = urllib.request.Request(url, headers={
+        'User-Agent': f'EcoParce/2.9 ({settings.SITE_URL})', 'Accept': 'application/json'})
+    with urllib.request.urlopen(req, timeout=6) as r:  # nosec B310: endpoint fijo HTTPS, código solo dígitos
+        datos = json.loads(r.read().decode('utf-8'))
+    items = datos.get('items') or []
+    if not items:
+        return None
+    item = items[0]
+    return {
+        'product_name_es': (item.get('title') or '').strip()[:120],
+        'brands': (item.get('brand') or '').strip()[:80],
+        'packaging_tags': [],
+        'categories_tags': [item.get('category') or ''],
+    }
+
+
 def buscar_producto(codigo):
-    """Devuelve (nombre_fuente, producto) o (None, None). Usa caché para no repetir consultas."""
+    """Devuelve (nombre_fuente, producto) o (None, None). Consulta API empresarial, Open*Facts y UPCitemdb."""
     if not CODIGO_VALIDO.match(codigo):
         return None, None
     clave = f'producto:{codigo}'
     guardado = cache.get(clave)
     if guardado is not None:
         return tuple(guardado) if guardado else (None, None)
+
+    # 1. API empresarial privada (si el administrador configuró EMPRESA_PRODUCTOS_API_URL)
+    try:
+        prod_emp = _consultar_api_empresa(codigo)
+        if prod_emp:
+            cache.set(clave, ['Catálogo Empresarial API', prod_emp], 60 * 60 * 24 * 7)
+            return 'Catálogo Empresarial API', prod_emp
+    except (urllib.error.URLError, TimeoutError, ValueError, OSError) as e:
+        log.warning('Consulta de producto fallida en API Empresarial: %s', e)
+
+    # 2. Bases abiertas globales (Open Food / Beauty / Products / Pet Facts)
     for nombre, base in BASES:
         try:
             producto = _consultar(base, codigo)
@@ -121,6 +212,16 @@ def buscar_producto(codigo):
         if producto:
             cache.set(clave, [nombre, producto], 60 * 60 * 24 * 7)
             return nombre, producto
+
+    # 3. Respaldo global UPCitemdb (productos comerciales y supermercados)
+    try:
+        prod_upc = _consultar_upcitemdb(codigo)
+        if prod_upc and prod_upc.get('product_name_es'):
+            cache.set(clave, ['UPCitemdb Global', prod_upc], 60 * 60 * 24 * 7)
+            return 'UPCitemdb Global', prod_upc
+    except (urllib.error.URLError, TimeoutError, ValueError, OSError) as e:
+        log.warning('Consulta de producto fallida en UPCitemdb: %s', e)
+
     cache.set(clave, [], 60 * 60 * 12)
     return None, None
 
@@ -177,4 +278,23 @@ def analizar(producto):
                 item['simbolo'] = simbolo
                 item['significado'] = significado
             partes.append(item)
+
+    if not partes:  # respaldo inteligente: inferencia por nombre, marca y categoría del producto
+        texto_prod = ' '.join(
+            str(producto.get(k) or '')
+            for k in ('product_name_es', 'product_name', 'brands')
+        ).lower() + ' ' + categorias.lower()
+        for claves, codigo, parte, nombre_mat, indicacion, simbolo in INFERENCIA_NOMBRE:
+            if any(c in texto_prod for c in claves):
+                c = contenedores[codigo]
+                item = {
+                    'parte': parte,
+                    'material': nombre_mat,
+                    'codigo': codigo,
+                    'contenedor': c.nombre,
+                    'indicacion': indicacion,
+                    'simbolo': simbolo,
+                }
+                partes.append(item)
+                break
     return partes

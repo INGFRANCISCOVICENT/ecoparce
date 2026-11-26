@@ -43,6 +43,12 @@ services:
         value: "1"
       - key: GEMINI_API_KEY
         sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: EMPRESA_PRODUCTOS_API_URL
+        sync: false
+      - key: EMPRESA_PRODUCTOS_API_KEY
+        sync: false
 
 databases:
   - name: ecoparce-db

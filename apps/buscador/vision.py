@@ -202,6 +202,60 @@ def _clasificar_visual_local(img):
     return perfil
 
 
+def _clasificar_con_openai(jpeg_bytes):
+    """Si OPENAI_API_KEY está configurada, identifica el producto y la bolsa con visión multimodal."""
+    api_key = (os.environ.get('OPENAI_API_KEY') or '').strip()
+    if not api_key:
+        return None
+    b64 = base64.b64encode(jpeg_bytes).decode('ascii')
+    prompt = (
+        'Eres un experto en separación de residuos de Colombia (Resolución 2184 de 2019). '
+        'Observa la foto y responde SOLO JSON válido con: '
+        '{"producto": "nombre corto en español", "material": "material principal", '
+        '"codigo": "BLANCA" | "NEGRA" | "VERDE" | "POSCONSUMO", '
+        '"indicacion": "cómo prepararlo", "simbolo": "ej. 1 · PET, PAP 21, Orgánico, Posconsumo"}.'
+    )
+    cuerpo = {
+        'model': 'gpt-4o-mini',
+        'response_format': {'type': 'json_object'},
+        'messages': [{
+            'role': 'user',
+            'content': [
+                {'type': 'text', 'text': prompt},
+                {'type': 'image_url', 'image_url': {'url': f'data:image/jpeg;base64,{b64}'}},
+            ],
+        }],
+        'max_tokens': 220,
+    }
+    req = urllib.request.Request(
+        'https://api.openai.com/v1/chat/completions',
+        data=json.dumps(cuerpo).encode('utf-8'),
+        headers={'Content-Type': 'application/json', 'Authorization': f'Bearer {api_key}'},
+        method='POST',
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=12) as resp:  # nosec B310: endpoint fijo HTTPS OpenAI
+            data = json.loads(resp.read().decode('utf-8'))
+        parsed = json.loads(data['choices'][0]['message']['content'])
+        codigo = str(parsed.get('codigo', '')).upper()
+        if codigo not in (Contenedor.BLANCA, Contenedor.NEGRA, Contenedor.VERDE, Contenedor.POSCONSUMO):
+            return None
+        cont = Contenedor.objects.filter(codigo=codigo).first()
+        return {
+            'producto': str(parsed.get('producto') or 'Producto identificado')[:120],
+            'material': str(parsed.get('material') or 'Material identificado')[:80],
+            'codigo': codigo,
+            'contenedor': cont.nombre if cont else codigo,
+            'indicacion': str(parsed.get('indicacion') or 'Sepáralo según la Resolución 2184 de 2019.')[:240],
+            'simbolo': str(parsed.get('simbolo') or '')[:60],
+            'metodo': 'ia_vision',
+            'requiere_confirmacion': False,
+        }
+    except (urllib.error.URLError, TimeoutError, KeyError, IndexError, ValueError, OSError) as exc:
+        log.warning('Clasificación con OpenAI Vision fallida, usando análisis local: %s', exc)
+        return None
+
+
 def analizar_foto(archivo_bytes, tipo_manual=''):
     """Analiza una foto de producto/residuo y devuelve la indicación completa de bolsa y preparación."""
     if tipo_manual and tipo_manual in PERFILES_MATERIAL:
@@ -211,7 +265,7 @@ def analizar_foto(archivo_bytes, tipo_manual=''):
         return perfil
 
     img, jpeg_bytes = validar_y_normalizar_foto(archivo_bytes)
-    resultado_ia = _clasificar_con_gemini(jpeg_bytes)
+    resultado_ia = _clasificar_con_gemini(jpeg_bytes) or _clasificar_con_openai(jpeg_bytes)
     if resultado_ia is not None:
         return resultado_ia
     return _clasificar_visual_local(img)

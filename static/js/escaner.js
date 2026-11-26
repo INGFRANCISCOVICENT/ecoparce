@@ -243,6 +243,32 @@
       .catch(function () { aviso('error', 'Error de conexión al analizar la foto. Intenta de nuevo.'); });
   }
 
+  function detectarCodigoEnImagen(blob, alTerminar) {
+    if ('BarcodeDetector' in window && window.createImageBitmap) {
+      var det = new window.BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'qr_code', 'code_128'] });
+      window.createImageBitmap(blob).then(function (bmp) {
+        return det.detect(bmp).then(function (codigos) {
+          if (bmp.close) { bmp.close(); }
+          alTerminar(codigos && codigos.length ? codigos[0].rawValue : '');
+        });
+      }).catch(function () { alTerminar(''); });
+      return;
+    }
+    alTerminar('');
+  }
+
+  function procesarFotoCapturada(blob) {
+    aviso('info', 'Escaneando foto en busca de código o producto…');
+    detectarCodigoEnImagen(blob, function (codigoDetectado) {
+      if (codigoDetectado) {
+        ultimo = '';
+        leido(codigoDetectado);
+        return;
+      }
+      enviarFoto(blob, '');
+    });
+  }
+
   function capturarDesdeVideo() {
     if (!video || !video.videoWidth) { aviso('error', 'Espera un segundo a que la cámara enfoque.'); return; }
     var canvas = document.createElement('canvas');
@@ -254,7 +280,7 @@
     ultimaFotoUrl = canvas.toDataURL('image/jpeg', 0.8);
     parar();
     canvas.toBlob(function (blob) {
-      if (blob) { enviarFoto(blob, ''); }
+      if (blob) { procesarFotoCapturada(blob); }
     }, 'image/jpeg', 0.82);
   }
 
@@ -308,7 +334,7 @@
       if (!archivo) { return; }
       if (ultimaFotoUrl && ultimaFotoUrl.indexOf('blob:') === 0) { URL.revokeObjectURL(ultimaFotoUrl); }
       ultimaFotoUrl = URL.createObjectURL(archivo);
-      enviarFoto(archivo, '');
+      procesarFotoCapturada(archivo);
       inputFoto.value = '';
     });
   }
