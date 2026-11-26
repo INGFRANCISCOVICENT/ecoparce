@@ -62,10 +62,10 @@
   <span>✨ ¡Hay una nueva versión de EcoParce disponible (<strong id="update-ver-txt"></strong>)!</span>
   <button type="button" class="btn p sm" id="btn-actualizar-app">Actualizar ahora</button>
 </aside>
-<!-- Asistente experto flotante: Consultor Instantáneo de Escarlata -->
-<button type="button" id="ecobot-fab" class="ecobot-fab" aria-expanded="false" aria-controls="ecobot-panel" aria-label="Abrir asistente experto de reciclaje Escarlata">
-  <img src="{% static 'img/logo-96.png' %}" alt="" width="28" height="28">
-  <span>Asistente Eco</span>
+<!-- Botón flotante limpio: logo circular de Escarlata como asistente -->
+<button type="button" id="ecobot-fab" class="ecobot-fab" aria-expanded="false" aria-controls="ecobot-panel" aria-label="Abrir asistente Escarlata" title="Escarlata · Asistente de reciclaje">
+  <img src="{% static 'img/logo-96.png' %}" alt="Escarlata" width="44" height="44">
+  <span class="ecobot-fab-dot" aria-hidden="true"></span>
 </button>
 <section id="ecobot-panel" class="ecobot-panel" role="dialog" aria-label="Asistente experto EcoParce" data-api="{% url 'buscador:asistente_consultar' %}" hidden>
   <header class="ecobot-head">

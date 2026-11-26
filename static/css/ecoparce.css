@@ -1197,14 +1197,20 @@ html[data-contraste="alto"] :focus-visible{outline:4px solid #000;outline-offset
 /* ---------- asistente experto flotante EcoBot ---------- */
 .ecobot-fab{
   position:fixed;right:14px;bottom:92px;z-index:85;
-  display:inline-flex;align-items:center;gap:8px;padding:9px 15px 9px 10px;border-radius:999px;
-  background:linear-gradient(135deg,#0B3B24,#16A34A);color:#fff;
-  border:1.5px solid rgba(110,231,183,.72);font:inherit;font-size:13.5px;font-weight:800;cursor:pointer;
-  box-shadow:0 10px 26px rgba(0,0,0,.42),0 0 20px rgba(52,211,153,.35),inset 0 1px 1px rgba(255,255,255,.35);
-  transition:transform var(--tr),filter var(--tr);
+  width:56px;height:56px;padding:0;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 30% 25%,#22C55E 0%,#14532D 78%);
+  border:2px solid rgba(134,239,172,.82);cursor:pointer;
+  box-shadow:0 10px 26px rgba(0,0,0,.42),0 0 22px rgba(52,211,153,.38),inset 0 1.5px 2px rgba(255,255,255,.45);
+  transition:transform var(--tr),filter var(--tr),box-shadow var(--tr);
 }
-.ecobot-fab:hover{transform:translateY(-2px);filter:brightness(1.08)}
-.ecobot-fab img{border-radius:50%;background:#fff}
+.ecobot-fab:hover{transform:translateY(-3px) scale(1.05);filter:brightness(1.06);box-shadow:0 14px 30px rgba(0,0,0,.48),0 0 28px rgba(74,222,128,.5)}
+.ecobot-fab img{width:44px;height:44px;border-radius:50%;background:#fff;display:block;object-fit:cover}
+.ecobot-fab-dot{
+  position:absolute;right:1px;bottom:1px;width:14px;height:14px;border-radius:50%;
+  background:#22C55E;border:2.5px solid #062114;
+  box-shadow:0 0 0 2px rgba(74,222,128,.45);
+}
 @media (min-width:1025px){.ecobot-fab{bottom:22px;right:22px}}
 .ecobot-panel{
   position:fixed;right:14px;bottom:146px;z-index:88;width:min(92vw,380px);

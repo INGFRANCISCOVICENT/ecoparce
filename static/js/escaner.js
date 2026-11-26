@@ -294,7 +294,7 @@
 
   function detectarCodigoEnImagen(blob, imgUrl, alTerminar) {
     if ('BarcodeDetector' in window && window.createImageBitmap) {
-      var det = new window.BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'qr_code', 'code_128'] });
+      var det = new window.BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128'] });
       window.createImageBitmap(blob).then(function (bmp) {
         return det.detect(bmp).then(function (codigos) {
           if (bmp.close) { bmp.close(); }
