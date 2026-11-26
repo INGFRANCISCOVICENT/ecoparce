@@ -662,4 +662,80 @@
       navigator.serviceWorker.register('/sw.js').catch(function () {});
     });
   }
+
+  // Lente Liquid Glass deslizante en la barra inferior de móvil y tablet (cursor y dedo)
+  var tabbar = document.querySelector('.tabbar');
+  if (tabbar) {
+    var enlaces = Array.prototype.slice.call(tabbar.querySelectorAll('a'));
+    if (enlaces.length) {
+      var pill = document.createElement('span');
+      pill.className = 'tabbar-glass-pill';
+      pill.setAttribute('aria-hidden', 'true');
+      tabbar.insertBefore(pill, tabbar.firstChild);
+
+      var activo = tabbar.querySelector('a.on') || enlaces[0];
+      var actualHover = activo;
+
+      function moverLente(el) {
+        if (!el) return;
+        var barRect = tabbar.getBoundingClientRect();
+        var r = el.getBoundingClientRect();
+        if (!r.width) return;
+        pill.style.width = r.width + 'px';
+        pill.style.transform = 'translate3d(' + (r.left - barRect.left) + 'px, 0, 0)';
+        tabbar.classList.add('glass-activo');
+        enlaces.forEach(function (a) { a.classList.toggle('glass-hover', a === el); });
+        actualHover = el;
+      }
+
+      function enlaceEnX(clientX) {
+        for (var i = 0; i < enlaces.length; i++) {
+          var r = enlaces[i].getBoundingClientRect();
+          if (clientX >= r.left && clientX <= r.right) return enlaces[i];
+        }
+        return null;
+      }
+
+      enlaces.forEach(function (a) {
+        a.addEventListener('pointerenter', function () { moverLente(a); });
+        a.addEventListener('focus', function () { moverLente(a); });
+      });
+
+      tabbar.addEventListener('pointermove', function (e) {
+        var destino = enlaceEnX(e.clientX);
+        if (destino && destino !== actualHover) moverLente(destino);
+      });
+
+      tabbar.addEventListener('pointerleave', function () {
+        moverLente(activo);
+      });
+
+      // Deslizamiento táctil suave por debajo del menú en teléfono/tablet
+      var arrastrando = false;
+      tabbar.addEventListener('touchstart', function (e) {
+        if (e.touches && e.touches[0]) {
+          arrastrando = true;
+          var d = enlaceEnX(e.touches[0].clientX);
+          if (d) moverLente(d);
+        }
+      }, { passive: true });
+      tabbar.addEventListener('touchmove', function (e) {
+        if (!arrastrando || !e.touches || !e.touches[0]) return;
+        var d = enlaceEnX(e.touches[0].clientX);
+        if (d && d !== actualHover) moverLente(d);
+      }, { passive: true });
+      tabbar.addEventListener('touchend', function () {
+        if (!arrastrando) return;
+        arrastrando = false;
+        if (actualHover && actualHover !== activo && actualHover.href) {
+          location.href = actualHover.href;
+        } else {
+          moverLente(activo);
+        }
+      });
+
+      window.addEventListener('resize', function () { moverLente(activo); });
+      requestAnimationFrame(function () { moverLente(activo); });
+    }
+  }
 })();

@@ -192,35 +192,58 @@
   function mostrarResultadoFoto(d) {
     if (d.error) { aviso('error', esc(d.error)); return; }
     var h = '<section class="card" style="margin-top:14px;padding:16px">';
-    if (ultimaFotoUrl) {
-      h += '<div class="row" style="gap:12px;align-items:center;margin-bottom:12px">' +
-        '<img src="' + esc(ultimaFotoUrl) + '" alt="Foto capturada del producto" style="width:72px;height:72px;object-fit:cover;border-radius:12px;border:1px solid var(--line)">' +
-        '<div><div class="xs mut">' + (d.metodo === 'ia_vision' ? 'Identificado por visión IA' : 'Análisis visual EcoParce · Res. 2184') + '</div>' +
-        '<strong style="font-size:18px">' + esc(d.producto) + '</strong>' +
-        (d.simbolo ? ' <div><span class="tag">' + esc(d.simbolo) + '</span></div>' : '') + '</div></div>';
+    if (d.identificado === false) {
+      if (ultimaFotoUrl) {
+        h += '<div class="row" style="gap:12px;align-items:center;margin-bottom:10px">' +
+          '<img src="' + esc(ultimaFotoUrl) + '" alt="Foto capturada" style="width:72px;height:72px;object-fit:cover;border-radius:12px;border:1px solid var(--line)">' +
+          '<div><strong style="font-size:16px">¿Qué objeto fotografiaste?</strong>' +
+          '<div class="xs mut" style="margin-top:3px">' + esc(d.mensaje || 'Escribe o toca el tipo de objeto para ver dónde va.') + '</div></div></div>';
+      } else {
+        h += '<p class="small">' + esc(d.mensaje) + '</p>';
+      }
+      h += '<form id="form-objeto-foto" class="search" style="margin-top:10px" autocomplete="off">' +
+        '<input id="input-objeto-foto" type="text" maxlength="80" placeholder="Ej. computador, botella, pilas, cartón, cáscara..." required>' +
+        '<button type="submit">Clasificar</button></form>';
     } else {
-      h += '<strong style="font-size:18px">' + esc(d.producto) + '</strong>';
+      if (ultimaFotoUrl) {
+        h += '<div class="row" style="gap:12px;align-items:center;margin-bottom:12px">' +
+          '<img src="' + esc(ultimaFotoUrl) + '" alt="Foto capturada del producto" style="width:72px;height:72px;object-fit:cover;border-radius:12px;border:1px solid var(--line)">' +
+          '<div><div class="xs mut">' + (d.metodo === 'ia_vision' ? 'Identificado por visión IA real' : 'Clasificación EcoParce · Res. 2184') + '</div>' +
+          '<strong style="font-size:18px">' + esc(d.producto) + '</strong>' +
+          (d.simbolo ? ' <div><span class="tag">' + esc(d.simbolo) + '</span></div>' : '') + '</div></div>';
+      } else {
+        h += '<strong style="font-size:18px">' + esc(d.producto) + '</strong>';
+      }
+      h += '<div class="row" style="margin-top:8px;align-items:flex-start">' +
+        '<span class="swatch chip-' + esc(d.codigo) + '" style="width:48px;height:48px;border-radius:12px"></span>' +
+        '<div><strong>Va en: ' + esc(d.contenedor) + '</strong>' +
+        '<div class="small mut" style="margin-top:4px">' + esc(d.indicacion) + '</div>' +
+        (d.puntos_url ? '<a class="btn p sm" style="margin-top:8px" href="' + esc(d.puntos_url) + '">Ver puntos posconsumo cercanos</a>' : '') +
+        '</div></div>';
     }
-    h += '<div class="row" style="margin-top:8px;align-items:flex-start">' +
-      '<span class="swatch chip-' + esc(d.codigo) + '" style="width:48px;height:48px;border-radius:12px"></span>' +
-      '<div><strong>Va en: ' + esc(d.contenedor) + '</strong>' +
-      '<div class="small mut" style="margin-top:4px">' + esc(d.indicacion) + '</div>' +
-      (d.puntos_url ? '<a class="btn p sm" style="margin-top:8px" href="' + esc(d.puntos_url) + '">Ver puntos posconsumo cercanos</a>' : '') +
-      '</div></div>';
 
     h += '<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line)">' +
-      '<div class="xs mut" style="margin-bottom:8px">¿Tu producto es de otro material? Tócalo para ajustar al instante:</div>' +
+      '<div class="xs mut" style="margin-bottom:8px">O toca la categoría real del objeto:</div>' +
       '<div class="row" style="gap:6px;flex-wrap:wrap">' +
+      '<button type="button" class="btn o sm" data-tipo-foto="electronico">PC / Electrónico (RAEE)</button>' +
       '<button type="button" class="btn o sm" data-tipo-foto="plastico">Plástico / Botella</button>' +
       '<button type="button" class="btn o sm" data-tipo-foto="carton">Cartón / Papel</button>' +
       '<button type="button" class="btn o sm" data-tipo-foto="vidrio">Vidrio</button>' +
       '<button type="button" class="btn o sm" data-tipo-foto="metal">Lata / Metal</button>' +
       '<button type="button" class="btn o sm" data-tipo-foto="metalizado">Mecato / Sucio</button>' +
       '<button type="button" class="btn o sm" data-tipo-foto="organico">Orgánico</button>' +
-      '<button type="button" class="btn o sm" data-tipo-foto="posconsumo">Pila / Especial</button>' +
+      '<button type="button" class="btn o sm" data-tipo-foto="posconsumo">Pila / Bombillo / Aceite</button>' +
       '</div></div></section>';
 
     resultado.innerHTML = h;
+    var fObj = document.getElementById('form-objeto-foto');
+    if (fObj) {
+      fObj.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var q = (document.getElementById('input-objeto-foto').value || '').trim();
+        if (q) { consultarCatalogoQr(q); }
+      });
+    }
     resultado.querySelectorAll('[data-tipo-foto]').forEach(function (b) {
       b.addEventListener('click', function () { enviarFoto(null, b.getAttribute('data-tipo-foto')); });
     });

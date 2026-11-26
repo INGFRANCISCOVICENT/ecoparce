@@ -75,12 +75,20 @@ PERFILES_MATERIAL = {
         'simbolo': 'Orgánico · Compostable',
     },
     'posconsumo': {
-        'producto': 'Residuo especial (pilas, bombillos, medicamentos, aceite o RAEE)',
+        'producto': 'Residuo especial (pilas, bombillos, medicamentos o aceite usado)',
         'material': 'Residuo posconsumo / peligroso',
         'codigo': Contenedor.POSCONSUMO,
         'contenedor': 'Punto de entrega Posconsumo',
         'indicacion': 'Nunca va en ninguna bolsa ordinaria. Guárdalo aparte sin romperlo y llévalo a un punto oficial.',
-        'simbolo': 'Posconsumo · RAEE',
+        'simbolo': 'Posconsumo · Especial',
+    },
+    'electronico': {
+        'producto': 'Aparato eléctrico o electrónico (PC, portátil, celular, monitor, teclado, cables)',
+        'material': 'RAEE (Residuo de Aparato Eléctrico y Electrónico)',
+        'codigo': Contenedor.POSCONSUMO,
+        'contenedor': 'Punto de entrega Posconsumo (RAEE)',
+        'indicacion': 'Nunca va en la basura ni se enjuaga. Entrégalo entero en un punto posconsumo RAEE (EcoCómputo / Red Verde) para recuperar sus metales y evitar contaminación.',
+        'simbolo': 'RAEE · Contenedor tachado',
     },
 }
 
@@ -153,6 +161,7 @@ def _clasificar_con_gemini(jpeg_bytes):
             'contenedor': cont.nombre if cont else codigo,
             'indicacion': str(parsed.get('indicacion') or 'Sepáralo según la Resolución 2184 de 2019.')[:240],
             'simbolo': str(parsed.get('simbolo') or '')[:60],
+            'identificado': True,
             'metodo': 'ia_vision',
             'requiere_confirmacion': False,
         }
@@ -248,6 +257,7 @@ def _clasificar_con_openai(jpeg_bytes):
             'contenedor': cont.nombre if cont else codigo,
             'indicacion': str(parsed.get('indicacion') or 'Sepáralo según la Resolución 2184 de 2019.')[:240],
             'simbolo': str(parsed.get('simbolo') or '')[:60],
+            'identificado': True,
             'metodo': 'ia_vision',
             'requiere_confirmacion': False,
         }
@@ -257,15 +267,33 @@ def _clasificar_con_openai(jpeg_bytes):
 
 
 def analizar_foto(archivo_bytes, tipo_manual=''):
-    """Analiza una foto de producto/residuo y devuelve la indicación completa de bolsa y preparación."""
+    """Analiza una foto real: usa IA multimodal (Gemini/OpenAI) si hay clave; jamás adivina por color."""
     if tipo_manual and tipo_manual in PERFILES_MATERIAL:
         perfil = dict(PERFILES_MATERIAL[tipo_manual])
+        perfil['identificado'] = True
         perfil['metodo'] = 'seleccion_directa'
         perfil['requiere_confirmacion'] = False
         return perfil
 
-    img, jpeg_bytes = validar_y_normalizar_foto(archivo_bytes)
+    _img, jpeg_bytes = validar_y_normalizar_foto(archivo_bytes)
     resultado_ia = _clasificar_con_gemini(jpeg_bytes) or _clasificar_con_openai(jpeg_bytes)
     if resultado_ia is not None:
         return resultado_ia
-    return _clasificar_visual_local(img)
+
+    # Sin clave de IA multimodal configurada, NO inventamos un material por color: pedimos confirmación real.
+    return {
+        'identificado': False,
+        'metodo': 'requiere_ia_o_seleccion',
+        'codigo': '',
+        'producto': '',
+        'material': '',
+        'contenedor': '',
+        'indicacion': '',
+        'simbolo': '',
+        'mensaje': (
+            'Foto recibida con éxito. El reconocimiento automático de objetos por IA aún no tiene clave '
+            'GEMINI_API_KEY activa en este servidor; para no darte una respuesta incorrecta, escribe qué '
+            'objeto fotografiaste o selecciónalo abajo para ver su bolsa exacta:'
+        ),
+        'requiere_confirmacion': True,
+    }

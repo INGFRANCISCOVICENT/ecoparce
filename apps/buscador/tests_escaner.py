@@ -76,20 +76,21 @@ class EscanerTests(TestCase):
         from django.core.files.uploadedfile import SimpleUploadedFile
         from PIL import Image
 
-        # 1. Foto JPEG válida (verde -> clasifica como orgánico en bolsa verde)
+        # 1. Foto JPEG válida sin clave IA: no adivina por color (identificado=False)
         buf = io.BytesIO()
         Image.new('RGB', (120, 120), color=(40, 180, 70)).save(buf, format='JPEG')
-        foto = SimpleUploadedFile('cascara.jpg', buf.getvalue(), content_type='image/jpeg')
+        foto = SimpleUploadedFile('objeto.jpg', buf.getvalue(), content_type='image/jpeg')
         r = self.client.post('/escanear/foto/', {'foto': foto})
         self.assertEqual(r.status_code, 200)
         d = r.json()
         self.assertTrue(d['ok'])
-        self.assertEqual(d['codigo'], 'VERDE')
-        self.assertEqual(d['metodo'], 'visual_local')
+        self.assertFalse(d['identificado'])
+        self.assertEqual(d['metodo'], 'requiere_ia_o_seleccion')
 
-        # 2. Ajuste directo en 1 toque -> posconsumo incluye puntos_url
-        r2 = self.client.post('/escanear/foto/', {'tipo': 'posconsumo'})
+        # 2. Ajuste directo en 1 toque -> electrónico (PC/RAEE) va a POSCONSUMO con puntos_url
+        r2 = self.client.post('/escanear/foto/', {'tipo': 'electronico'})
         self.assertEqual(r2.status_code, 200)
+        self.assertTrue(r2.json()['identificado'])
         self.assertEqual(r2.json()['codigo'], 'POSCONSUMO')
         self.assertTrue(r2.json().get('puntos_url'))
 

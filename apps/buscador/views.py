@@ -226,9 +226,10 @@ def analizar_foto_vista(request):
     except ValueError as exc:
         return JsonResponse({'error': str(exc)}, status=400)
 
-    if datos['codigo'] == Contenedor.POSCONSUMO:
+    if datos.get('codigo') == Contenedor.POSCONSUMO:
         datos['puntos_url'] = reverse('contenidos:puntos')
-    Busqueda.objects.create(termino=f"foto {normalizar(datos['material'])}"[:100], encontrado=True)
+    if datos.get('identificado'):
+        Busqueda.objects.create(termino=f"foto {normalizar(datos['material'])}"[:100], encontrado=True)
     resp = JsonResponse({'ok': True, **datos})
     resp['Cache-Control'] = 'no-store'
     return resp
