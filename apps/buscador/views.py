@@ -77,7 +77,7 @@ def buscar_residuos(termino):
     candidatos = []
     for r in publicados:
         sim = _similitud_residuo(objetivo, tokens_largos or [objetivo], r)
-        if sim >= 0.70:
+        if sim >= 0.78:
             candidatos.append((sim, r))
     candidatos.sort(key=lambda par: (-par[0], len(par[1].nombre)))
     return [r for _, r in candidatos[:6]]

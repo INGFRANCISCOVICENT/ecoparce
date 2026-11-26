@@ -131,6 +131,11 @@ class EscanerTests(TestCase):
         self.assertEqual(r_pc.json()['codigo'], 'POSCONSUMO')
         self.assertTrue(r_pc.json().get('puntos_url'))
 
+        # Cabello humano -> Bolsa Negra (jamás confundir con cebolla/cáscaras)
+        r_cab = self.client.get('/asistente/consultar/?q=quiero botar cabello humano')
+        self.assertEqual(r_cab.status_code, 200)
+        self.assertEqual(r_cab.json()['codigo'], 'NEGRA')
+
     def test_google_sin_configurar_no_manda_a_google(self):
         from django.test import override_settings
         with override_settings(SOCIALACCOUNT_PROVIDERS={'google': {'APPS': [{'client_id': '', 'secret': '', 'key': ''}]}}):

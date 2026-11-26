@@ -82,6 +82,29 @@ def _respuesta_intencion(qn):
             'relacionados': ['Servilletas', 'Icopor', 'Cartón limpio'],
         }
 
+    # 3b. Residuos de higiene personal, sanitarios y no aprovechables comunes del hogar
+    if any(p in qn for p in (
+        'cabello', 'pelo', 'unas', 'panal', 'toalla higienica', 'tampon', 'tapabocas',
+        'mascarilla', 'copito', 'algodon', 'curita', 'gasa', 'colilla', 'cigarrillo',
+        'chicle', 'arena de gato', 'heces', 'excremento', 'polvo', 'barrido', 'esponja',
+        'cepillo de dientes', 'prestobarba', 'cuchilla',
+    )):
+        return {
+            'encontrado': True,
+            'residuo': 'Residuo de higiene personal o no aprovechable (cabello, aseo, sanitarios)',
+            'contenedor': 'Bolsa negra (No aprovechables)',
+            'codigo': 'NEGRA',
+            'pasos': [
+                'El cabello humano, uñas, copitos, tapabocas, pañales, colillas y residuos de barrido no son reciclables ni van al compostaje ordinario.',
+                'Deposítalos directamente en la bolsa negra bien cerrada.',
+                'Si es una cuchilla o elemento cortopunzante, envuélvelo en cartón o papel grueso y márcalo para proteger a los recolectores.',
+            ],
+            'guia_url': reverse('contenidos:guias'),
+            'guia_titulo': 'Ver guía de Bolsa Negra',
+            'puntos_url': '',
+            'relacionados': ['Servilletas', 'Papel higiénico', 'Res. 2184'],
+        }
+
     # 4. Aparatos electrónicos / RAEE (PC, celular, monitor, cables, electrodomésticos)
     if any(p in qn for p in ('computador', 'portatil', 'laptop', 'monitor', 'teclado', 'mouse', 'cargador', 'celular', 'televisor', 'raee', 'electronico', 'electrodomestico')):
         return {
