@@ -2,7 +2,7 @@ class CabecerasSeguridadMiddleware:
     """Cabeceras de endurecimiento OWASP (RNF-02): CSP estricta, Permissions-Policy y aislamiento."""
     CSP = (
         "default-src 'self'; "
-        "img-src 'self' data: https://tile.openstreetmap.org; "
+        "img-src 'self' data: blob: https://tile.openstreetmap.org; "
         "style-src 'self' 'unsafe-inline'; "
         "script-src 'self'; "
         "font-src 'self'; "

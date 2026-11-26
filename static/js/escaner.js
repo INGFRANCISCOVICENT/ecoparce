@@ -5,13 +5,16 @@
   var script = document.getElementById('escaner-js');
   if (!script) { return; }
   var API = script.getAttribute('data-api').replace('00000000', '{c}');
+  var API_FOTO = script.getAttribute('data-foto') || '/escanear/foto/';
   var BUSCAR = script.getAttribute('data-buscar');
   var ASISTENTE = script.getAttribute('data-asistente') || '/asistente/consultar/';
   var caja = document.getElementById('escaner');
   var video = document.getElementById('video'), vacio = document.getElementById('escaner-vacio');
   var btn = document.getElementById('btn-camara'), detener = document.getElementById('btn-detener');
+  var btnFoto = document.getElementById('btn-foto'), btnCapturar = document.getElementById('btn-capturar');
+  var inputFoto = document.getElementById('input-foto'), formFoto = document.getElementById('form-foto');
   var resultado = document.getElementById('resultado');
-  var flujo = null, lector = null, activo = false, ultimo = '';
+  var flujo = null, lector = null, activo = false, ultimo = '', ultimaFotoUrl = '';
 
   function esc(t) { var d = document.createElement('div'); d.textContent = t == null ? '' : String(t); return d.innerHTML; }
   function aviso(clase, html) {
@@ -22,8 +25,10 @@
   function mostrar(d) {
     if (d.error) { aviso('error', esc(d.error)); return; }
     if (!d.encontrado) {
-      aviso('info', 'No encontramos el producto <strong>' + esc(d.codigo) + '</strong> en las bases abiertas. ' +
-        'Revisa el símbolo de reciclaje en la base del envase abajo o <a href="' + BUSCAR + '">búscalo por su nombre</a>.');
+      aviso('info', 'No encontramos el código <strong>' + esc(d.codigo) + '</strong> en bases externas. ' +
+        '<strong>¡No importa!</strong> <button type="button" class="link-btn" data-abrir-foto>Toma una foto del producto aquí</button> o <a href="' + BUSCAR + '">búscalo por nombre</a>.');
+      var bnf = resultado.querySelector('[data-abrir-foto]');
+      if (bnf && inputFoto) { bnf.addEventListener('click', function () { inputFoto.click(); }); }
       return;
     }
     var h = '<section class="card" style="margin-top:14px;padding:16px"><div class="small mut">' + esc(d.marca) + '</div>' +
@@ -175,6 +180,82 @@
     if (lector) { try { lector.reset(); } catch (e) { /* ignorar */ } lector = null; }
     if (flujo) { flujo.getTracks().forEach(function (t) { t.stop(); }); flujo = null; }
     video.srcObject = null; vacio.hidden = false; btn.hidden = false; detener.hidden = true;
+    if (btnCapturar) { btnCapturar.hidden = true; }
+  }
+
+  function obtenerCsrf() {
+    if (!formFoto) { return ''; }
+    var inp = formFoto.querySelector('input[name="csrfmiddlewaretoken"]');
+    return inp ? inp.value : '';
+  }
+
+  function mostrarResultadoFoto(d) {
+    if (d.error) { aviso('error', esc(d.error)); return; }
+    var h = '<section class="card" style="margin-top:14px;padding:16px">';
+    if (ultimaFotoUrl) {
+      h += '<div class="row" style="gap:12px;align-items:center;margin-bottom:12px">' +
+        '<img src="' + esc(ultimaFotoUrl) + '" alt="Foto capturada del producto" style="width:72px;height:72px;object-fit:cover;border-radius:12px;border:1px solid var(--line)">' +
+        '<div><div class="xs mut">' + (d.metodo === 'ia_vision' ? 'Identificado por visión IA' : 'Análisis visual EcoParce · Res. 2184') + '</div>' +
+        '<strong style="font-size:18px">' + esc(d.producto) + '</strong>' +
+        (d.simbolo ? ' <div><span class="tag">' + esc(d.simbolo) + '</span></div>' : '') + '</div></div>';
+    } else {
+      h += '<strong style="font-size:18px">' + esc(d.producto) + '</strong>';
+    }
+    h += '<div class="row" style="margin-top:8px;align-items:flex-start">' +
+      '<span class="swatch chip-' + esc(d.codigo) + '" style="width:48px;height:48px;border-radius:12px"></span>' +
+      '<div><strong>Va en: ' + esc(d.contenedor) + '</strong>' +
+      '<div class="small mut" style="margin-top:4px">' + esc(d.indicacion) + '</div>' +
+      (d.puntos_url ? '<a class="btn p sm" style="margin-top:8px" href="' + esc(d.puntos_url) + '">Ver puntos posconsumo cercanos</a>' : '') +
+      '</div></div>';
+
+    h += '<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line)">' +
+      '<div class="xs mut" style="margin-bottom:8px">¿Tu producto es de otro material? Tócalo para ajustar al instante:</div>' +
+      '<div class="row" style="gap:6px;flex-wrap:wrap">' +
+      '<button type="button" class="btn o sm" data-tipo-foto="plastico">Plástico / Botella</button>' +
+      '<button type="button" class="btn o sm" data-tipo-foto="carton">Cartón / Papel</button>' +
+      '<button type="button" class="btn o sm" data-tipo-foto="vidrio">Vidrio</button>' +
+      '<button type="button" class="btn o sm" data-tipo-foto="metal">Lata / Metal</button>' +
+      '<button type="button" class="btn o sm" data-tipo-foto="metalizado">Mecato / Sucio</button>' +
+      '<button type="button" class="btn o sm" data-tipo-foto="organico">Orgánico</button>' +
+      '<button type="button" class="btn o sm" data-tipo-foto="posconsumo">Pila / Especial</button>' +
+      '</div></div></section>';
+
+    resultado.innerHTML = h;
+    resultado.querySelectorAll('[data-tipo-foto]').forEach(function (b) {
+      b.addEventListener('click', function () { enviarFoto(null, b.getAttribute('data-tipo-foto')); });
+    });
+    enfocarResultado();
+  }
+
+  function enviarFoto(blob, tipoManual) {
+    aviso('info', tipoManual ? 'Actualizando indicación de bolsa…' : 'Analizando la foto del producto…');
+    var fd = new FormData();
+    if (blob) { fd.append('foto', blob, 'producto.jpg'); }
+    if (tipoManual) { fd.append('tipo', tipoManual); }
+    fetch(API_FOTO, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'X-CSRFToken': obtenerCsrf(), 'Accept': 'application/json' },
+      body: fd
+    })
+      .then(function (r) { return r.json().catch(function () { return { error: 'No pudimos leer la respuesta del servidor.' }; }); })
+      .then(mostrarResultadoFoto)
+      .catch(function () { aviso('error', 'Error de conexión al analizar la foto. Intenta de nuevo.'); });
+  }
+
+  function capturarDesdeVideo() {
+    if (!video || !video.videoWidth) { aviso('error', 'Espera un segundo a que la cámara enfoque.'); return; }
+    var canvas = document.createElement('canvas');
+    var maxDim = 800;
+    var escale = Math.min(1, maxDim / Math.max(video.videoWidth, video.videoHeight));
+    canvas.width = Math.round(video.videoWidth * escale);
+    canvas.height = Math.round(video.videoHeight * escale);
+    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+    ultimaFotoUrl = canvas.toDataURL('image/jpeg', 0.8);
+    parar();
+    canvas.toBlob(function (blob) {
+      if (blob) { enviarFoto(blob, ''); }
+    }, 'image/jpeg', 0.82);
   }
 
   function conDetector() {
@@ -212,12 +293,25 @@
       aviso('error', 'Este navegador no permite usar la cámara aquí. Escribe el número del código.'); return;
     }
     ultimo = ''; resultado.innerHTML = ''; vacio.hidden = true; btn.hidden = true; detener.hidden = false;
+    if (btnCapturar) { btnCapturar.hidden = false; }
     if ('BarcodeDetector' in window) {
       window.BarcodeDetector.getSupportedFormats().then(function (f) { return f.indexOf('ean_13') >= 0 ? conDetector() : conZxing(); })
         .catch(conZxing);
     } else { conZxing(); }
   });
   detener.addEventListener('click', parar);
+  if (btnCapturar) { btnCapturar.addEventListener('click', capturarDesdeVideo); }
+  if (btnFoto && inputFoto) {
+    btnFoto.addEventListener('click', function () { inputFoto.click(); });
+    inputFoto.addEventListener('change', function () {
+      var archivo = inputFoto.files && inputFoto.files[0];
+      if (!archivo) { return; }
+      if (ultimaFotoUrl && ultimaFotoUrl.indexOf('blob:') === 0) { URL.revokeObjectURL(ultimaFotoUrl); }
+      ultimaFotoUrl = URL.createObjectURL(archivo);
+      enviarFoto(archivo, '');
+      inputFoto.value = '';
+    });
+  }
   document.getElementById('form-codigo').addEventListener('submit', function (e) {
     e.preventDefault();
     ultimo = '';

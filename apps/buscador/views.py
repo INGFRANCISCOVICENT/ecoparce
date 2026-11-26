@@ -4,8 +4,9 @@ from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.views.decorators.http import require_POST
 
-from apps.contenidos.models import EstadoContenido, Residuo
+from apps.contenidos.models import Contenedor, EstadoContenido, Residuo
 from apps.core.seguridad import limitar
 from apps.core.texto import normalizar
 
@@ -203,3 +204,31 @@ def producto(request, codigo):
     return JsonResponse({'encontrado': True, 'codigo': codigo, 'nombre': nombre or 'Producto sin nombre',
                          'marca': (datos.get('brands') or '').split(',')[0].strip()[:80], 'partes': partes,
                          'fuente': fuente, 'fuente_url': f'https://world.openfoodfacts.org/product/{codigo}'})
+
+
+@require_POST
+def analizar_foto_vista(request):
+    """POST /escanear/foto/ — Analiza una foto del producto/residuo en memoria y devuelve la bolsa correcta."""
+    from django.http import JsonResponse
+
+    from .vision import analizar_foto
+
+    if not limitar(request, 'escaneo_foto', 30, 600):
+        return JsonResponse({'error': 'Demasiadas fotos seguidas. Espera unos minutos.'}, status=429)
+
+    tipo_manual = (request.POST.get('tipo') or '').strip().lower()
+    archivo = request.FILES.get('foto')
+    if not archivo and not tipo_manual:
+        return JsonResponse({'error': 'Toma o selecciona una foto del producto para analizarla.'}, status=400)
+
+    try:
+        datos = analizar_foto(archivo.read() if archivo else b'', tipo_manual=tipo_manual)
+    except ValueError as exc:
+        return JsonResponse({'error': str(exc)}, status=400)
+
+    if datos['codigo'] == Contenedor.POSCONSUMO:
+        datos['puntos_url'] = reverse('contenidos:puntos')
+    Busqueda.objects.create(termino=f"foto {normalizar(datos['material'])}"[:100], encontrado=True)
+    resp = JsonResponse({'ok': True, **datos})
+    resp['Cache-Control'] = 'no-store'
+    return resp

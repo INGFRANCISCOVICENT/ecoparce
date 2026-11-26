@@ -41,6 +41,8 @@ services:
         sync: false
       - key: VERIFICAR_CORREO_POR_CODIGO
         value: "1"
+      - key: GEMINI_API_KEY
+        sync: false
 
 databases:
   - name: ecoparce-db

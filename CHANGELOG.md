@@ -2,6 +2,10 @@
 
 Este proyecto sigue el [Versionado Semántico (SemVer 2.0.0)](https://semver.org/lang/es/) y control de versiones en Git.
 
+## [2.10.0] - 2026-11-26
+### Innovación
+- **Escaneo de productos por foto (`/escanear/foto/`)**: ahora cualquier persona puede tomar una foto directa del producto o residuo (sin necesidad de que el código exista en una base de datos) y recibir al instante la bolsa exacta (Resolución 2184 de 2019), pasos de preparación y enlace a puntos posconsumo. Funciona en memoria con privacidad total usando análisis visual local (Pillow) y soporte opcional de **Gemini Vision** si se define `GEMINI_API_KEY`.
+
 ## [2.9.1] - 2026-11-26
 ### Corregido
 - **Escáner QR y códigos de barras (`/escanear/`)**: corregida la lectura de códigos QR de EcoParce (`/q/XXXXXXXX`) independientemente del dominio/puerto, extracción automática de GTIN en QR GS1 Digital Link, consulta automática al catálogo de EcoParce para QR de texto/residuos, tarjeta informativa para enlaces externos, detención correcta de la cámara al leer y versionado `?v=` del script.

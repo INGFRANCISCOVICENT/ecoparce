@@ -66,7 +66,35 @@ class EscanerTests(TestCase):
         self.assertFalse(r.json()['encontrado'])
 
     def test_pagina_escanear(self):
-        self.assertContains(self.client.get('/escanear/'), 'Abrir cámara')
+        r = self.client.get('/escanear/')
+        self.assertContains(r, 'Tomar foto del producto')
+        self.assertContains(r, '/escanear/foto/')
+
+    def test_analizar_foto_producto_local_y_seleccion_material(self):
+        import io
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        from PIL import Image
+
+        # 1. Foto JPEG válida (verde -> clasifica como orgánico en bolsa verde)
+        buf = io.BytesIO()
+        Image.new('RGB', (120, 120), color=(40, 180, 70)).save(buf, format='JPEG')
+        foto = SimpleUploadedFile('cascara.jpg', buf.getvalue(), content_type='image/jpeg')
+        r = self.client.post('/escanear/foto/', {'foto': foto})
+        self.assertEqual(r.status_code, 200)
+        d = r.json()
+        self.assertTrue(d['ok'])
+        self.assertEqual(d['codigo'], 'VERDE')
+        self.assertEqual(d['metodo'], 'visual_local')
+
+        # 2. Ajuste directo en 1 toque -> posconsumo incluye puntos_url
+        r2 = self.client.post('/escanear/foto/', {'tipo': 'posconsumo'})
+        self.assertEqual(r2.status_code, 200)
+        self.assertEqual(r2.json()['codigo'], 'POSCONSUMO')
+        self.assertTrue(r2.json().get('puntos_url'))
+
+        # 3. Archivo corrupto rechazado con 400
+        malo = SimpleUploadedFile('malo.jpg', b'no-es-una-imagen', content_type='image/jpeg')
+        self.assertEqual(self.client.post('/escanear/foto/', {'foto': malo}).status_code, 400)
 
     def test_google_sin_configurar_no_manda_a_google(self):
         from django.test import override_settings

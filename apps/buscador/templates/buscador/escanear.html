@@ -2,15 +2,24 @@
 {% block titulo %}Escanear producto y etiquetas{% endblock %}
 {% block contenido %}
 <h1>Escanea y separa</h1>
-<p class="mut">Apunta la cámara al <strong>código de barras</strong> del empaque para saber en qué bolsa va cada parte y qué significa su <strong>etiqueta de reciclaje</strong>. También lee códigos QR de EcoParce.</p>
+<p class="mut">Toma una <strong>foto del producto</strong> o apunta al <strong>código de barras / QR</strong> para saber al instante en qué bolsa va (Resolución 2184 de 2019), sin depender de que el código esté en una base de datos.</p>
 <div class="escaner" id="escaner">
   <video id="video" playsinline muted aria-label="Vista de la cámara"></video>
   <div class="marco" aria-hidden="true"></div>
-  <div class="escaner-vacio" id="escaner-vacio">{% icono 'qr' 48 '#1E7A46' 1.6 %}<span>La cámara se activa solo cuando tú lo pides</span></div>
+  <div class="escaner-vacio" id="escaner-vacio">{% icono 'qr' 48 '#1E7A46' 1.6 %}<span>Toma una foto del residuo o abre el escáner en vivo</span></div>
 </div>
-<button class="btn p full" type="button" id="btn-camara" style="margin-top:12px">{% icono 'qr' 20 '#fff' %}Abrir cámara</button>
-<button class="btn o full" type="button" id="btn-detener" style="margin-top:10px" hidden>Detener cámara</button>
-<p class="xs mut center" style="margin-top:6px">Las imágenes de la cámara no salen de tu teléfono: solo se envía el número del código.</p>
+<form id="form-foto" method="post" enctype="multipart/form-data" style="margin-top:12px">{% csrf_token %}
+  <input type="file" id="input-foto" name="foto" accept="image/*" capture="environment" hidden>
+  <div class="row" style="gap:8px;flex-wrap:wrap">
+    <button class="btn p" type="button" id="btn-foto" style="flex:1;min-width:170px">{% icono 'qr' 20 '#fff' %}Tomar foto del producto</button>
+    <button class="btn o" type="button" id="btn-camara" style="flex:1;min-width:170px">Escáner en vivo (QR / barras)</button>
+  </div>
+  <div class="row" style="gap:8px;flex-wrap:wrap;margin-top:10px">
+    <button class="btn p" type="button" id="btn-capturar" style="flex:1" hidden>Capturar foto ahora</button>
+    <button class="btn o" type="button" id="btn-detener" style="flex:1" hidden>Detener cámara</button>
+  </div>
+</form>
+<p class="xs mut center" style="margin-top:6px">Privacidad garantizada: tu foto se analiza en memoria y nunca se guarda en el servidor.</p>
 
 <form id="form-codigo" class="search" style="margin-top:16px" autocomplete="off">
   {% icono 'search' 22 '#1E7A46' %}<label class="sr" for="codigo">Número del código de barras o texto QR</label>
@@ -57,5 +66,5 @@
 
 <div class="speech" style="margin-top:16px"><img src="{% static 'img/logo-96.png' %}" alt="Escarlata, mascota de EcoParce"><div>¿El producto no tiene código? <a href="{% url 'buscador:buscar' %}">Búscalo por su nombre</a>: «botella», «icopor», «pilas»…</div></div>
 <script src="{% static 'vendor/zxing/zxing.min.js' %}" defer></script>
-<script src="{% static 'js/escaner.js' %}?v={{ APP_VERSION }}" defer data-api="{% url 'buscador:producto' '00000000' %}" data-buscar="{% url 'buscador:buscar' %}" data-asistente="{% url 'buscador:asistente_consultar' %}" id="escaner-js"></script>
+<script src="{% static 'js/escaner.js' %}?v={{ APP_VERSION }}" defer data-api="{% url 'buscador:producto' '00000000' %}" data-foto="{% url 'buscador:analizar_foto' %}" data-buscar="{% url 'buscador:buscar' %}" data-asistente="{% url 'buscador:asistente_consultar' %}" id="escaner-js"></script>
 {% endblock %}
