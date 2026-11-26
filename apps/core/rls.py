@@ -190,7 +190,8 @@ def aplicar_politicas_postgresql():
 
 
 class RLSContextMiddleware:
-    """Middleware que sincroniza el usuario autenticado con el contexto RLS en cada petición."""
+    """Middleware previo a AuthenticationMiddleware: establece app.current_user_id desde la sesión
+    para que PostgreSQL con FORCE ROW LEVEL SECURITY permita cargar la fila del propio usuario."""
 
     RUTAS_AUTH = ('/accounts/', '/api/v1/oauth/')
 
@@ -198,13 +199,25 @@ class RLSContextMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        usuario = getattr(request, 'user', None)
         es_ruta_auth = request.path.startswith(self.RUTAS_AUTH)
-        if usuario is not None and getattr(usuario, 'is_authenticated', False):
-            aplicar_contexto_db(user_id=usuario.pk, role=getattr(usuario, 'rol', 'VISITANTE'), bypass=es_ruta_auth)
-        else:
-            aplicar_contexto_db(user_id='', role='ANON', bypass=es_ruta_auth)
+        session = getattr(request, 'session', None)
+        user_id = session.get('_auth_user_id', '') if session is not None else ''
+        aplicar_contexto_db(user_id=user_id, role='VISITANTE' if user_id else 'ANON', bypass=es_ruta_auth)
         try:
             return self.get_response(request)
         finally:
             aplicar_contexto_db(user_id='', role='ANON', bypass=False)
+
+
+class RLSRolMiddleware:
+    """Middleware posterior a AuthenticationMiddleware: propaga el rol real del usuario autenticado a PostgreSQL."""
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        usuario = getattr(request, 'user', None)
+        if usuario is not None and getattr(usuario, 'is_authenticated', False):
+            es_ruta_auth = request.path.startswith(RLSContextMiddleware.RUTAS_AUTH)
+            aplicar_contexto_db(user_id=usuario.pk, role=getattr(usuario, 'rol', 'VISITANTE'), bypass=es_ruta_auth)
+        return self.get_response(request)

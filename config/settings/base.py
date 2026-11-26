@@ -47,10 +47,11 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'apps.api.gateway.ApiGatewayMiddleware',            # API Gateway (WAF, API Key, rate limit, bitácora)
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'apps.core.rls.RLSContextMiddleware',               # sincroniza app.current_user_id ANTES de cargar request.user en PostgreSQL
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'apps.core.rls.RLSContextMiddleware',               # contexto Row-Level Security por petición
+    'apps.core.rls.RLSRolMiddleware',                   # completa app.current_user_role tras autenticar request.user
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',

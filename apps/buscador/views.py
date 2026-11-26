@@ -1,3 +1,4 @@
+import difflib
 import time
 
 from django.conf import settings
@@ -13,14 +14,73 @@ from apps.core.texto import normalizar
 from .forms import SugerenciaForm
 from .models import Busqueda, EstadoSugerencia, Sugerencia
 
+# Equivalencias coloquiales y términos frecuentes que complementan los sinónimos del catálogo.
+ALIAS_BUSQUEDA = {
+    'pc': 'celular', 'computador': 'celular', 'computadora': 'celular', 'portatil': 'celular',
+    'laptop': 'celular', 'monitor': 'celular', 'teclado': 'celular', 'mouse': 'celular',
+    'cargador': 'celular', 'audifonos': 'celular', 'televisor': 'celular', 'electrodomestico': 'celular',
+    'pet': 'botella', 'gaseosa': 'botella', 'tarro': 'botella', 'galon': 'botella',
+    'foco': 'bombillo', 'lampara': 'bombillo', 'tubo': 'bombillo',
+    'pastillas': 'medicamento', 'jarabe': 'medicamento', 'remedio': 'medicamento',
+    'mecato': 'papas', 'chitos': 'papas', 'doritos': 'papas', 'golosina': 'papas',
+    'panal': 'higienico', 'toalla': 'higienico', 'copito': 'higienico',
+    'banano': 'cascara', 'manzana': 'cascara', 'naranja': 'cascara', 'fruta': 'cascara', 'verdura': 'cascara',
+    'pitillo': 'plastico', 'tenedor': 'plastico', 'cuchara': 'plastico',
+}
+_STOPWORDS = {'de', 'la', 'el', 'los', 'las', 'un', 'una', 'en', 'con', 'sin', 'por', 'para', 'del', 'y', 'o'}
+
+
+def _similitud_residuo(objetivo, tokens_q, residuo):
+    """Calcula la mejor similitud aproximada (0..1) tolerando errores ortográficos."""
+    frases = [normalizar(residuo.nombre)] + [normalizar(s) for s in (residuo.sinonimos or '').split(',') if s.strip()]
+    mejor = 0.0
+    for frase in frases:
+        if not frase:
+            continue
+        r_completa = difflib.SequenceMatcher(None, objetivo, frase).ratio()
+        if r_completa > mejor:
+            mejor = r_completa
+        palabras_f = [p for p in frase.split() if len(p) >= 3 and p not in _STOPWORDS]
+        for tq in tokens_q:
+            for pf in palabras_f:
+                if abs(len(tq) - len(pf)) > 3:
+                    continue
+                score = difflib.SequenceMatcher(None, tq, pf).ratio()
+                if score > mejor:
+                    mejor = score
+    return mejor
+
 
 def buscar_residuos(termino):
-    """RF-03: busca por nombre o sinónimo, sin importar mayúsculas ni tildes. Devuelve la lista ordenada."""
-    if not normalizar(termino):
+    """RF-03: busca por nombre, sinónimo, alias coloquial o coincidencia aproximada (tolera errores de escritura)."""
+    objetivo = normalizar(termino)
+    if not objetivo:
         return []
-    publicados = Residuo.objects.filter(estado=EstadoContenido.PUBLICADO).select_related('contenedor', 'guia')
+    publicados = list(Residuo.objects.filter(estado=EstadoContenido.PUBLICADO).select_related('contenedor', 'guia'))
     encontrados = [r for r in publicados if r.coincide_con(termino)]
-    return sorted(encontrados, key=lambda r: (r.puntuacion(termino), len(r.nombre)))
+    if encontrados:
+        return sorted(encontrados, key=lambda r: (r.puntuacion(termino), len(r.nombre)))
+
+    # 2. Alias coloquiales (ej. computador -> raee/celular, mecato -> empaque metalizado)
+    tokens = [t for t in objetivo.split() if len(t) >= 2 and t not in _STOPWORDS]
+    for tok in tokens:
+        alias = ALIAS_BUSQUEDA.get(tok)
+        if alias:
+            por_alias = [r for r in publicados if r.coincide_con(alias)]
+            if por_alias:
+                return sorted(por_alias, key=lambda r: (r.puntuacion(alias), len(r.nombre)))
+
+    # 3. Búsqueda aproximada tolerante a errores ortográficos (ej. "boteya", "aseite", "ikopor", "vombillo")
+    tokens_largos = [t for t in tokens if len(t) >= 3]
+    if not tokens_largos and len(objetivo) < 3:
+        return []
+    candidatos = []
+    for r in publicados:
+        sim = _similitud_residuo(objetivo, tokens_largos or [objetivo], r)
+        if sim >= 0.70:
+            candidatos.append((sim, r))
+    candidatos.sort(key=lambda par: (-par[0], len(par[1].nombre)))
+    return [r for _, r in candidatos[:6]]
 
 
 def buscar(request):

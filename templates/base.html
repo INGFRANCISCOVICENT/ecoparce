@@ -41,8 +41,8 @@
   </nav>
   {% if user.is_authenticated %}
   <div class="top-sesion">
-    <a class="cuenta" href="{% if user.es_personal %}{% url 'estadisticas:resumen' %}{% else %}{% url 'cuentas:mi_cuenta' %}{% endif %}" aria-label="Mi cuenta">{% icono 'users' 18 %}<span>{{ user.nombre.split.0|truncatechars:12 }}</span></a>
-    <form method="post" action="{% url 'account_logout' %}" data-cerrar-sesion>{% csrf_token %}<button class="btn-salir" type="submit" aria-label="Cerrar sesión">{% icono 'logout' 16 %}<span>Salir</span></button></form>
+    <a class="cuenta" href="{% if user.es_personal %}{% url 'estadisticas:resumen' %}{% else %}{% url 'cuentas:mi_cuenta' %}{% endif %}" aria-label="Configuración de cuenta">{% icono 'shield' 16 %}<span>Configuración</span></a>
+    <form method="post" action="{% url 'account_logout' %}" data-cerrar-sesion>{% csrf_token %}<button class="btn-salir" type="submit" aria-label="Cerrar sesión">{% icono 'logout' 16 %}<span>Cerrar sesión</span></button></form>
   </div>
   {% else %}
   <a class="cuenta" href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}">{% icono 'users' 18 %}<span>Ingresar</span></a>
