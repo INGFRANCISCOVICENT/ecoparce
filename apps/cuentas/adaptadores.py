@@ -17,9 +17,13 @@ from .models import Rol
 
 
 def _destino(request, usuario):
+    """Calcula la redirección segura tras ingresar o registrarse según el rol real del usuario."""
     destino = request.POST.get('next') or request.GET.get('next')
     if destino and url_has_allowed_host_and_scheme(destino, allowed_hosts={request.get_host()},
                                                    require_https=request.is_secure()):
+        # Nunca enviar a un visitante al panel administrativo tras registrarse o ingresar
+        if destino.startswith('/panel/') and not getattr(usuario, 'es_personal', False):
+            return reverse('cuentas:mi_cuenta')
         return destino
     if getattr(usuario, 'es_personal', False):
         return reverse('estadisticas:resumen')
@@ -45,7 +49,24 @@ class CuentaAdapter(DefaultAccountAdapter):
             raise forms.ValidationError('Ese dominio de correo no existe o no recibe mensajes. Revisa que esté bien escrito.')
         return correo
 
+    def is_safe_url(self, url):
+        """Impide que un visitante sea redirigido a /panel/ tras registrarse o iniciar sesión."""
+        if not super().is_safe_url(url):
+            return False
+        from allauth.core import context as allauth_ctx
+        req = getattr(allauth_ctx, 'request', None)
+        if url and str(url).startswith('/panel/') and req is not None:
+            if req.path.startswith('/accounts/signup'):
+                return False
+            usuario = getattr(req, 'user', None)
+            if usuario is not None and getattr(usuario, 'is_authenticated', False) and not getattr(usuario, 'es_personal', False):
+                return False
+        return True
+
     def get_login_redirect_url(self, request):
+        return _destino(request, request.user)
+
+    def get_signup_redirect_url(self, request):
         return _destino(request, request.user)
 
     def get_logout_redirect_url(self, request):

@@ -2,6 +2,28 @@
 
 Este proyecto sigue el [Versionado Semántico (SemVer 2.0.0)](https://semver.org/lang/es/) y control de versiones en Git.
 
+## [2.9.1] - 2026-11-26
+### Corregido
+- **Escáner QR y códigos de barras (`/escanear/`)**: corregida la lectura de códigos QR de EcoParce (`/q/XXXXXXXX`) independientemente del dominio/puerto, extracción automática de GTIN en QR GS1 Digital Link, consulta automática al catálogo de EcoParce para QR de texto/residuos, tarjeta informativa para enlaces externos, detención correcta de la cámara al leer y versionado `?v=` del script.
+
+## [2.9.0] - 2026-11-26
+### Seguridad, Arquitectura, OAuth 2.0 y Calidad de Software
+- **Cifrado de cuentas en base de datos y cifrado E2E (AES-256-GCM)**:
+  - Cifrado transparente a nivel de campo con **MultiFernet (AES-128-CBC + HMAC-SHA256)** y rotación de claves (`apps/core/cifrado.py`) para `Usuario.nombre` y `SolicitudAdmin.motivo`, más huella ciega **HMAC-SHA256** (`Usuario.correo_hash`) y comando `cifrar_datos_cuentas`.
+  - Nuevo módulo de cifrado autenticado de extremo a extremo **AES-256-GCM + HKDF-SHA256 + AAD** (`apps/core/cifrado_e2e.py`), disponible en `/api/v1/cuenta/resumen/?e2e=1`.
+- **Row-Level Security (RLS) de mínimo privilegio (32 políticas, cero reglas abiertas)**:
+  - Políticas granulares separadas por operación (`FOR SELECT`, `FOR INSERT`, `FOR UPDATE`, `FOR DELETE`) sobre las 8 tablas sensibles en `apps/core/rls.py` y `docs/rls_postgresql.sql`, con inmutabilidad forzada en BD (`USING (false)`) para auditoría y gateway, más capa ORM `RLSContextMiddleware` / `filtrar_por_rls()`.
+- **API Gateway REST (`GET`/`POST`), WAF y Bitácora Inmutable (`apps/api/`)**:
+  - Endpoints `/api/v1/estado/`, `/guias/`, `/buscar/`, `/puntos/`, `/escanear/`, `/sugerencias/`, `/cuenta/resumen/`, `/gateway/logs/` y especificación **OpenAPI 3.0.3** (`/api/v1/openapi.json`).
+  - Filtros WAF contra SQLi, XSS, Path Traversal y Null Bytes, gestión de **API Keys (SHA-256)**, *rate limiting* y bitácora inmutable `RegistroGateway`.
+- **Servidor OAuth 2.0 endurecido (RFC 6749, 7519, 7009, 7662, 8414, 8725, 9700)**:
+  - Emisión de tokens **Bearer JWT HS256** + **Refresh Tokens rotativos** con detección de reutilización (`/api/v1/oauth/token/`), revocación (`/oauth/revoke/`), introspección (`/oauth/introspect/`), UserInfo (`/oauth/userinfo/`), metadatos (`/.well-known/oauth-authorization-server`) y validación estricta de `scopes` (`read`/`write`).
+- **Tablero en vivo de Calidad de Software (`/panel/calidad/`)**:
+  - Métricas ISO/IEC 25010 en tiempo real, estado de cifrado, RLS, amenazas WAF bloqueadas, bitácora del Gateway y gestión visual de API Keys para `SISTEMA`.
+- **PWA verificada de extremo a extremo y diseño Aurora Boreal**:
+  - Service Worker seguro (`/sw.js`), guía sin conexión (`/offline/`), iconos PWA obligatorios `192×192` y `512×512` en `manifest.webmanifest`, verificación de correo por código (`VERIFICAR_CORREO_POR_CODIGO=1`) y fondo animado **Aurora Boreal verde** visible en todo el sitio.
+  - Suite ampliada a **120 pruebas automatizadas** aprobadas (`0` fallos) y `check --deploy` sin advertencias.
+
 ## [2.8.0] - 2026-11-23
 ### Innovación
 - **Generador interactivo de Carteles y Etiquetas HD para Canecas (`/guias/`)**: permite personalizar en vivo con el nombre de tu hogar, colegio u oficina y descargar en PNG listo para imprimir el cartel completo de la Resolución 2184 o las etiquetas individuales de Bolsa Blanca, Bolsa Negra y Bolsa Verde (100 % local en Canvas HTML5 y compatible con CSP estricta).

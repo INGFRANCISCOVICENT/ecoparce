@@ -1,6 +1,9 @@
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.db import models
 
+from apps.core.cifrado import CampoTextoCifrado, indice_ciego
+from apps.core.rls import filtrar_por_rls
+
 
 class Rol(models.TextChoices):
     VISITANTE = 'VISITANTE', 'Visitante'
@@ -33,7 +36,8 @@ class Usuario(AbstractBaseUser):
     """Persona con cuenta: visitante que entró con Google o administrador del panel.
     Navegar, buscar y jugar no exige cuenta; los registros de uso siguen siendo anónimos (RN-08)."""
     correo = models.EmailField('correo', max_length=254, unique=True)
-    nombre = models.CharField('nombre', max_length=120)
+    correo_hash = models.CharField('huella del correo', max_length=64, blank=True, default='', db_index=True)
+    nombre = CampoTextoCifrado('nombre', max_length_logico=120)
     password = models.CharField('contraseña', max_length=128, db_column='contrasena_hash')
     last_login = models.DateTimeField('último acceso', null=True, blank=True, db_column='ultimo_acceso')
     rol = models.CharField('rol', max_length=10, choices=Rol.choices, default=Rol.VISITANTE)
@@ -50,6 +54,12 @@ class Usuario(AbstractBaseUser):
         verbose_name = 'usuario'
         ordering = ['nombre']
         constraints = [models.CheckConstraint(condition=models.Q(rol__in=['VISITANTE', 'CONTENIDO', 'SISTEMA']), name='ck_usuario_rol')]
+
+    def save(self, *args, **kwargs):
+        if self.correo:
+            self.correo = self.correo.strip().lower()
+            self.correo_hash = indice_ciego(self.correo, contexto='correo')
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.nombre
@@ -99,6 +109,10 @@ class Consentimiento(models.Model):
         db_table = 'consentimiento'
         constraints = [models.UniqueConstraint(fields=['usuario', 'version'], name='uq_consentimiento_version')]
 
+    @classmethod
+    def para_usuario_rls(cls, usuario):
+        return filtrar_por_rls(cls.objects.all(), usuario, campo_usuario='usuario')
+
     def __str__(self):
         return f'{self.usuario} · {self.version}'
 
@@ -112,7 +126,7 @@ class EstadoSolicitudAdmin(models.TextChoices):
 class SolicitudAdmin(models.Model):
     """Solicitud de un usuario registrado para ser aprobado como administrador por el admin del sistema."""
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='solicitudes_admin')
-    motivo = models.CharField('motivo', max_length=300)
+    motivo = CampoTextoCifrado('motivo', max_length_logico=300)
     estado = models.CharField('estado', max_length=12, choices=EstadoSolicitudAdmin.choices, default=EstadoSolicitudAdmin.PENDIENTE)
     creada_en = models.DateTimeField(auto_now_add=True)
     resuelta_por = models.ForeignKey(Usuario, null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
@@ -121,6 +135,10 @@ class SolicitudAdmin(models.Model):
     class Meta:
         db_table = 'solicitud_admin'
         ordering = ['-creada_en']
+
+    @classmethod
+    def para_usuario_rls(cls, usuario):
+        return filtrar_por_rls(cls.objects.all(), usuario, campo_usuario='usuario')
 
     def __str__(self):
         return f'{self.usuario} ({self.get_estado_display()})'

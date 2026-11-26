@@ -19,7 +19,7 @@ from django.urls import reverse
 
 from apps.core.seguridad import evento
 
-LIBRES = ('/static/', '/media/', '/accounts/', '/cuenta/autorizacion/', '/privacidad/', '/terminos/', '/.well-known/')
+LIBRES = ('/static/', '/media/', '/accounts/', '/api/v1/', '/sw.js', '/offline/', '/cuenta/autorizacion/', '/privacidad/', '/terminos/', '/.well-known/')
 
 
 class ControlAccesoMiddleware:

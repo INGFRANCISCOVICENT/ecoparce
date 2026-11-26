@@ -13,8 +13,8 @@
 <p class="xs mut center" style="margin-top:6px">Las imágenes de la cámara no salen de tu teléfono: solo se envía el número del código.</p>
 
 <form id="form-codigo" class="search" style="margin-top:16px" autocomplete="off">
-  {% icono 'search' 22 '#1E7A46' %}<label class="sr" for="codigo">Número del código de barras</label>
-  <input id="codigo" name="codigo" inputmode="numeric" pattern="[0-9]{8,14}" maxlength="14" placeholder="O escribe el número del código de barras" required>
+  {% icono 'search' 22 '#1E7A46' %}<label class="sr" for="codigo">Número del código de barras o texto QR</label>
+  <input id="codigo" name="codigo" maxlength="180" placeholder="O escribe el código de barras, código QR o residuo" required>
   <button type="submit">Ver</button>
 </form>
 
@@ -57,5 +57,5 @@
 
 <div class="speech" style="margin-top:16px"><img src="{% static 'img/logo-96.png' %}" alt="Escarlata, mascota de EcoParce"><div>¿El producto no tiene código? <a href="{% url 'buscador:buscar' %}">Búscalo por su nombre</a>: «botella», «icopor», «pilas»…</div></div>
 <script src="{% static 'vendor/zxing/zxing.min.js' %}" defer></script>
-<script src="{% static 'js/escaner.js' %}" defer data-api="{% url 'buscador:producto' '00000000' %}" data-buscar="{% url 'buscador:buscar' %}" id="escaner-js"></script>
+<script src="{% static 'js/escaner.js' %}?v={{ APP_VERSION }}" defer data-api="{% url 'buscador:producto' '00000000' %}" data-buscar="{% url 'buscador:buscar' %}" data-asistente="{% url 'buscador:asistente_consultar' %}" id="escaner-js"></script>
 {% endblock %}

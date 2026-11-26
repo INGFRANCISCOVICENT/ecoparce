@@ -1,0 +1,160 @@
+{% extends "panel/base.html" %}
+{% load eco %}
+{% block titulo %}Calidad de software y API Gateway{% endblock %}
+{% block encabezado %}Calidad de software, seguridad y API Gateway{% endblock %}
+
+{% block contenido %}
+{% if clave_recien_creada %}
+<div class="aviso ok" role="status" style="margin-bottom:16px">
+  {% icono 'shield' 20 %}
+  <div>
+    <strong>Nueva API Key generada ({{ clave_recien_creada.nombre }}):</strong>
+    cópiala ahora mismo, no se volverá a mostrar:<br>
+    <code style="display:inline-block;margin-top:6px;padding:6px 10px;background:#fff;border-radius:8px;word-break:break-all;font-size:13px">{{ clave_recien_creada.clave }}</code>
+  </div>
+</div>
+{% endif %}
+
+<section class="kpis" aria-label="Indicadores ISO/IEC 25010 en vivo">
+  <article class="kpi">
+    <span class="mut xs">Cuentas cifradas (MultiFernet)</span>
+    <strong>{{ pct_cifrado }}%</strong>
+    <span class="xs mut">{{ usuarios_cifrados }}/{{ total_usuarios }} cifrados · {{ usuarios_hash }} con huella HMAC</span>
+  </article>
+  <article class="kpi">
+    <span class="mut xs">Row-Level Security (RLS)</span>
+    <strong>{{ politicas_rls|length }} políticas</strong>
+    <span class="xs mut">{% if rls_nativo %}PostgreSQL nativo + ORM{% else %}Capa ORM ({{ motor_bd }}) + SQL PostgreSQL{% endif %}</span>
+  </article>
+  <article class="kpi">
+    <span class="mut xs">API Gateway (GET/POST)</span>
+    <strong>{{ total_gw }} peticiones</strong>
+    <span class="xs mut">{{ bloqueados_gw }} bloqueadas · {{ latencia_media }} ms promedio</span>
+  </article>
+  <article class="kpi">
+    <span class="mut xs">Google OAuth y Código Correo</span>
+    <strong>{% if google_ok %}Google OK{% else %}Google pendiente{% endif %}</strong>
+    <span class="xs mut">Código registro: {% if codigo_registro %}Activo{% else %}Opcional{% endif %} · SMTP: {% if smtp_ok %}Configurado{% else %}Consola{% endif %}</span>
+  </article>
+</section>
+
+<div class="card" style="margin-top:18px">
+  <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+    <div>
+      <h2 style="margin:0">Especificación OpenAPI 3.0 y Endpoints</h2>
+      <p class="small mut" style="margin:4px 0 0">Importa el contrato REST en Postman, Insomnia o Swagger UI para probar GET y POST a través del Gateway.</p>
+    </div>
+    <div class="row" style="gap:8px;flex-wrap:wrap">
+      <a class="btn p sm" href="{% url 'api:openapi' %}" target="_blank" rel="noopener">Abrir OpenAPI JSON</a>
+      <a class="btn o sm" href="{% url 'api:estado' %}" target="_blank" rel="noopener">Ver /api/v1/estado/</a>
+    </div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:18px">
+  <h2 style="margin-top:0">Gestión de API Keys (Hash SHA-256)</h2>
+  <form method="post" action="{% url 'panel_api:crear_llave' %}" class="row" style="gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px">
+    {% csrf_token %}
+    <label style="flex:1;min-width:180px">
+      <span class="xs mut" style="display:block;margin-bottom:4px">Nombre del cliente</span>
+      <input type="text" name="nombre" required maxlength="120" placeholder="Ej. App móvil / Postman" style="width:100%">
+    </label>
+    <label style="min-width:180px">
+      <span class="xs mut" style="display:block;margin-bottom:4px">Permisos</span>
+      <select name="permisos" style="width:100%">
+        {% for val, etiqueta in permisos_choices %}
+        <option value="{{ val }}">{{ etiqueta }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label style="width:120px">
+      <span class="xs mut" style="display:block;margin-bottom:4px">Límite / min</span>
+      <input type="number" name="limite" value="60" min="5" max="600" style="width:100%">
+    </label>
+    <button type="submit" class="btn p sm">Generar API Key</button>
+  </form>
+
+  {% if api_keys %}
+  <div style="overflow-x:auto">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Prefijo</th>
+          <th>Permisos</th>
+          <th>Límite/min</th>
+          <th>Estado</th>
+          <th>Último uso</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for k in api_keys %}
+        <tr>
+          <td><strong>{{ k.nombre }}</strong></td>
+          <td><code>{{ k.prefijo }}...</code></td>
+          <td>{{ k.get_permisos_display }}</td>
+          <td>{{ k.limite_por_minuto }}</td>
+          <td><span class="badge {% if k.activa %}ok{% else %}err{% endif %}">{% if k.activa %}Activa{% else %}Revocada{% endif %}</span></td>
+          <td class="small mut">{% if k.ultimo_uso %}{{ k.ultimo_uso|date:"d/m/Y H:i" }}{% else %}Sin uso{% endif %}</td>
+          <td>
+            <form method="post" action="{% url 'panel_api:alternar_llave' k.pk %}">
+              {% csrf_token %}
+              <button type="submit" class="btn o sm">{% if k.activa %}Revocar{% else %}Reactivar{% endif %}</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="small mut">Aún no hay API Keys creadas. Genera una arriba para probar peticiones POST autenticadas.</p>
+  {% endif %}
+</div>
+
+{% if amenazas %}
+<div class="card" style="margin-top:18px">
+  <h2 style="margin-top:0">Amenazas y bloqueos WAF detectados</h2>
+  <div class="row" style="gap:10px;flex-wrap:wrap">
+    {% for a in amenazas %}
+    <span class="badge err">{{ a.motivo_bloqueo }}: {{ a.total }}</span>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<div class="card" style="margin-top:18px">
+  <h2 style="margin-top:0">Bitácora inmutable del API Gateway (últimas 25 peticiones)</h2>
+  {% if logs_gw %}
+  <div style="overflow-x:auto">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Método</th>
+          <th>Ruta</th>
+          <th>HTTP</th>
+          <th>Latencia</th>
+          <th>Filtro / Motivo</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in logs_gw %}
+        <tr>
+          <td class="small mut">{{ r.fecha_hora|date:"d/m H:i:s" }}</td>
+          <td><code>{{ r.metodo }}</code></td>
+          <td class="small"><code>{{ r.ruta }}</code></td>
+          <td><span class="badge {% if r.bloqueado or r.codigo_estado >= 400 %}err{% else %}ok{% endif %}">{{ r.codigo_estado }}</span></td>
+          <td class="small mut">{{ r.duracion_ms }} ms</td>
+          <td class="small">{% if r.motivo_bloqueo %}<code>{{ r.motivo_bloqueo }}</code>{% else %}<span class="mut">OK</span>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="small mut">Todavía no hay peticiones registradas en el API Gateway.</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -3,6 +3,7 @@ Django==5.2.19
 django-allauth[socialaccount,mfa]==65.22.1
 argon2-cffi==25.1.0
 cryptography==50.0.2
+PyJWT==2.15.1
 dnspython==2.9.2
 qrcode==8.2
 pillow==13.0.0

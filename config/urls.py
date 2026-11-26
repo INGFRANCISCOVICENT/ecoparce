@@ -3,6 +3,7 @@ from django.conf.urls.static import static
 from django.http import Http404
 from django.urls import include, path, re_path
 
+from apps.api.views import oauth_metadata
 from apps.core.context_processors import google_configurado
 from apps.core.views import security_txt
 
@@ -31,8 +32,10 @@ BLOQUEADAS.append(re_path(r'^accounts/google/login/$', _google_login))
 
 urlpatterns = BLOQUEADAS + [
     path('accounts/', include('allauth.urls')),
+    path('api/v1/', include('apps.api.urls')),
     path('', include('apps.cuentas.urls')),
     path('.well-known/security.txt', security_txt),
+    path('.well-known/oauth-authorization-server', oauth_metadata),
     path('', include('apps.core.urls')),
     path('', include('apps.contenidos.urls')),
     path('', include('apps.buscador.urls')),
@@ -43,6 +46,7 @@ urlpatterns = BLOQUEADAS + [
     path('panel/', include('apps.buscador.urls_panel')),
     path('panel/', include('apps.qr.urls_panel')),
     path('panel/', include('apps.trivia.urls_panel')),
+    path('panel/', include('apps.api.urls_panel')),
 ]
 
 handler404 = 'apps.core.views.error_404'

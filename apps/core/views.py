@@ -40,6 +40,74 @@ def licencias(request):
     return render(request, 'core/licencias.html')
 
 
+def offline(request):
+    """Guía rápida offline de la Resolución 2184 de 2019 para el Service Worker PWA."""
+    return render(request, 'core/offline.html')
+
+
+def service_worker(request):
+    """Service Worker PWA servido en raíz (/sw.js) con caché segura (excluye panel, cuenta y API)."""
+    from django.http import HttpResponse
+    from apps.core.context_processors import app_version
+    ver = app_version()
+    js = f"""/* EcoParce PWA Service Worker v{ver} */
+const CACHE = 'ecoparce-pwa-{ver}';
+const PRECACHE = [
+  '/offline/',
+  '/static/css/ecoparce.css?v={ver}',
+  '/static/js/ecoparce.js?v={ver}',
+  '/static/img/logo-96.png',
+  '/static/img/logo-256.png',
+  '/static/manifest.webmanifest'
+];
+const NO_CACHE_PREFIX = ['/panel/', '/cuenta/', '/accounts/', '/api/'];
+
+self.addEventListener('install', (event) => {{
+  event.waitUntil(
+    caches.open(CACHE).then((c) => c.addAll(PRECACHE)).then(() => self.skipWaiting())
+  );
+}});
+
+self.addEventListener('activate', (event) => {{
+  event.waitUntil(
+    caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then(() => self.clients.claim())
+  );
+}});
+
+self.addEventListener('fetch', (event) => {{
+  const req = event.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+  if (NO_CACHE_PREFIX.some((p) => url.pathname.startsWith(p))) return;
+
+  if (url.pathname.startsWith('/static/')) {{
+    event.respondWith(
+      caches.match(req).then((cached) => cached || fetch(req).then((resp) => {{
+        if (resp.ok) {{
+          const copy = resp.clone();
+          caches.open(CACHE).then((c) => c.put(req, copy));
+        }}
+        return resp;
+      }}))
+    );
+    return;
+  }}
+
+  if (req.mode === 'navigate') {{
+    event.respondWith(
+      fetch(req).catch(() => caches.match('/offline/'))
+    );
+  }}
+}});
+"""
+    resp = HttpResponse(js, content_type='application/javascript; charset=utf-8')
+    resp['Service-Worker-Allowed'] = '/'
+    resp['Cache-Control'] = 'no-cache, must-revalidate'
+    return resp
+
+
 def version_json(request):
     """Devuelve la versión activa en servidor sin caché para avisar actualizaciones en móvil/PC."""
     from django.http import JsonResponse

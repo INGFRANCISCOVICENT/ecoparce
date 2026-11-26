@@ -6,6 +6,7 @@
   if (!script) { return; }
   var API = script.getAttribute('data-api').replace('00000000', '{c}');
   var BUSCAR = script.getAttribute('data-buscar');
+  var ASISTENTE = script.getAttribute('data-asistente') || '/asistente/consultar/';
   var caja = document.getElementById('escaner');
   var video = document.getElementById('video'), vacio = document.getElementById('escaner-vacio');
   var btn = document.getElementById('btn-camara'), detener = document.getElementById('btn-detener');
@@ -56,16 +57,116 @@
       .catch(function () { aviso('error', 'No hay conexión. Inténtalo de nuevo.'); });
   }
 
+  function enfocarResultado() {
+    if (resultado && resultado.scrollIntoView) {
+      resultado.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
+  function mostrarQrTexto(texto, esUrl) {
+    var h = '<section class="card" style="margin-top:14px;padding:16px">' +
+      '<div class="small mut">Código QR leído correctamente</div>' +
+      '<strong style="font-size:17px;word-break:break-word;display:block;margin-top:4px">' + esc(texto) + '</strong>';
+    if (esUrl) {
+      h += '<p class="small mut" style="margin-top:8px">Este QR apunta a un enlace externo. Puedes abrirlo o buscar el producto/residuo en EcoParce:</p>' +
+        '<div class="row" style="gap:8px;flex-wrap:wrap;margin-top:10px">' +
+        '<a class="btn p sm" href="' + esc(texto) + '" target="_blank" rel="noopener noreferrer">Abrir enlace del QR</a>' +
+        '<a class="btn o sm" href="' + BUSCAR + '">Buscar residuo en EcoParce</a></div>';
+    } else {
+      h += '<p class="small mut" style="margin-top:8px">No corresponde a un código de barras numérico de producto, pero puedes buscar este texto en nuestro catálogo:</p>' +
+        '<div class="row" style="gap:8px;flex-wrap:wrap;margin-top:10px">' +
+        '<a class="btn p sm" href="' + BUSCAR + '?q=' + encodeURIComponent(texto.slice(0, 80)) + '">Buscar «' + esc(texto.slice(0, 40)) + '» en EcoParce</a></div>';
+    }
+    h += '</section>';
+    resultado.innerHTML = h;
+    enfocarResultado();
+  }
+
+  function consultarCatalogoQr(texto) {
+    aviso('info', 'QR leído: <strong>' + esc(texto) + '</strong>. Consultando en EcoParce…');
+    fetch(ASISTENTE + '?q=' + encodeURIComponent(texto.slice(0, 80)), {
+      credentials: 'same-origin',
+      headers: { 'Accept': 'application/json' }
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d && d.encontrado) {
+          var h = '<section class="card" style="margin-top:14px;padding:16px">' +
+            '<div class="small mut">Código QR identificado en EcoParce</div>' +
+            '<div class="row" style="margin-top:10px;align-items:flex-start">' +
+            '<span class="swatch chip-' + esc(d.codigo || 'BLANCA') + '" style="width:44px;height:44px;border-radius:12px"></span>' +
+            '<div><strong style="font-size:18px">' + esc(d.residuo) + '</strong>' +
+            '<br>va en: <strong>' + esc(d.contenedor) + '</strong>';
+          if (d.pasos && d.pasos.length) {
+            h += '<ul class="small mut" style="margin:8px 0 0 18px;padding:0">';
+            d.pasos.forEach(function (paso) { h += '<li>' + esc(paso) + '</li>'; });
+            h += '</ul>';
+          }
+          h += '<div class="row" style="gap:8px;flex-wrap:wrap;margin-top:10px">';
+          if (d.guia_url) { h += '<a class="btn p sm" href="' + esc(d.guia_url) + '">' + esc(d.guia_titulo || 'Ver guía') + '</a>'; }
+          if (d.puntos_url) { h += '<a class="btn o sm" href="' + esc(d.puntos_url) + '">Ver puntos de recolección</a>'; }
+          h += '</div></div></div></section>';
+          resultado.innerHTML = h;
+          enfocarResultado();
+        } else {
+          mostrarQrTexto(texto, false);
+        }
+      })
+      .catch(function () { mostrarQrTexto(texto, false); });
+  }
+
+  function extraerGtinDeUrl(u) {
+    var mPath = u.pathname.match(/\/01\/(\d{8,14})(?:\/|$)/);
+    if (mPath) { return mPath[1]; }
+    var claves = ['gtin', 'ean', 'upc', 'barcode', 'code', 'codigo'];
+    for (var i = 0; i < claves.length; i++) {
+      var val = (u.searchParams.get(claves[i]) || '').trim();
+      if (/^\d{8,14}$/.test(val)) { return val; }
+    }
+    return '';
+  }
+
   function leido(texto) {
+    texto = (texto || '').trim();
     if (!texto || texto === ultimo) { return; }
     ultimo = texto;
     if (navigator.vibrate) { navigator.vibrate(80); }
-    try {
-      var u = new URL(texto, location.origin);
-      if (u.origin === location.origin && /^\/q\/[A-Z0-9]{8}$/.test(u.pathname)) { parar(); location.href = u.pathname; return; }
-    } catch (e) { /* no es URL */ }
-    if (/^\d{8,14}$/.test(texto)) { parar(); document.getElementById('codigo').value = texto; consultar(texto); return; }
-    aviso('info', 'Leímos un código que no es de un producto ni de EcoParce.');
+    parar();
+
+    // 1. Código QR oficial de EcoParce (/q/XXXXXXXX en cualquier dominio o ruta relativa)
+    var mEco = texto.match(/\/q\/([A-Za-z0-9]{6,16})\/?(?:\?.*)?$/i);
+    if (mEco) {
+      aviso('ok', 'Código QR de EcoParce detectado (<strong>' + esc(mEco[1].toUpperCase()) + '</strong>). Abriendo guía…');
+      location.href = '/q/' + mEco[1].toUpperCase();
+      return;
+    }
+
+    // 2. Código de barras numérico estándar (EAN-8, EAN-13, UPC-A, GTIN-14)
+    if (/^\d{8,14}$/.test(texto)) {
+      document.getElementById('codigo').value = texto;
+      consultar(texto);
+      enfocarResultado();
+      return;
+    }
+
+    // 3. URL en QR: verificar si es GS1 Digital Link con código de producto o enlace web normal
+    if (/^https?:\/\//i.test(texto)) {
+      try {
+        var u = new URL(texto);
+        var gtin = extraerGtinDeUrl(u);
+        if (gtin) {
+          document.getElementById('codigo').value = gtin;
+          consultar(gtin);
+          enfocarResultado();
+          return;
+        }
+        mostrarQrTexto(texto, true);
+        return;
+      } catch (e) { /* continuar como texto */ }
+    }
+
+    // 4. QR con texto libre o nombre de residuo -> consultar catálogo EcoParce
+    consultarCatalogoQr(texto);
   }
 
   function parar() {
@@ -118,7 +219,9 @@
   });
   detener.addEventListener('click', parar);
   document.getElementById('form-codigo').addEventListener('submit', function (e) {
-    e.preventDefault(); consultar(document.getElementById('codigo').value.trim());
+    e.preventDefault();
+    ultimo = '';
+    leido(document.getElementById('codigo').value.trim());
   });
   window.addEventListener('pagehide', parar);
 

@@ -40,14 +40,17 @@ INSTALLED_APPS = [
     'apps.qr',
     'apps.trivia',
     'apps.estadisticas',
+    'apps.api',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'apps.api.gateway.ApiGatewayMiddleware',            # API Gateway (WAF, API Key, rate limit, bitácora)
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'apps.core.rls.RLSContextMiddleware',               # contexto Row-Level Security por petición
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
@@ -128,9 +131,10 @@ ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_FORMS = {'login': 'apps.cuentas.forms.IngresoForm'}
 ACCOUNT_SIGNUP_FORM_CLASS = 'apps.cuentas.forms.RegistroForm'   # nombre + autorizaciones (Ley 1581)
-# Registro ágil para visitantes (entran de inmediato); la 2FA TOTP sigue siendo obligatoria para administradores en /panel/.
-ACCOUNT_EMAIL_VERIFICATION = 'optional'
-ACCOUNT_EMAIL_VERIFICATION_BY_CODE_ENABLED = False
+# Verificación de correo por código: en producción es obligatoria; en local se activa con VERIFICAR_CORREO_POR_CODIGO=1.
+_VERIFICAR_CORREO_POR_CODIGO = env('VERIFICAR_CORREO_POR_CODIGO', '0') == '1'
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory' if _VERIFICAR_CORREO_POR_CODIGO else 'optional'
+ACCOUNT_EMAIL_VERIFICATION_BY_CODE_ENABLED = _VERIFICAR_CORREO_POR_CODIGO
 ACCOUNT_EMAIL_VERIFICATION_BY_CODE_TIMEOUT = 15 * 60
 ACCOUNT_EMAIL_VERIFICATION_BY_CODE_MAX_ATTEMPTS = 5
 ACCOUNT_PASSWORD_RESET_BY_CODE_ENABLED = True       # recuperar contraseña con código, no con enlaces largos
@@ -175,6 +179,7 @@ SOCIALACCOUNT_PROVIDERS = {
 # Verificación en dos pasos (TOTP, compatible con Google Authenticator, Microsoft Authenticator, Authy...)
 MFA_ADAPTER = 'apps.cuentas.mfa_adapter.MFAAdapter'
 MFA_CLAVES_CIFRADO = [k for k in [env('MFA_CLAVE_CIFRADO', ''), env('MFA_CLAVE_CIFRADO_ANTERIOR', '')] if k]
+DB_CLAVES_CIFRADO = [k for k in [env('DB_CLAVE_CIFRADO', ''), env('DB_CLAVE_CIFRADO_ANTERIOR', '')] if k]
 MFA_SUPPORTED_TYPES = ['totp', 'recovery_codes']
 MFA_TOTP_ISSUER = 'EcoParce'
 MFA_TOTP_TOLERANCE = 1
@@ -205,6 +210,10 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = 'Lax'
+DATA_UPLOAD_MAX_MEMORY_SIZE = 2_621_440     # 2.5 MB máximo por petición (anti-DoS)
+FILE_UPLOAD_MAX_MEMORY_SIZE = 2_621_440
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 500
 X_FRAME_OPTIONS = 'DENY'
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block titulo %}Modo sin conexión{% endblock %}
+{% block contenido %}
+<section class="card" style="max-width:760px;margin:24px auto">
+  <h1>Estás sin conexión a Internet</h1>
+  <p class="mut">No te preocupes: EcoParce guarda esta guía rápida de la <strong>Resolución 2184 de 2019</strong> para que puedas separar correctamente incluso sin señal.</p>
+
+  <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:18px">
+    <article class="card" style="border-top:5px solid #94A3B8">
+      <h2 style="margin-top:0">Bolsa Blanca</h2>
+      <p class="small"><strong>Aprovechables limpios y secos:</strong> plástico (PET, HDPE), vidrio, papel, cartón, latas de metal y envases Tetra Pak enjuagados.</p>
+    </article>
+    <article class="card" style="border-top:5px solid #1E293B">
+      <h2 style="margin-top:0">Bolsa Negra</h2>
+      <p class="small"><strong>No aprovechables:</strong> papel higiénico, servilletas sucias, cartón con grasa o comida, empaques metalizados e icopor sucio.</p>
+    </article>
+    <article class="card" style="border-top:5px solid #15803D">
+      <h2 style="margin-top:0">Bolsa Verde</h2>
+      <p class="small"><strong>Orgánicos aprovechables:</strong> cáscaras de frutas y verduras, restos de comida cruda y residuos de poda o jardinería.</p>
+    </article>
+    <article class="card" style="border-top:5px solid #D97706">
+      <h2 style="margin-top:0">Puntos Posconsumo</h2>
+      <p class="small"><strong>Residuos especiales:</strong> pilas, bombillos, medicamentos vencidos, aceite de cocina usado y aparatos eléctricos (nunca van a la bolsa ordinaria).</p>
+    </article>
+  </div>
+
+  <p style="margin-top:18px"><a class="btn p" href="{% url 'core:inicio' %}">Reintentar conexión</a></p>
+</section>
+{% endblock %}

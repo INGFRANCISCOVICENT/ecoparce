@@ -37,6 +37,8 @@ def ingresar(request):
 def _destino_seguro(request, defecto='/'):
     destino = request.POST.get('next') or request.GET.get('next') or defecto
     if url_has_allowed_host_and_scheme(destino, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+        if destino.startswith('/panel/') and not getattr(request.user, 'es_personal', False):
+            return reverse('cuentas:mi_cuenta')
         return destino
     return defecto
 

@@ -47,6 +47,7 @@ class RegistroConCorreoTests(TestCase):
         from django.core.cache import cache
         cache.clear()
 
+    @override_settings(ACCOUNT_EMAIL_VERIFICATION='none')
     def test_registro_visitante_directo_y_nombre_desde_correo(self):
         r = self.client.post('/accounts/signup/', self.datos)
         u = Usuario.objects.get(correo='laura@ejemplo.co')
@@ -60,6 +61,13 @@ class RegistroConCorreoTests(TestCase):
         self.client.post('/accounts/signup/', sin_nombre)
         u2 = Usuario.objects.get(correo='carlos.perez@ejemplo.co')
         self.assertEqual(u2.nombre, 'Carlos Perez')
+
+    @override_settings(ACCOUNT_EMAIL_VERIFICATION='none')
+    def test_registro_visitante_con_next_panel_redirige_a_mi_cuenta_y_no_da_403(self):
+        datos = {**self.datos, 'email': 'visitante.panel@ejemplo.co', 'next': '/panel/usuarios/'}
+        r = self.client.post('/accounts/signup/?next=/panel/usuarios/', datos)
+        self.assertEqual(r.status_code, 302)
+        self.assertEqual(r['Location'], '/cuenta/', 'un visitante jamás debe ser enviado a /panel/ tras registrarse')
 
     def test_registro_sin_autorizacion_rechazado(self):
         datos = {**self.datos, 'acepta_datos': ''}

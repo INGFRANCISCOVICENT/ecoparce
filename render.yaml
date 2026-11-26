@@ -23,6 +23,24 @@ services:
         sync: false
       - key: GOOGLE_CLIENT_SECRET
         sync: false
+      - key: MFA_CLAVE_CIFRADO
+        sync: false
+      - key: DB_CLAVE_CIFRADO
+        sync: false
+      - key: SMTP_HOST
+        value: "smtp.gmail.com"
+      - key: SMTP_PORT
+        value: "465"
+      - key: SMTP_SSL
+        value: "1"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: CORREO_REMITENTE
+        sync: false
+      - key: VERIFICAR_CORREO_POR_CODIGO
+        value: "1"
 
 databases:
   - name: ecoparce-db

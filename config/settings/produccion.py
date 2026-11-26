@@ -41,6 +41,10 @@ for _var, _ayuda in [('GOOGLE_CLIENT_ID', 'Google Auth Platform → Clientes'), 
     if not env(_var):
         raise ImproperlyConfigured(f'Falta la variable de entorno {_var} ({_ayuda}).')
 
+# En producción (donde SMTP es obligatorio), exigir verificación de correo por código de 6 caracteres.
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_VERIFICATION_BY_CODE_ENABLED = True
+
 LOGGING['loggers']['ecoparce.seguridad'] = {'handlers': ['consola'], 'level': 'INFO', 'propagate': False}
 
 # La precarga HSTS en los navegadores es irreversible; se activa solo cuando el dominio esté estable.
