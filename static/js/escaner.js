@@ -266,7 +266,33 @@
       .catch(function () { aviso('error', 'Error de conexión al analizar la foto. Intenta de nuevo.'); });
   }
 
-  function detectarCodigoEnImagen(blob, alTerminar) {
+  function comprimirImagen(archivo, alTerminar) {
+    // Comprime fotos pesadas de cámaras móviles (4-12 MB) a <= 960 px (~120 KB JPEG) antes de subir.
+    if (!archivo || archivo.size <= 350 * 1024) { alTerminar(archivo); return; }
+    var urlTmp = URL.createObjectURL(archivo);
+    var img = new Image();
+    img.onload = function () {
+      try {
+        var maxDim = 960;
+        var escale = Math.min(1, maxDim / Math.max(img.naturalWidth || 1, img.naturalHeight || 1));
+        var c = document.createElement('canvas');
+        c.width = Math.max(1, Math.round((img.naturalWidth || 1) * escale));
+        c.height = Math.max(1, Math.round((img.naturalHeight || 1) * escale));
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        c.toBlob(function (blob) {
+          URL.revokeObjectURL(urlTmp);
+          alTerminar(blob || archivo);
+        }, 'image/jpeg', 0.82);
+      } catch (e) {
+        URL.revokeObjectURL(urlTmp);
+        alTerminar(archivo);
+      }
+    };
+    img.onerror = function () { URL.revokeObjectURL(urlTmp); alTerminar(archivo); };
+    img.src = urlTmp;
+  }
+
+  function detectarCodigoEnImagen(blob, imgUrl, alTerminar) {
     if ('BarcodeDetector' in window && window.createImageBitmap) {
       var det = new window.BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'qr_code', 'code_128'] });
       window.createImageBitmap(blob).then(function (bmp) {
@@ -277,18 +303,30 @@
       }).catch(function () { alTerminar(''); });
       return;
     }
+    // Respaldo para iOS Safari y Firefox: decodificar QR o código de barras desde la foto con ZXing
+    if (window.ZXing && imgUrl) {
+      try {
+        var z = new ZXing.BrowserMultiFormatReader();
+        z.decodeFromImageUrl(imgUrl).then(function (res) {
+          alTerminar(res && res.getText ? res.getText() : '');
+        }).catch(function () { alTerminar(''); });
+        return;
+      } catch (e) { /* continuar */ }
+    }
     alTerminar('');
   }
 
   function procesarFotoCapturada(blob) {
     aviso('info', 'Escaneando foto en busca de código o producto…');
-    detectarCodigoEnImagen(blob, function (codigoDetectado) {
+    detectarCodigoEnImagen(blob, ultimaFotoUrl, function (codigoDetectado) {
       if (codigoDetectado) {
         ultimo = '';
         leido(codigoDetectado);
         return;
       }
-      enviarFoto(blob, '');
+      comprimirImagen(blob, function (blobListo) {
+        enviarFoto(blobListo, '');
+      });
     });
   }
 
