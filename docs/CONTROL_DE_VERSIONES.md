@@ -5,7 +5,7 @@
 | **Proyecto** | EcoParce · Sistema Web Educativo de Reciclaje y Manejo de Residuos |
 | **Institución / Curso** | Politécnico Internacional · Calidad de Software (Docente: Camilo Ramírez) |
 | **Equipo responsable** | Francisco Jesús Navarro Vicent · Danixa Alexandra Herrera Nimisaca · Darien García Morales |
-| **Versión vigente** | **2.9.1** (`VERSION` = `2.9.1`) |
+| **Versión vigente** | **2.9.5** (`VERSION` = `2.9.5`) |
 | **Fecha de actualización** | 2026-11-26 |
 | **Estándar aplicado** | SemVer 2.0.0 · Keep a Changelog · CMMI Nivel 2 (Área de Proceso: Gestión de Configuración — CM) · ISO/IEC 25010 |
 
@@ -67,7 +67,8 @@ Cada lanzamiento sigue el formato **`MAYOR.MENOR.PARCHE`** (ej. `2.9.0`):
 | **2.7.0** | 2026-11-22 | Menor | Autocompletado instantáneo `/buscar/autocompletar/`, soporte progresivo de instalación PWA y sanitización contra CSV Formula Injection. | Protección OWASP CSV Injection en exportación de estadísticas. | Liberada |
 | **2.8.0** | 2026-11-23 | Menor | Generador interactivo de Carteles y Etiquetas HD para Canecas en Canvas HTML5 (`/guias/`). | 100 % local en navegador, compatible con CSP estricta. | Liberada |
 | **2.9.0** | 2026-11-26 | Menor | **API Gateway (`GET`/`POST`, WAF, API Keys SHA-256, bitácora inmutable)**, **OAuth 2.0 JWT endurecido (RFC 6749/7519/7009/7662/8414/8725/9700)** con rotación y detección de reutilización, **cifrado de cuentas MultiFernet + `correo_hash` + E2E AES-256-GCM**, **32 políticas RLS granulares sin reglas abiertas**, tablero `/panel/calidad/`, **OpenAPI 3.0.3**, **PWA E2E** (`/sw.js`, `/offline/`, iconos `192×192` y `512×512`) y fondo animado **Aurora Boreal verde**. | `api/0001_initial`, `cuentas/0006`, `docs/rls_postgresql.sql`. **120/120 pruebas OK**, `check --deploy` 0 advertencias. | Liberada |
-| **2.9.1** | 2026-11-26 | Parche (Vigente) | **Corrección del escáner QR y códigos de barras (`/escanear/`)**: soporte multi-dominio para QR de EcoParce (`/q/XXXXXXXX`), extracción automática de GTIN en QR GS1 Digital Link, consulta automática al catálogo para QR de texto, tarjeta informativa con enlace seguro para QR externos y detención limpia de cámara. | Sin cambio de esquema. Versionado `?v=` de `escaner.js` y `collectstatic` actualizado. | **Activa** |
+| **2.9.1** | 2026-11-26 | Parche | **Corrección del escáner QR y códigos de barras (`/escanear/`)**: soporte multi-dominio para QR de EcoParce (`/q/XXXXXXXX`), extracción automática de GTIN en QR GS1 Digital Link, consulta automática al catálogo para QR de texto, tarjeta informativa con enlace seguro para QR externos y detención limpia de cámara. | Sin cambio de esquema. Versionado `?v=` de `escaner.js` y `collectstatic` actualizado. | Liberada |
+| **2.9.5** | 2026-11-26 | Parche (Vigente) | **Escaneo de productos por foto (`/escanear/foto/`)** sin depender de códigos en BD (análisis visual local con Pillow en memoria + soporte opcional **Gemini Vision**), **corrección de contraste** en `/privacidad/`, `/terminos/`, `/licencias/` y banner de cookies (contraste normal y alto contraste WCAG AAA), corrección de redirección de registro para visitantes y estabilización de despliegue en Render (`build.sh` y `requirements-render.txt`). | Sin cambio de esquema. CSP ampliada con `blob:` para vista previa local, **122 pruebas automatizadas OK**. | **Activa** |
 
 ---
 
@@ -85,11 +86,11 @@ Cada lanzamiento sigue el formato **`MAYOR.MENOR.PARCHE`** (ej. `2.9.0`):
 
 ---
 
-## 5. Verificación de Calidad de la Línea Base Vigente (`v2.9.0`)
+## 5. Verificación de Calidad de la Línea Base Vigente (`v2.9.5`)
 
 | Control de calidad | Herramienta / Comando | Resultado |
 |---|---|---|
-| Pruebas unitarias, de integración y seguridad E2E | `python manage.py test` | **120 / 120 OK** (`0` fallos, `0` errores) |
+| Pruebas unitarias, de integración y seguridad E2E | `python manage.py test` | **122 / 122 OK** (`0` fallos, `0` errores) |
 | Integridad de migraciones | `python manage.py makemigrations --check --dry-run` | **0 migraciones pendientes** |
 | Auditoría de despliegue Django | `python manage.py check --deploy` | **0 errores / 0 advertencias** |
 | Diagnóstico integral y APIs remotas | `python manage.py verificar_sistema --probar-remoto` | **5/5 cuentas cifradas · Open Food Facts 200 OK · SDA Bogotá 200 OK** |
@@ -102,7 +103,7 @@ Cada lanzamiento sigue el formato **`MAYOR.MENOR.PARCHE`** (ej. `2.9.0`):
 
 | Rol | Responsable | Versión revisada | Estado |
 |---|---|---|---|
-| Líder de Desarrollo y Seguridad | Francisco Jesús Navarro Vicent | `2.9.0` | Aprobado |
-| Gestión de Contenidos y Calidad | Danixa Alexandra Herrera Nimisaca | `2.9.0` | Aprobado |
-| Arquitectura y Pruebas | Darien García Morales | `2.9.0` | Aprobado |
-| Evaluación Académica (Calidad de Software) | Prof. Camilo Ramírez | `2.9.0` | En revisión |
+| Líder de Desarrollo y Seguridad | Francisco Jesús Navarro Vicent | `2.9.5` | Aprobado |
+| Gestión de Contenidos y Calidad | Danixa Alexandra Herrera Nimisaca | `2.9.5` | Aprobado |
+| Arquitectura y Pruebas | Darien García Morales | `2.9.5` | Aprobado |
+| Evaluación Académica (Calidad de Software) | Prof. Camilo Ramírez | `2.9.5` | En revisión |

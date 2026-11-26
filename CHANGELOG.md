@@ -2,9 +2,12 @@
 
 Este proyecto sigue el [Versionado Semántico (SemVer 2.0.0)](https://semver.org/lang/es/) y control de versiones en Git.
 
-## [2.10.0] - 2026-11-26
-### Innovación
+## [2.9.5] - 2026-11-26
+### Innovación y Correcciones
 - **Escaneo de productos por foto (`/escanear/foto/`)**: ahora cualquier persona puede tomar una foto directa del producto o residuo (sin necesidad de que el código exista en una base de datos) y recibir al instante la bolsa exacta (Resolución 2184 de 2019), pasos de preparación y enlace a puntos posconsumo. Funciona en memoria con privacidad total usando análisis visual local (Pillow) y soporte opcional de **Gemini Vision** si se define `GEMINI_API_KEY`.
+- **Contraste legible en Privacidad, Términos, Licencias y Cookies**: corregida la regla CSS `.card.prose` y `.cookies-banner` que pintaba texto claro sobre tarjeta blanca en contraste normal y alto contraste.
+- **Registro abierto para visitantes**: corregida la redirección de `django-allauth` cuando existía `?next=/panel/` para que cualquier visitante entre siempre a `/cuenta/`.
+- **Despliegue en Render estabilizado**: `requirements-render.txt` y `build.sh` ajustados para construcción limpia y aplicación segura de cifrado y RLS en PostgreSQL.
 
 ## [2.9.1] - 2026-11-26
 ### Corregido
