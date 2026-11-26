@@ -114,6 +114,23 @@ class EscanerTests(TestCase):
         self.assertEqual(d['fuente'], 'UPCitemdb Global')
         self.assertEqual(d['partes'][0]['codigo'], 'NEGRA')
 
+    def test_asistente_eco_conversacional_y_reglas_expertas(self):
+        # Saludo profesional
+        r_hola = self.client.get('/asistente/consultar/?q=hola')
+        self.assertEqual(r_hola.status_code, 200)
+        self.assertTrue(r_hola.json()['encontrado'])
+
+        # Caja de pizza con grasa -> Bolsa Negra
+        r_pizza = self.client.get('/asistente/consultar/?q=donde boto una caja de pizza con grasa')
+        self.assertEqual(r_pizza.status_code, 200)
+        self.assertEqual(r_pizza.json()['codigo'], 'NEGRA')
+
+        # Computador -> Posconsumo RAEE
+        r_pc = self.client.get('/asistente/consultar/?q=donde boto un computador viejo')
+        self.assertEqual(r_pc.status_code, 200)
+        self.assertEqual(r_pc.json()['codigo'], 'POSCONSUMO')
+        self.assertTrue(r_pc.json().get('puntos_url'))
+
     def test_google_sin_configurar_no_manda_a_google(self):
         from django.test import override_settings
         with override_settings(SOCIALACCOUNT_PROVIDERS={'google': {'APPS': [{'client_id': '', 'secret': '', 'key': ''}]}}):

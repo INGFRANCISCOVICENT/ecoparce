@@ -176,8 +176,10 @@ def autocompletar(request):
 
 
 def asistente_consultar(request):
-    """API JSON del Asistente Experto EcoBot: consulta la base real de residuos y guías con rate limit."""
+    """API JSON del Asistente Experto EcoBot: intenciones conversacionales + catálogo oficial con rate limit."""
     from django.http import JsonResponse
+
+    from .asistente import responder_consulta
 
     if not limitar(request, 'asistente', 45, 60):
         resp = JsonResponse({'error': 'Demasiadas consultas seguidas. Espera unos segundos e intenta de nuevo.'}, status=429)
@@ -190,51 +192,7 @@ def asistente_consultar(request):
         resp['Cache-Control'] = 'no-store'
         return resp
 
-    qn = normalizar(q)
-    # Respuestas rápidas para preguntas normativas generales
-    if any(p in qn for p in ('2184', 'resolucion', 'codigo de colores', 'bolsa blanca', 'bolsa negra', 'bolsa verde')):
-        resp = JsonResponse({
-            'encontrado': True,
-            'residuo': 'Código de colores en Colombia (Res. 2184 de 2019)',
-            'contenedor': 'Blanca · Negra · Verde · Posconsumo',
-            'codigo': 'VERDE',
-            'pasos': [
-                'Bolsa Blanca: aprovechables limpios y secos (plástico, vidrio, cartón, papel, metales).',
-                'Bolsa Negra: no aprovechables (servilletas, papel higiénico, cartón con grasa).',
-                'Bolsa Verde: orgánicos aprovechables (cáscaras, restos de comida cruda, cuncho de café).',
-                'Posconsumo: pilas, aceite usado, bombillos, medicamentos vencidos y RAEE.',
-            ],
-            'guia_url': reverse('contenidos:guias'),
-            'guia_titulo': 'Ver todas las guías oficiales',
-            'puntos_url': reverse('contenidos:puntos'),
-            'relacionados': ['Botella PET', 'Aceite usado', 'Pilas'],
-        })
-        resp['Cache-Control'] = 'no-store'
-        return resp
-
-    resultados = buscar_residuos(q)
-    if resultados:
-        principal = resultados[0]
-        guia_pub = principal.guia if principal.guia and principal.guia.publicado else None
-        datos = {
-            'encontrado': True,
-            'residuo': principal.nombre,
-            'contenedor': principal.contenedor.nombre,
-            'codigo': principal.contenedor.codigo,
-            'es_especial': principal.es_especial,
-            'pasos': principal.pasos[:4],
-            'guia_url': guia_pub.get_absolute_url() if guia_pub else reverse('contenidos:guias'),
-            'guia_titulo': f'Ver guía: {guia_pub.titulo}' if guia_pub else 'Ver guías de separación',
-            'puntos_url': f"{reverse('contenidos:puntos')}?residuo={principal.pk}" if principal.es_especial else '',
-            'relacionados': [r.nombre for r in resultados[1:4]],
-        }
-    else:
-        datos = {
-            'encontrado': False,
-            'mensaje': f'No encontré «{q}» exacto en nuestro catálogo todavía. Mientras lo revisamos, no lo mezcles con reciclables limpios.',
-            'buscar_url': f"{reverse('buscador:buscar')}?q={q}",
-            'sugerir_url': reverse('buscador:sugerir'),
-        }
+    datos = responder_consulta(q, buscar_residuos)
     resp = JsonResponse(datos)
     resp['Cache-Control'] = 'no-store'
     return resp
