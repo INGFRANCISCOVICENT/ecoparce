@@ -84,13 +84,13 @@ self.addEventListener('fetch', (event) => {{
 
   if (url.pathname.startsWith('/static/')) {{
     event.respondWith(
-      caches.match(req).then((cached) => cached || fetch(req).then((resp) => {{
+      fetch(req).then((resp) => {{
         if (resp.ok) {{
           const copy = resp.clone();
           caches.open(CACHE).then((c) => c.put(req, copy));
         }}
         return resp;
-      }}))
+      }}).catch(() => caches.match(req))
     );
     return;
   }}

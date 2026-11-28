@@ -3,10 +3,10 @@
 {% block contenido %}
 <h1>Identifica y separa por foto</h1>
 <p class="mut">Toma una <strong>foto del producto o residuo</strong> para saber al instante qué es y en qué bolsa va según la <strong>Resolución 2184 de 2019</strong>.</p>
-<section class="card center" style="padding:22px 18px;margin-top:12px">
+<section class="card center" style="padding:22px 18px;margin-top:12px;color:#102318">
   <img src="{% static 'img/logo-96.png' %}" alt="" width="56" height="56" style="border-radius:50%;margin-bottom:8px">
-  <h2 style="margin:0 0 6px;font-size:19px">Fotografía cualquier objeto</h2>
-  <p class="small mut" style="margin:0 0 14px">Botellas, cajas, empaques, pilas, residuos orgánicos o aparatos electrónicos: nuestra visión IA identifica el objeto y te dice dónde va.</p>
+  <h2 style="margin:0 0 6px;font-size:19px;color:#102318">Fotografía cualquier objeto</h2>
+  <p class="small" style="margin:0 0 14px;color:#334155">Botellas, cajas, empaques, pilas, residuos orgánicos o aparatos electrónicos: nuestra visión IA identifica el objeto y te dice dónde va.</p>
   <form id="form-foto" method="post" enctype="multipart/form-data">{% csrf_token %}
     <input type="file" id="input-foto" name="foto" accept="image/*" capture="environment" hidden>
     <input type="file" id="input-galeria" accept="image/*" hidden>
@@ -24,7 +24,7 @@
       <button class="btn o" type="button" id="btn-galeria" style="flex:1;min-width:180px">Elegir foto de galería</button>
     </div>
   </form>
-  <p class="xs mut" style="margin:10px 0 0">Privacidad garantizada: tu foto se analiza en memoria y nunca se guarda en el servidor.</p>
+  <p class="xs" style="margin:10px 0 0;color:#475569">Privacidad garantizada: tu foto se analiza en memoria y nunca se guarda en el servidor.</p>
 </section>
 
 <div id="resultado" aria-live="polite"></div>
