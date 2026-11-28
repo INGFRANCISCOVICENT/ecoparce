@@ -64,6 +64,6 @@
   </div>
 </section>
 
-<div class="speech" style="margin-top:16px"><img src="{% static 'img/logo-96.png' %}" alt="Escarlata, mascota de EcoParce"><div>¿El producto no tiene código? <a href="{% url 'buscador:buscar' %}">Búscalo por su nombre</a>: «botella», «icopor», «pilas»…</div></div>
+<div class="speech" style="margin-top:16px"><img src="{% static 'img/logo-96.png' %}" alt="Escarlata, mascota de EcoParce"><div>¿No tienes foto del producto? No te preocupes, <a href="{% url 'buscador:buscar' %}">búscalo por su nombre</a>: «botella», «icopor», «pilas»…</div></div>
 <script src="{% static 'js/escaner.js' %}?v={{ APP_VERSION }}" defer data-api="{% url 'buscador:producto' '00000000' %}" data-foto="{% url 'buscador:analizar_foto' %}" data-buscar="{% url 'buscador:buscar' %}" data-asistente="{% url 'buscador:asistente_consultar' %}" id="escaner-js"></script>
 {% endblock %}
