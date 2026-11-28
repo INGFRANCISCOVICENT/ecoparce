@@ -1,31 +1,22 @@
 {% extends 'base.html' %}{% load static eco %}
-{% block titulo %}Escanear producto y etiquetas{% endblock %}
+{% block titulo %}Identificar producto por foto{% endblock %}
 {% block contenido %}
-<h1>Escanea y separa</h1>
-<p class="mut">Toma una <strong>foto del producto</strong> o escanea su <strong>código de barras</strong> para saber al instante en qué bolsa va (Resolución 2184 de 2019).</p>
-<div class="escaner" id="escaner">
-  <video id="video" playsinline muted aria-label="Vista de la cámara"></video>
-  <div class="marco" aria-hidden="true"></div>
-  <div class="escaner-vacio" id="escaner-vacio">{% icono 'search' 44 '#1E7A46' 1.6 %}<span>Toma una foto del producto o escanea su código de barras</span></div>
-</div>
-<form id="form-foto" method="post" enctype="multipart/form-data" style="margin-top:12px">{% csrf_token %}
-  <input type="file" id="input-foto" name="foto" accept="image/*" capture="environment" hidden>
-  <div class="row" style="gap:8px;flex-wrap:wrap">
-    <button class="btn p" type="button" id="btn-foto" style="flex:1;min-width:170px">Tomar foto del producto</button>
-    <button class="btn o" type="button" id="btn-camara" style="flex:1;min-width:170px">Escanear código de barras</button>
-  </div>
-  <div class="row" style="gap:8px;flex-wrap:wrap;margin-top:10px">
-    <button class="btn p" type="button" id="btn-capturar" style="flex:1" hidden>Capturar foto ahora</button>
-    <button class="btn o" type="button" id="btn-detener" style="flex:1" hidden>Detener cámara</button>
-  </div>
-</form>
-<p class="xs mut center" style="margin-top:6px">Privacidad garantizada: tu foto se analiza en memoria y nunca se guarda en el servidor.</p>
-
-<form id="form-codigo" class="search" style="margin-top:16px" autocomplete="off">
-  {% icono 'search' 22 '#1E7A46' %}<label class="sr" for="codigo">Número del código de barras o nombre del producto</label>
-  <input id="codigo" name="codigo" maxlength="120" placeholder="O escribe el código de barras o nombre del residuo" required>
-  <button type="submit">Ver</button>
-</form>
+<h1>Identifica y separa por foto</h1>
+<p class="mut">Toma una <strong>foto del producto o residuo</strong> para saber al instante qué es y en qué bolsa va según la <strong>Resolución 2184 de 2019</strong>.</p>
+<section class="card center" style="padding:22px 18px;margin-top:12px">
+  <img src="{% static 'img/logo-96.png' %}" alt="" width="56" height="56" style="border-radius:50%;margin-bottom:8px">
+  <h2 style="margin:0 0 6px;font-size:19px">Fotografía cualquier objeto</h2>
+  <p class="small mut" style="margin:0 0 14px">Botellas, cajas, empaques, pilas, residuos orgánicos o aparatos electrónicos: nuestra visión IA identifica el objeto y te dice dónde va.</p>
+  <form id="form-foto" method="post" enctype="multipart/form-data">{% csrf_token %}
+    <input type="file" id="input-foto" name="foto" accept="image/*" capture="environment" hidden>
+    <input type="file" id="input-galeria" accept="image/*" hidden>
+    <div class="row" style="gap:10px;flex-wrap:wrap;justify-content:center">
+      <button class="btn p" type="button" id="btn-foto" style="flex:1;min-width:180px">Tomar foto del producto</button>
+      <button class="btn o" type="button" id="btn-galeria" style="flex:1;min-width:180px">Elegir foto de galería</button>
+    </div>
+  </form>
+  <p class="xs mut" style="margin:10px 0 0">Privacidad garantizada: tu foto se analiza en memoria y nunca se guarda en el servidor.</p>
+</section>
 
 <div id="resultado" aria-live="polite"></div>
 
@@ -65,6 +56,5 @@
 </section>
 
 <div class="speech" style="margin-top:16px"><img src="{% static 'img/logo-96.png' %}" alt="Escarlata, mascota de EcoParce"><div>¿El producto no tiene código? <a href="{% url 'buscador:buscar' %}">Búscalo por su nombre</a>: «botella», «icopor», «pilas»…</div></div>
-<script src="{% static 'vendor/zxing/zxing.min.js' %}" defer></script>
 <script src="{% static 'js/escaner.js' %}?v={{ APP_VERSION }}" defer data-api="{% url 'buscador:producto' '00000000' %}" data-foto="{% url 'buscador:analizar_foto' %}" data-buscar="{% url 'buscador:buscar' %}" data-asistente="{% url 'buscador:asistente_consultar' %}" id="escaner-js"></script>
 {% endblock %}

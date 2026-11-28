@@ -11,8 +11,8 @@
   var caja = document.getElementById('escaner');
   var video = document.getElementById('video'), vacio = document.getElementById('escaner-vacio');
   var btn = document.getElementById('btn-camara'), detener = document.getElementById('btn-detener');
-  var btnFoto = document.getElementById('btn-foto'), btnCapturar = document.getElementById('btn-capturar');
-  var inputFoto = document.getElementById('input-foto'), formFoto = document.getElementById('form-foto');
+  var btnFoto = document.getElementById('btn-foto'), btnGaleria = document.getElementById('btn-galeria'), btnCapturar = document.getElementById('btn-capturar');
+  var inputFoto = document.getElementById('input-foto'), inputGaleria = document.getElementById('input-galeria'), formFoto = document.getElementById('form-foto');
   var resultado = document.getElementById('resultado');
   var flujo = null, lector = null, activo = false, ultimo = '', ultimaFotoUrl = '';
 
@@ -317,16 +317,9 @@
   }
 
   function procesarFotoCapturada(blob) {
-    aviso('info', 'Escaneando foto en busca de código o producto…');
-    detectarCodigoEnImagen(blob, ultimaFotoUrl, function (codigoDetectado) {
-      if (codigoDetectado) {
-        ultimo = '';
-        leido(codigoDetectado);
-        return;
-      }
-      comprimirImagen(blob, function (blobListo) {
-        enviarFoto(blobListo, '');
-      });
+    aviso('info', 'Analizando tu foto con visión IA…');
+    comprimirImagen(blob, function (blobListo) {
+      enviarFoto(blobListo, '');
     });
   }
 
@@ -375,35 +368,47 @@
       : 'No pudimos abrir la cámara. Puedes escribir el número del código.');
   }
 
-  btn.addEventListener('click', function () {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      aviso('error', 'Este navegador no permite usar la cámara aquí. Escribe el número del código.'); return;
-    }
-    ultimo = ''; resultado.innerHTML = ''; vacio.hidden = true; btn.hidden = true; detener.hidden = false;
-    if (btnCapturar) { btnCapturar.hidden = false; }
-    if ('BarcodeDetector' in window) {
-      window.BarcodeDetector.getSupportedFormats().then(function (f) { return f.indexOf('ean_13') >= 0 ? conDetector() : conZxing(); })
-        .catch(conZxing);
-    } else { conZxing(); }
-  });
-  detener.addEventListener('click', parar);
-  if (btnCapturar) { btnCapturar.addEventListener('click', capturarDesdeVideo); }
-  if (btnFoto && inputFoto) {
-    btnFoto.addEventListener('click', function () { inputFoto.click(); });
-    inputFoto.addEventListener('change', function () {
-      var archivo = inputFoto.files && inputFoto.files[0];
-      if (!archivo) { return; }
-      if (ultimaFotoUrl && ultimaFotoUrl.indexOf('blob:') === 0) { URL.revokeObjectURL(ultimaFotoUrl); }
-      ultimaFotoUrl = URL.createObjectURL(archivo);
-      procesarFotoCapturada(archivo);
-      inputFoto.value = '';
+  if (btn) {
+    btn.addEventListener('click', function () {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        aviso('error', 'Este navegador no permite usar la cámara aquí.'); return;
+      }
+      ultimo = ''; resultado.innerHTML = ''; if (vacio) vacio.hidden = true; btn.hidden = true; if (detener) detener.hidden = false;
+      if (btnCapturar) { btnCapturar.hidden = false; }
+      if ('BarcodeDetector' in window) {
+        window.BarcodeDetector.getSupportedFormats().then(function (f) { return f.indexOf('ean_13') >= 0 ? conDetector() : conZxing(); })
+          .catch(conZxing);
+      } else { conZxing(); }
     });
   }
-  document.getElementById('form-codigo').addEventListener('submit', function (e) {
-    e.preventDefault();
-    ultimo = '';
-    leido(document.getElementById('codigo').value.trim());
-  });
+  if (detener) { detener.addEventListener('click', parar); }
+  if (btnCapturar) { btnCapturar.addEventListener('click', capturarDesdeVideo); }
+
+  function manejarArchivoFoto(inp) {
+    var archivo = inp.files && inp.files[0];
+    if (!archivo) { return; }
+    if (ultimaFotoUrl && ultimaFotoUrl.indexOf('blob:') === 0) { URL.revokeObjectURL(ultimaFotoUrl); }
+    ultimaFotoUrl = URL.createObjectURL(archivo);
+    procesarFotoCapturada(archivo);
+    inp.value = '';
+  }
+
+  if (btnFoto && inputFoto) {
+    btnFoto.addEventListener('click', function () { inputFoto.click(); });
+    inputFoto.addEventListener('change', function () { manejarArchivoFoto(inputFoto); });
+  }
+  if (btnGaleria && inputGaleria) {
+    btnGaleria.addEventListener('click', function () { inputGaleria.click(); });
+    inputGaleria.addEventListener('change', function () { manejarArchivoFoto(inputGaleria); });
+  }
+  var formCodigo = document.getElementById('form-codigo');
+  if (formCodigo) {
+    formCodigo.addEventListener('submit', function (e) {
+      e.preventDefault();
+      ultimo = '';
+      leido(document.getElementById('codigo').value.trim());
+    });
+  }
   window.addEventListener('pagehide', parar);
 
   // Decodificador interactivo de símbolos de reciclaje (base del envase)
