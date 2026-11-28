@@ -64,7 +64,7 @@
         {% endif %}
         {% else %}
         <h1 class="portada-titulo">Vuela limpio,<br><span class="portada-grad">separa bien.</span></h1>
-        <p class="portada-sub">Aprende en segundos en qué bolsa va cada residuo, escanea empaques y ubica puntos posconsumo en vivo.</p>
+        <p class="portada-sub">Aprende en segundos en qué bolsa va cada residuo, identifica objetos por foto y ubica puntos posconsumo en vivo.</p>
 
         <div class="portada-ctas">
           <a class="btn-cta-grad" href="{% url 'account_signup' %}">Crear cuenta gratis →</a>
@@ -126,7 +126,7 @@
 </form>
 
 <div class="grid g3" style="margin-top:14px">
-  <a class="btn p" href="{% url 'buscador:escanear' %}">{% icono 'qr' 20 '#fff' %}Escanear envase y etiquetas</a>
+  <a class="btn p" href="{% url 'buscador:escanear' %}">{% icono 'eye' 20 '#fff' %}Identificar por foto IA</a>
   <a class="btn o" href="{% url 'contenidos:puntos' %}">{% icono 'pin' 20 '#1E7A46' %}Puntos cercanos</a>
   <a class="btn o" href="{% url 'trivia:inicio' %}">{% icono 'game' 20 '#1E7A46' %}Trivia y medallas 3D</a>
 </div>
@@ -330,8 +330,8 @@
 <div class="grid g3">
   <div class="card paso-card">
     <span class="paso-num">1</span>
-    <strong>Busca o escanea</strong>
-    <p class="small mut" style="margin:4px 0 0">Escribe el nombre del residuo, escanea el código de barras o toca el símbolo en la base del envase.</p>
+    <strong>Busca o toma una foto</strong>
+    <p class="small mut" style="margin:4px 0 0">Escribe el nombre del residuo, tómale una foto con visión IA o toca el símbolo en la base del envase.</p>
   </div>
   <div class="card paso-card">
     <span class="paso-num">2</span>

@@ -34,7 +34,7 @@
     <a class="{% activo '/' %}" {% aria_actual '/' %} href="{% url 'core:inicio' %}">Inicio</a>
     <a class="{% activo '/guias/' '/manejo/' %}" {% aria_actual '/guias/' '/manejo/' %} href="{% url 'contenidos:guias' %}">Guías</a>
     <a class="{% activo '/buscar/' %}" {% aria_actual '/buscar/' %} href="{% url 'buscador:buscar' %}">Buscar</a>
-    <a class="{% activo '/escanear/' %}" {% aria_actual '/escanear/' %} href="{% url 'buscador:escanear' %}">Escanear</a>
+    <a class="{% activo '/escanear/' %}" {% aria_actual '/escanear/' %} href="{% url 'buscador:escanear' %}">Foto IA</a>
     <a class="{% activo '/puntos/' %}" {% aria_actual '/puntos/' %} href="{% url 'contenidos:puntos' %}">Puntos</a>
     <a class="{% activo '/trivia/' %}" {% aria_actual '/trivia/' %} href="{% url 'trivia:inicio' %}">Trivia</a>
     <a class="{% activo '/sugerencias/' %}" {% aria_actual '/sugerencias/' %} href="{% url 'buscador:sugerir' %}">Sugerencias</a>
@@ -115,7 +115,7 @@
 <nav class="tabbar" aria-label="Navegación principal">
   <a class="{% activo '/' %}" {% aria_actual '/' %} href="{% url 'core:inicio' %}">{% icono 'home' 24 %}<span>Inicio</span></a>
   <a class="{% activo '/guias/' '/manejo/' %}" {% aria_actual '/guias/' '/manejo/' %} href="{% url 'contenidos:guias' %}">{% icono 'book' 24 %}<span>Guías</span></a>
-  <a class="{% activo '/escanear/' %} tab-escanear" {% aria_actual '/escanear/' %} href="{% url 'buscador:escanear' %}">{% icono 'qr' 24 %}<span>Escanear</span></a>
+  <a class="{% activo '/escanear/' %} tab-escanear" {% aria_actual '/escanear/' %} href="{% url 'buscador:escanear' %}">{% icono 'eye' 24 %}<span>Foto IA</span></a>
   <a class="{% activo '/buscar/' '/puntos/' %}" {% aria_actual '/buscar/' '/puntos/' %} href="{% url 'buscador:buscar' %}">{% icono 'search' 24 %}<span>Buscar</span></a>
   <a class="{% activo '/trivia/' %}" {% aria_actual '/trivia/' %} href="{% url 'trivia:inicio' %}">{% icono 'game' 24 %}<span>Trivia</span></a>
 </nav>

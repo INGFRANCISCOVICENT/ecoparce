@@ -174,10 +174,10 @@ main:focus{outline:none}
 @media (min-width:1025px){.pie{padding:20px 20px 36px}}
 
 /* contraste WCAG AAA para textos directos sobre el fondo verde luminoso oscuro */
-main.wrap > h1,main.wrap > h2,main.wrap > .row h1,main.wrap > section.center > h1,main.wrap > div:not(.card) > h2{color:#F3FBF6}
-main.wrap > p,main.wrap > p.mut,main.wrap > .mut,main.wrap > .crumb,main.wrap > .src,main.wrap > section.center p,main.wrap > section.center p.mut,main.wrap > .row > span{color:#DCF3E5}
-main.wrap > .crumb a,main.wrap > p a,main.wrap > .src a,main.wrap > section.center a{color:#6EE7B7}
-main.wrap > .crumb a:hover,main.wrap > p a:hover,main.wrap > .src a:hover,main.wrap > section.center a:hover{color:#A7F3D0}
+main.wrap > h1,main.wrap > h2,main.wrap > .row h1,main.wrap > section.center:not(.card) > h1,main.wrap > div:not(.card) > h2{color:#F3FBF6}
+main.wrap > p,main.wrap > p.mut,main.wrap > .mut,main.wrap > .crumb,main.wrap > .src,main.wrap > section.center:not(.card) p,main.wrap > section.center:not(.card) p.mut,main.wrap > .row > span{color:#DCF3E5}
+main.wrap > .crumb a,main.wrap > p a,main.wrap > .src a,main.wrap > section.center:not(.card) a{color:#6EE7B7}
+main.wrap > .crumb a:hover,main.wrap > p a:hover,main.wrap > .src a:hover,main.wrap > section.center:not(.card) a:hover{color:#A7F3D0}
 main.wrap > .prose:not(.card) p{color:#E8F6EE}
 main.wrap > .card.prose,main.wrap > .card.prose h2,main.wrap > .card.prose h3,main.wrap > .card.prose p,main.wrap > .card.prose li,main.wrap > .card.prose td,main.wrap > .card.prose th{color:var(--ink)}
 main.wrap > .card.prose a{color:var(--gd);font-weight:700;text-decoration:underline}
