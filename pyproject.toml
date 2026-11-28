@@ -1,0 +1,13 @@
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.local"
+python_files = ["tests.py", "test_*.py", "tests_*.py"]
+addopts = "--strict-markers -ra"
+
+[tool.coverage.run]
+source = ["apps", "config"]
+omit = ["*/migrations/*", "*/tests*.py", "apps/core/pruebas.py"]
+
+[tool.bandit]
+targets = ["apps", "config"]
+exclude_dirs = ["migrations"]
+skips = ["B101"]
