@@ -12,6 +12,7 @@
   var video = document.getElementById('video'), vacio = document.getElementById('escaner-vacio');
   var btn = document.getElementById('btn-camara'), detener = document.getElementById('btn-detener');
   var btnFoto = document.getElementById('btn-foto'), btnGaleria = document.getElementById('btn-galeria'), btnCapturar = document.getElementById('btn-capturar');
+  var camaraBox = document.getElementById('camara-box'), accionesFoto = document.getElementById('acciones-foto');
   var inputFoto = document.getElementById('input-foto'), inputGaleria = document.getElementById('input-galeria'), formFoto = document.getElementById('form-foto');
   var resultado = document.getElementById('resultado');
   var flujo = null, lector = null, activo = false, ultimo = '', ultimaFotoUrl = '';
@@ -179,8 +180,11 @@
     if (caja) { caja.classList.remove('escaner--activo'); }
     if (lector) { try { lector.reset(); } catch (e) { /* ignorar */ } lector = null; }
     if (flujo) { flujo.getTracks().forEach(function (t) { t.stop(); }); flujo = null; }
-    video.srcObject = null; vacio.hidden = false; btn.hidden = false; detener.hidden = true;
-    if (btnCapturar) { btnCapturar.hidden = true; }
+    if (video) { video.srcObject = null; }
+    if (vacio) { vacio.hidden = false; }
+    if (btn) { btn.hidden = false; }
+    if (camaraBox) { camaraBox.hidden = true; }
+    if (accionesFoto) { accionesFoto.hidden = false; }
   }
 
   function obtenerCsrf() {
@@ -393,9 +397,32 @@
     inp.value = '';
   }
 
-  if (btnFoto && inputFoto) {
-    btnFoto.addEventListener('click', function () { inputFoto.click(); });
-    inputFoto.addEventListener('change', function () { manejarArchivoFoto(inputFoto); });
+  function abrirCamaraParaFoto() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !video || !camaraBox) {
+      if (inputFoto) { inputFoto.click(); }
+      return;
+    }
+    resultado.innerHTML = '';
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false })
+      .then(function (s) {
+        flujo = s;
+        video.srcObject = s;
+        video.play();
+        activo = true;
+        camaraBox.hidden = false;
+        if (accionesFoto) { accionesFoto.hidden = true; }
+      })
+      .catch(function () {
+        // Si el navegador bloquea getUserMedia, abre el selector nativo de cámara/galería
+        if (inputFoto) { inputFoto.click(); }
+      });
+  }
+
+  if (btnFoto) {
+    btnFoto.addEventListener('click', abrirCamaraParaFoto);
+    if (inputFoto) {
+      inputFoto.addEventListener('change', function () { manejarArchivoFoto(inputFoto); });
+    }
   }
   if (btnGaleria && inputGaleria) {
     btnGaleria.addEventListener('click', function () { inputGaleria.click(); });

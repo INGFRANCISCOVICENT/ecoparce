@@ -68,7 +68,8 @@ class EscanerTests(TestCase):
 
     def test_pagina_escanear(self):
         r = self.client.get('/escanear/')
-        self.assertContains(r, 'Tomar foto del producto')
+        self.assertContains(r, 'Tomar foto con cámara')
+        self.assertContains(r, 'Elegir foto de galería')
         self.assertContains(r, '/escanear/foto/')
 
     def test_analizar_foto_producto_local_y_seleccion_material(self):
